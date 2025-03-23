@@ -96,6 +96,7 @@ public sealed class GameManager : MonoBehaviour
                 CMcam.m_Lens.OrthographicSize = 9;
             }
             CMcam.Follow = BaitCam();
+
             CMcamBody.m_TrackedObjectOffset.y = 0;
             if(currentTime >= 3f)
             {
@@ -133,6 +134,10 @@ public sealed class GameManager : MonoBehaviour
     {
         Transform currenthook;
         currenthook = GameObject.FindGameObjectWithTag("Bait").GetComponent<Transform>();
+        if(currenthook == null)
+        {
+            return boatScript.transform;
+        }
         return currenthook;
     }
 
