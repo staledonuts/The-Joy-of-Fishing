@@ -5,9 +5,8 @@ Shader "JoyofFishing/Sprite-Lit"
         [PerRendererData] _MainTex("Diffuse", 2D) = "white" {}
         _MaskTex("Mask", 2D) = "white" {}
         _NormalMap("Normal Map", 2D) = "bump" {}
+        _Color("Tint", Color) = (1,1,1,1)
 
-        // Legacy properties. They're here so that materials using this shader can gracefully fallback to the legacy sprite shader.
-        [HideInInspector] _Color("Tint", Color) = (1,1,1,1)
         [HideInInspector] _RendererColor("RendererColor", Color) = (1,1,1,1)
         [HideInInspector] _Flip("Flip", Vector) = (1,1,1,1)
         [HideInInspector] _AlphaTex("External Alpha", 2D) = "white" {}
@@ -68,7 +67,7 @@ Shader "JoyofFishing/Sprite-Lit"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _Color;
-                half4 _RendererColor;
+                float4 _RendererColor;
             CBUFFER_END
 
             #if USE_SHAPE_LIGHT_TYPE_0
@@ -97,7 +96,7 @@ Shader "JoyofFishing/Sprite-Lit"
                 #if defined(DEBUG_DISPLAY)
                 o.positionWS = TransformObjectToWorld(v.positionOS);
                 #endif
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                o.uv = v.uv;
                 o.screenPos = ComputeScreenPos(o.positionCS);
 
                 o.color = v.color * _Color * _RendererColor;
@@ -108,13 +107,13 @@ Shader "JoyofFishing/Sprite-Lit"
 
             half4 CombinedShapeLightFragment(Varyings i) : SV_Target
             {
-                const half4 main = i.color * SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
-                const half4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, i.uv);
+                const float4 main = i.color * SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+                const float4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, i.uv);
                 SurfaceData2D surfaceData;
                 InputData2D inputData;
 
                 InitializeSurfaceData(main.rgb, main.a, mask, surfaceData);
-                half2 lightingUV = i.screenPos.xy / i.screenPos.w;
+                float2 lightingUV = i.screenPos.xy / i.screenPos.w;
                 InitializeInputData(i.uv, lightingUV, inputData);
 
                 return CombinedShapeLightShared(surfaceData, inputData);
@@ -182,8 +181,8 @@ Shader "JoyofFishing/Sprite-Lit"
 
             half4 NormalsRenderingFragment(Varyings i) : SV_Target
             {
-                const half4 mainTex = i.color * SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
-                const half3 normalTS = UnpackNormal(SAMPLE_TEXTURE2D(_NormalMap, sampler_NormalMap, i.uv));
+                const float4 mainTex = i.color * SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+                const float3 normalTS = UnpackNormal(SAMPLE_TEXTURE2D(_NormalMap, sampler_NormalMap, i.uv));
 
                 return NormalsRenderingShared(mainTex, normalTS, i.tangentWS.xyz, i.bitangentWS.xyz, i.normalWS.xyz);
             }
@@ -225,7 +224,7 @@ Shader "JoyofFishing/Sprite-Lit"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _Color;
-                half4 _RendererColor;
+                float4 _RendererColor;
             CBUFFER_END
 
             Varyings UnlitVertex(Attributes attributes)
