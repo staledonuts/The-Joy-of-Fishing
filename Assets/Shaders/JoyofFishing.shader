@@ -67,9 +67,6 @@ Shader "JoyofFishing/Sprite-Lit"
             SAMPLER(sampler_MaskTex);
 
             CBUFFER_START(UnityPerMaterial)
-                half4 _NormalMap_ST;
-                half4 _MainTex_ST;
-                half4 _MaskTex_ST;
                 float4 _Color;
                 half4 _RendererColor;
             CBUFFER_END
@@ -162,9 +159,6 @@ Shader "JoyofFishing/Sprite-Lit"
             SAMPLER(sampler_NormalMap);
 
             CBUFFER_START(UnityPerMaterial)
-                half4 _NormalMap_ST;
-                half4 _MainTex_ST;
-                half4 _MaskTex_ST;
                 float4 _Color;
                 half4 _RendererColor;
             CBUFFER_END
@@ -176,7 +170,7 @@ Shader "JoyofFishing/Sprite-Lit"
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
                 o.positionCS = TransformObjectToHClip(attributes.positionOS);
-                o.uv = TRANSFORM_TEX(attributes.uv, _NormalMap);
+                o.uv = attributes.uv;
                 o.color = attributes.color;
                 o.normalWS = -GetViewForwardDir();
                 o.tangentWS = TransformObjectToWorldDir(attributes.tangent.xyz);
@@ -230,9 +224,6 @@ Shader "JoyofFishing/Sprite-Lit"
             SAMPLER(sampler_MainTex);
 
             CBUFFER_START(UnityPerMaterial)
-                half4 _NormalMap_ST;
-                half4 _MainTex_ST;
-                half4 _MaskTex_ST;
                 float4 _Color;
                 half4 _RendererColor;
             CBUFFER_END
@@ -247,7 +238,7 @@ Shader "JoyofFishing/Sprite-Lit"
                 #if defined(DEBUG_DISPLAY)
                 o.positionWS = TransformObjectToWorld(v.positionOS);
                 #endif
-                o.uv = TRANSFORM_TEX(attributes.uv, _MainTex);
+                o.uv = attributes.uv;
                 o.color = attributes.color * _Color * _RendererColor;
                 return o;
             }
