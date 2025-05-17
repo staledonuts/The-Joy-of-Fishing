@@ -11,7 +11,7 @@ public class ScaleSound : MonoBehaviour
     void Awake()
     {
         inst = FMODUnity.RuntimeManager.CreateInstance("event:/SFX/bff_trigger");
-        musicPlayer = FindObjectOfType<MusicPlayer>();
+        musicPlayer = FindAnyObjectByType<MusicPlayer>();
     }
 
 

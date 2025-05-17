@@ -99,9 +99,9 @@ public class BoatScript : MonoBehaviour
 
         else
         {
-            bool playerhashorizontalspeed = Mathf.Abs(rig2d.velocity.x) > Mathf.Epsilon;
-            Vector2 playerVelocity = new Vector2(moveInput.x * BoatSpeedForce, rig2d.velocity.y);
-            rig2d.velocity = playerVelocity;
+            bool playerhashorizontalspeed = Mathf.Abs(rig2d.linearVelocity.x) > Mathf.Epsilon;
+            Vector2 playerVelocity = new Vector2(moveInput.x * BoatSpeedForce, rig2d.linearVelocity.y);
+            rig2d.linearVelocity = playerVelocity;
         }
     }
     public void PauseButton(InputAction.CallbackContext context)
@@ -203,25 +203,6 @@ public class BoatScript : MonoBehaviour
         DoneFishing?.Invoke();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

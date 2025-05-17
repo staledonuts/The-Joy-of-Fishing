@@ -28,7 +28,7 @@ public class MoneyEffect : MonoBehaviour
         //FMODUnity.RuntimeManager.AttachInstanceToGameObject(coinsInstnace, gameObject.transform);
         //coinsInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(gameObject));
         //fishGetInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(gameObject));
-        callBankAccountScript = FindObjectOfType<BankAccountScript>();
+        callBankAccountScript = FindAnyObjectByType<BankAccountScript>();
     }
 
     private void OnEnable()

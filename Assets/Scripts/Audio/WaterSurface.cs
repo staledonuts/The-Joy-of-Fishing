@@ -16,7 +16,7 @@ public class WaterSurface : MonoBehaviour
 
     private void Awake()
     {
-        boatEmitter = FindObjectOfType<BoatEmitter>();
+        boatEmitter = FindAnyObjectByType<BoatEmitter>();
 
         splashEvent.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(gameObject));
         splashEvent = FMODUnity.RuntimeManager.CreateInstance("event:/SFX/hook_splash");

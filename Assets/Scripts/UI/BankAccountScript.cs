@@ -15,7 +15,7 @@ public class BankAccountScript : MonoBehaviour
     RectTransform TextMeshParentTransform;
     void Start()
     {
-        callMoneyEffectScript = FindObjectOfType<MoneyEffect>();
+        callMoneyEffectScript = FindAnyObjectByType<MoneyEffect>();
         BankText = GetComponent<TextMeshProUGUI>();
         if (thisIs2)
         {
@@ -45,7 +45,7 @@ public class BankAccountScript : MonoBehaviour
             
             elapsed += Time.deltaTime;
             BankText.text = "Gains: " + callMoneyEffectScript.fractionMoney + "c";
-            thisIs2rb.velocity = new Vector2(0, 1);
+            thisIs2rb.linearVelocity = new Vector2(0, 1);
             if(elapsed <= 0.2)
             {
                 BankText.color = new Color(1, 1, 1, 1);
@@ -53,11 +53,11 @@ public class BankAccountScript : MonoBehaviour
             if (elapsed >= 3 && elapsed <= 4f)
             {
                 BankText.color = new Color(1, 1, 1, 0);
-                thisIs2rb.velocity = new Vector2(0, -3);
+                thisIs2rb.linearVelocity = new Vector2(0, -3);
             }
             if (elapsed > 4f)
             {
-                thisIs2rb.velocity = Vector2.zero;
+                thisIs2rb.linearVelocity = Vector2.zero;
                 callMoneyEffectScript.gainedNow = false;
             }
            
@@ -91,6 +91,6 @@ public class BankAccountScript : MonoBehaviour
     {
 
         yield return new WaitForSeconds(3);
-        thisIs2rb.velocity = Vector2.zero;
+        thisIs2rb.linearVelocity = Vector2.zero;
     }
 }

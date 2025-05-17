@@ -92,7 +92,7 @@ public class BaitScript : MonoBehaviour
                 colChild.GetComponent<Collider2D>().enabled = false;
                 colChild.GetComponent<MoveAi>().enabled = false;
                 colChild.GetComponent<Pathfinding.AIPath>().enabled = false;
-                colChild.GetComponent<Rigidbody2D>().isKinematic = true;
+                colChild.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
                 colChild.GetComponentInChildren<Animator>().SetBool("Moveing", false);
                 colChild.position = this.transform.position;
                 colChild.rotation = Quaternion.Euler(0, 0, 0);

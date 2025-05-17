@@ -13,7 +13,7 @@ public class bffEventTrigger : MonoBehaviour
     void Awake()
     {
         inst = FMODUnity.RuntimeManager.CreateInstance("event:/SFX/bff_end2");
-        musicPlayer = FindObjectOfType<MusicPlayer>();
+        musicPlayer = FindAnyObjectByType<MusicPlayer>();
     }
 
 

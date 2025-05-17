@@ -47,7 +47,7 @@ public class CollectFish : MonoBehaviour
                 fishInventory = fishGameObject.transform;
             }
 
-            hook = FindObjectOfType<BaitScript>().transform;
+            hook = FindAnyObjectByType<BaitScript>().transform;
             CanCatchFish = bait;
         }
         else

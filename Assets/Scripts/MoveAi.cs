@@ -37,7 +37,7 @@ public class MoveAi : FishStats
         Wander();
         BaitScript.BaitIsOut += delegate (bool theBait)
         {
-            player = FindObjectOfType<BaitScript>().transform;
+            player = FindAnyObjectByType<BaitScript>().transform;
 
             CanFish = theBait;
         };
@@ -46,7 +46,7 @@ public class MoveAi : FishStats
     {
         BaitScript.BaitIsOut -= delegate (bool theBait)
         {
-            player = FindObjectOfType<BaitScript>().transform;
+            player = FindAnyObjectByType<BaitScript>().transform;
 
             CanFish = theBait;
         };

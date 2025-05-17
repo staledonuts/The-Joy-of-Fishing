@@ -48,7 +48,7 @@ public class BoatSliderScript : MonoBehaviour
         playerIniPosY = playerTransform.position.y;
 
 
-        boatScript = FindObjectOfType<BoatScript>();
+        boatScript = FindAnyObjectByType<BoatScript>();
         cache = false;
 
 

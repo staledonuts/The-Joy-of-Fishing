@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using Cinemachine;
+using Unity.Cinemachine;
 using TMPro;
 
 
@@ -11,11 +11,11 @@ using TMPro;
 public sealed class GameManager : MonoBehaviour
 {
     public static GameManager instance = null;
-    CinemachineFramingTransposer CMcamBody;
+    [SerializeField] private CinemachinePositionComposer CMcamBody;
     public RadioMusic radioMusic;
     
     [Header("UI Control Center")]
-    public CinemachineVirtualCamera CMcam;
+    public CinemachineCamera CinemachineCam;
     public GameObject pauseCanvas, callShopCanvas, goFishCanvas;
     [HideInInspector] public int moveCam = 1;
     [HideInInspector] public bool baitCam = false;
@@ -47,8 +47,8 @@ public sealed class GameManager : MonoBehaviour
         UIScreenfadein();
         ShoppeBoat = GameObject.Find("ShoppeBoat").GetComponent<Transform>();
         Player = GameObject.Find("Player").GetComponent<Transform>();
-        boatScript = FindObjectOfType<BoatScript>();
-        CMcamBody = CMcam.GetCinemachineComponent<CinemachineFramingTransposer>();
+        boatScript = FindAnyObjectByType<BoatScript>();
+        CMcamBody = (CinemachinePositionComposer)CinemachineCam.GetCinemachineComponent(CinemachineCore.Stage.Body);
     }
 
     void Update()
@@ -64,40 +64,40 @@ public sealed class GameManager : MonoBehaviour
         {
             callShopCanvas.SetActive(true);
             goFishCanvas.SetActive(true);
-            CMcam.m_Lens.OrthographicSize += Time.deltaTime * 3;
-            if (CMcam.m_Lens.OrthographicSize >= 9)
+            CinemachineCam.Lens.OrthographicSize += Time.deltaTime * 3;
+            if (CinemachineCam.Lens.OrthographicSize >= 9)
             {
-                CMcam.m_Lens.OrthographicSize = 9;
+                CinemachineCam.Lens.OrthographicSize = 9;
             }
-            CMcam.Follow = Player;
-            CMcamBody.m_TrackedObjectOffset.y = 3;
+            CinemachineCam.Follow = Player;
+            CMcamBody.TargetOffset.y = 3;
         }
 
         else if (moveCam == 2)
         {
             callShopCanvas.SetActive(true);
             goFishCanvas.SetActive(false);
-            CMcam.m_Lens.OrthographicSize -= Time.deltaTime * 3;
-            if (CMcam.m_Lens.OrthographicSize <= 5)
+            CinemachineCam.Lens.OrthographicSize -= Time.deltaTime * 3;
+            if (CinemachineCam.Lens.OrthographicSize <= 5)
             {
-                CMcam.m_Lens.OrthographicSize = 5;
+                CinemachineCam.Lens.OrthographicSize = 5;
             }
-            CMcam.Follow = ShoppeBoat;
-            CMcamBody.m_TrackedObjectOffset.y = 3;
+            CinemachineCam.Follow = ShoppeBoat;
+            CMcamBody.TargetOffset.y = 3;
         }
 
         else if (moveCam == 3)
         {
             callShopCanvas.SetActive(false);
             goFishCanvas.SetActive(false);
-            CMcam.m_Lens.OrthographicSize += Time.deltaTime * 3;
-            if (CMcam.m_Lens.OrthographicSize >= 9)
+            CinemachineCam.Lens.OrthographicSize += Time.deltaTime * 3;
+            if (CinemachineCam.Lens.OrthographicSize >= 9)
             {
-                CMcam.m_Lens.OrthographicSize = 9;
+                CinemachineCam.Lens.OrthographicSize = 9;
             }
-            CMcam.Follow = BaitCam();
+            CinemachineCam.Follow = BaitCam();
 
-            CMcamBody.m_TrackedObjectOffset.y = 0;
+            CMcamBody.TargetOffset.y = 0;
             if(currentTime >= 3f)
             {
                 SceneManager.LoadScene("End Scene");

@@ -68,7 +68,7 @@ public sealed class RopeScript : MonoBehaviour
         if (rodtransform == null)
         {
             rodtransform = GameObject.FindGameObjectWithTag("PlayerRod");
-            boatScript = FindObjectOfType<BoatScript>();
+            boatScript = FindAnyObjectByType<BoatScript>();
             lastNode = base.transform.gameObject;
             //Nodes.Add(transform.gameObject);
         }

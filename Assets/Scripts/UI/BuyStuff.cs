@@ -26,8 +26,8 @@ public class BuyStuff : MonoBehaviour
 
     private void Start() 
     {
-    callMoneyEffectScript = FindObjectOfType<MoneyEffect>();   
-    callBoatScript = FindObjectOfType<BoatScript>(); 
+    callMoneyEffectScript = FindAnyObjectByType<MoneyEffect>();   
+    callBoatScript = FindAnyObjectByType<BoatScript>(); 
     }
 
     public void BuyMindControlLure()

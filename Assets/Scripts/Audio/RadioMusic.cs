@@ -11,7 +11,7 @@ public class RadioMusic : MonoBehaviour
 
     private void Awake()
     {
-        musicPlayer = FindObjectOfType<MusicPlayer>();
+        musicPlayer = FindAnyObjectByType<MusicPlayer>();
         radioInstance = FMODUnity.RuntimeManager.CreateInstance("event:/radio_music");
         radioInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(gameObject));
     }
