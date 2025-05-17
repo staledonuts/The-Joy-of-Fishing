@@ -67,6 +67,7 @@ Material:
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
     - _WindDirection: {r: 0.5, g: 0.5, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &3787429758068003027
 MonoBehaviour:
   m_ObjectHideFlags: 11

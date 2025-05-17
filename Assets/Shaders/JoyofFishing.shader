@@ -186,7 +186,7 @@ Shader "JoyofFishing/Sprite-Lit"
         Pass
         {
             Name "Pass 3"
-            Tags { "LightMode" = "UniversalForward" "Queue"="Transparent" "RenderType"="Transparent"}
+            Tags { "LightMode" = "UniversalForward" "Queue"="Transparent" "RenderType"="Transparent" "CanUseSpriteAtlas"="True"}
 
             HLSLPROGRAM
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
