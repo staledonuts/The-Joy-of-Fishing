@@ -6,16 +6,11 @@ Shader "JoyofFishing/Sprite-Lit"
         _MaskTex("Mask", 2D) = "white" {}
         _NormalMap("Normal Map", 2D) = "bump" {}
         _Color("Tint", Color) = (1,1,1,1)
-
-        [HideInInspector] _RendererColor("RendererColor", Color) = (1,1,1,1)
-        [HideInInspector] _Flip("Flip", Vector) = (1,1,1,1)
-        [HideInInspector] _AlphaTex("External Alpha", 2D) = "white" {}
-        [HideInInspector] _EnableExternalAlpha("Enable External Alpha", Float) = 0
     }
 
     SubShader
     {
-        Tags {"Queue" = "Transparent" "RenderType" = "Transparent" "RenderPipeline" = "UniversalPipeline" }
+        Tags {"Queue" = "Transparent" "RenderType" = "Transparent" "RenderPipeline" = "UniversalPipeline" "CanUseSpriteAtlas"="True" }
 
         Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
         Cull Off
@@ -67,7 +62,7 @@ Shader "JoyofFishing/Sprite-Lit"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _Color;
-                float4 _RendererColor;
+                float2 _Flip;
             CBUFFER_END
 
             #if USE_SHAPE_LIGHT_TYPE_0
@@ -96,10 +91,10 @@ Shader "JoyofFishing/Sprite-Lit"
                 #if defined(DEBUG_DISPLAY)
                 o.positionWS = TransformObjectToWorld(v.positionOS);
                 #endif
-                o.uv = v.uv;
+                o.uv = lerp(1.0 - v.uv, v.uv, _Flip);
                 o.screenPos = ComputeScreenPos(o.positionCS);
 
-                o.color = v.color * _Color * _RendererColor;
+                o.color = v.color * _Color;
                 return o;
             }
 
@@ -159,7 +154,7 @@ Shader "JoyofFishing/Sprite-Lit"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _Color;
-                half4 _RendererColor;
+                float2 _Flip;
             CBUFFER_END
 
             Varyings NormalsRenderingVertex(Attributes attributes)
@@ -167,9 +162,8 @@ Shader "JoyofFishing/Sprite-Lit"
                 Varyings o = (Varyings)0;
                 UNITY_SETUP_INSTANCE_ID(attributes);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-
                 o.positionCS = TransformObjectToHClip(attributes.positionOS);
-                o.uv = attributes.uv;
+                o.uv = lerp(1.0 - attributes.uv, attributes.uv, _Flip);
                 o.color = attributes.color;
                 o.normalWS = -GetViewForwardDir();
                 o.tangentWS = TransformObjectToWorldDir(attributes.tangent.xyz);
@@ -224,7 +218,7 @@ Shader "JoyofFishing/Sprite-Lit"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _Color;
-                float4 _RendererColor;
+                float2 _Flip;
             CBUFFER_END
 
             Varyings UnlitVertex(Attributes attributes)
@@ -237,8 +231,8 @@ Shader "JoyofFishing/Sprite-Lit"
                 #if defined(DEBUG_DISPLAY)
                 o.positionWS = TransformObjectToWorld(v.positionOS);
                 #endif
-                o.uv = attributes.uv;
-                o.color = attributes.color * _Color * _RendererColor;
+                o.uv = lerp(1.0 - attributes.uv, attributes.uv, _Flip);
+                o.color = attributes.color * _Color;
                 return o;
             }
 

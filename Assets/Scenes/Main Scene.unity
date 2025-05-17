@@ -2399,6 +2399,10 @@ PrefabInstance:
       propertyPath: Target.TrackingTarget
       value: 
       objectReference: {fileID: 2018631586}
+    - target: {fileID: 4962793762285738571, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+      propertyPath: m_RenderMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5582745425297336145, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
       propertyPath: m_Size
       value: 1
