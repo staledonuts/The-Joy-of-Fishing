@@ -1,9 +1,15 @@
+using Ami.BroAudio;
 using UnityEngine;
 
 public class MoneyEffect : MonoBehaviour
 {
-    private FMOD.Studio.EventInstance fishGetInstance;
-    private FMOD.Studio.EventInstance coinsInstance;
+    private SoundID rarefishGet;
+    private SoundID commonfishGet;
+    private SoundID legendaryfishGet;
+    private SoundID lvl0coins;
+    private SoundID lvl1coins;
+    private SoundID lvl2coins;
+    private SoundID lvl3coins;
 
     [SerializeField] private ParticleSystem[] coinParticle;
 
@@ -22,8 +28,6 @@ public class MoneyEffect : MonoBehaviour
 
     private void Awake()
     {
-        fishGetInstance = FMODUnity.RuntimeManager.CreateInstance("event:/SFX/fish_get");
-        coinsInstance = FMODUnity.RuntimeManager.CreateInstance("event:/SFX/coins");
         //FMODUnity.RuntimeManager.AttachInstanceToGameObject(fishGetInstance, gameObject.transform);
         //FMODUnity.RuntimeManager.AttachInstanceToGameObject(coinsInstnace, gameObject.transform);
         //coinsInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(gameObject));
@@ -101,11 +105,36 @@ public class MoneyEffect : MonoBehaviour
     private void PlaySound(int level)
     {
         // Levels 0 1 2 3 small to big.
-        coinsInstance.setParameterByName("level", level);
-        fishGetInstance.setParameterByName("level", level);
+        switch (level)
+        {
+            default:
+            case 0:
+            {
+                lvl0coins.Play(transform);
+                commonfishGet.Play(transform);
+                break;
+            }
+            case 1:
+            {
+                lvl1coins.Play(transform);
+                commonfishGet.Play(transform);
+                break;
+            }
+            case 2:
+            {
+                lvl2coins.Play(transform);
+                rarefishGet.Play(transform);
+                break;
+            }
+            case 3:
+            {
+                lvl3coins.Play(transform);
+                legendaryfishGet.Play(transform);
 
-        coinsInstance.start();
-        fishGetInstance.start();
+                break;
+            }
+        }
+
     }
 
 

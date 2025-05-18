@@ -31,7 +31,7 @@ public class BankAccountScript : MonoBehaviour
     void Update()
     {
 
-        if (GameManager.instance.moveCam != 3 && thisIs1)
+        if (GameManager.Instance.moveCam != 3 && thisIs1)
         {
             BankText.text = "Savings: " + callMoneyEffectScript.totalMoney.ToString() + "c";
         }

@@ -90,7 +90,7 @@ public class BoatScript : MonoBehaviour
     {
         if (context.performed)
         {
-            GameManager.instance.onShopSwitch();
+            GameManager.Instance.onShopSwitch();
         }
     }
     private void MoveLeftRight()
@@ -108,13 +108,13 @@ public class BoatScript : MonoBehaviour
     {
         if(context.performed)
         {
-            GameManager.instance.Pause();
+            GameManager.Instance.Pause();
         }
     }
 
     public void moveHook()
     {
-        if(ropeActive && GameManager.instance.MindcontrolActive)
+        if(ropeActive && GameManager.Instance.MindcontrolActive)
         {
             if (RopeScript.instance.hookRigidbody2D == null) 
             {  
@@ -173,7 +173,7 @@ public class BoatScript : MonoBehaviour
     public void OnCastOut()
     {
         //when rope is not activated
-        if (ropeActive == false && GameManager.instance.moveCam == 1)
+        if (ropeActive == false && GameManager.Instance.moveCam == 1)
         {
 
             //destiny is where the mouse is
@@ -183,9 +183,9 @@ public class BoatScript : MonoBehaviour
             curHook.transform.parent = transform;
             //sets its destiny
             curHook.GetComponent<RopeScript>().destiny = destiny;
-            GameManager.instance.Hook = curHook.transform;
-            GameManager.instance.baitCam = true;
-            GameManager.instance.moveCam = 3;
+            GameManager.Instance.Hook = curHook.transform;
+            GameManager.Instance.baitCam = true;
+            GameManager.Instance.moveCam = 3;
             //sets rope to enabled
             ropeActive = true;
         }
@@ -194,8 +194,8 @@ public class BoatScript : MonoBehaviour
     public void DeleteRope()
     {
         Destroy(curHook);
-        GameManager.instance.baitCam = false;
-        GameManager.instance.moveCam = 1;
+        GameManager.Instance.baitCam = false;
+        GameManager.Instance.moveCam = 1;
         //sets rope to disabled
         ropeActive = false;
 

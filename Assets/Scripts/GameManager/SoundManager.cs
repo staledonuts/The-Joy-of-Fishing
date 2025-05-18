@@ -1,71 +1,92 @@
 using System.Collections;
 using System.Collections.Generic;
+using Ami.BroAudio;
 using UnityEngine;
 
 
 public class SoundManager : MonoBehaviour
 {
-    private FMOD.Studio.EventInstance volumeTestEvent;
+    private static SoundManager instance = null;
 
-    private FMOD.Studio.Bus music;
-    private FMOD.Studio.Bus sfx;
-    private FMOD.Studio.Bus master; //needed?
-    private FMOD.Studio.Bus ambience;
+    public static SoundManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                // Find singleton of this type in the scene
+                instance = FindFirstObjectByType<SoundManager>();
+                // If there is no singleton object in the scene, we have to add one
+                if (instance == null)
+                {
+                    GameObject obj = new GameObject("SoundManager Singelton");
+                    instance = obj.AddComponent<SoundManager>();
+                    // The singleton object shouldn't be destroyed when we switch between scenes
+                    DontDestroyOnLoad(obj);
+                }
+            }
+
+            return instance;
+        }
+    }
     private float musicVolume = 0.25f;
     private float sfxVolume = 0.5f;
     private float masterVolume = 1f;
     private float ambienceVolume = 0.05f;
     // Any sliders connected to these values must on start have the same in insepctor component.
     // Slider component's "Value" setting Must match these float values.
-    
 
+    [SerializeField] private SoundID musicTracks;
+    [SerializeField] private SoundID radioTrack;
+    private IAudioPlayer musicPlayer;
 
-    void Awake()
+    private void Start()
     {
-        master = FMODUnity.RuntimeManager.GetBus("bus:/");
-        ambience = FMODUnity.RuntimeManager.GetBus("bus:/Ambience");
-        sfx = FMODUnity.RuntimeManager.GetBus("bus:/SFX");
-        music = FMODUnity.RuntimeManager.GetBus("bus:/Music");
-        volumeTestEvent = FMODUnity.RuntimeManager.CreateInstance("event:/SFX/VolumeTest");
+        musicPlayer = musicTracks.Play();
+    }
+
+    public void NextMusicTrack()
+    {
+        musicPlayer = musicTracks.Play();
+    }
+
+
+
+    private void Awake()
+    {
+        BroAudio.SetVolume(BroAudioType.All, masterVolume);
+        BroAudio.SetVolume(BroAudioType.Music, musicVolume);
+        BroAudio.SetVolume(BroAudioType.SFX, sfxVolume);
+        BroAudio.SetVolume(BroAudioType.Ambience, ambienceVolume);
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        // FMOD bus volume 1 = whatever its set in FMOD Studio. 0-1 represents the distance between that and inf/mute.
-        music.setVolume(musicVolume);
-        sfx.setVolume(sfxVolume);
-        ambience.setVolume(ambienceVolume);
-        master.setVolume(masterVolume);
-        //does this chug framerate? maybe not have it in update? idk how FMOD likes to do things.
+    private void Update()
+    {    
     }
 
     public void MasterVolumeLevel(float newMasterVolume)
     {
         masterVolume = newMasterVolume;
+        BroAudio.SetVolume(BroAudioType.All, masterVolume);
     }
 
     public void MusicVolumeLevel(float newMusicVolume)
     {
         musicVolume = newMusicVolume;
+        BroAudio.SetVolume(BroAudioType.Music, musicVolume);
     }
 
     public void SfxVolumeLevel(float newSfxVolume)
     {
         sfxVolume = newSfxVolume;
-        
-        //for example volume sfx play
-        FMOD.Studio.PLAYBACK_STATE pbState;
-        volumeTestEvent.getPlaybackState(out pbState);
-        if (pbState != FMOD.Studio.PLAYBACK_STATE.PLAYING)
-        {
-            volumeTestEvent.start();
-        }
+        BroAudio.SetVolume(BroAudioType.SFX, sfxVolume);        
     }
 
     public void AmbienceVolumeLevel(float newAmbienceVolume)
     {
         ambienceVolume = newAmbienceVolume;
+        BroAudio.SetVolume(BroAudioType.Ambience, ambienceVolume);
     }
     
 

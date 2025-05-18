@@ -1505,6 +1505,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ShoppeBoat
       objectReference: {fileID: 0}
+    - target: {fileID: 2955867409893056421, guid: c6a4dcf01b485c945a3ab0ded4a2f019, type: 3}
+      propertyPath: m_FlipX
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6475346120064133853, guid: c6a4dcf01b485c945a3ab0ded4a2f019, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -1554,6 +1558,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c6a4dcf01b485c945a3ab0ded4a2f019, type: 3}
+--- !u!1 &2009392075 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5105503721067358441, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+  m_PrefabInstance: {fileID: 4962793760973506359}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2018631586 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7824927940298590364, guid: 4768b34c54479b441af32aacd2aa619c, type: 3}
@@ -2327,6 +2336,30 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -0.00091552734
       objectReference: {fileID: 0}
+    - target: {fileID: 2621202474216397258, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+      propertyPath: radioTrack.ID
+      value: 268435457
+      objectReference: {fileID: 0}
+    - target: {fileID: 2621202474216397258, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+      propertyPath: musicTracks.ID
+      value: 268435456
+      objectReference: {fileID: 0}
+    - target: {fileID: 2621202474216397258, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+      propertyPath: radioTrack._sourceAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 4166addeb8bde4b88a5367cae333c0d4, type: 2}
+    - target: {fileID: 2621202474216397258, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+      propertyPath: musicTracks._sourceAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 4166addeb8bde4b88a5367cae333c0d4, type: 2}
+    - target: {fileID: 2621202474216397258, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+      propertyPath: radioTrack.<DebugObject>k__BackingField
+      value: 
+      objectReference: {fileID: 2009392075}
+    - target: {fileID: 2621202474216397258, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+      propertyPath: musicTracks.<DebugObject>k__BackingField
+      value: 
+      objectReference: {fileID: 2009392075}
     - target: {fileID: 3352766575461589192, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -2482,7 +2515,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2621202474216397258, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
   m_PrefabInstance: {fileID: 4962793760973506359}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 2009392075}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 68622c55de5528f4386f35a5582e4d3b, type: 3}

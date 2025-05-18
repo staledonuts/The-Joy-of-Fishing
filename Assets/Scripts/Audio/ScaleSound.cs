@@ -1,34 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using Ami.BroAudio;
 using UnityEngine;
 
 public class ScaleSound : MonoBehaviour
 {
-    private FMOD.Studio.EventInstance inst;
+    private SoundID inst;
     private bool triggered;
-    private MusicPlayer musicPlayer;
-
-    void Awake()
-    {
-        inst = FMODUnity.RuntimeManager.CreateInstance("event:/SFX/bff_trigger");
-        musicPlayer = FindAnyObjectByType<MusicPlayer>();
-    }
 
 
     void OnTriggerEnter2D(Collider2D other) 
     {
         if(other.tag == "Bait" && !triggered)
         {
-            musicPlayer.DuckMusic();
-            inst.start();
-            inst.release();
+            
+            inst.Play(transform);
             triggered = true;
-            Invoke("DoMusic", 29f);
         }
-    }
-
-    void DoMusic()
-    {
-        musicPlayer.RaiseMusic();
     }
 }

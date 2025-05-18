@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0345f6968f9c4241959624889b545dd, type: 3}
+  m_Name: MusicCollection
+  m_EditorClassIdentifier: 
+  Entities:
+  - <Name>k__BackingField: Music
+    <ID>k__BackingField: 268435456
+    MulticlipsPlayMode: 3
+    _group: {fileID: 0}
+    Clips:
+    - AudioClip: {fileID: 8300000, guid: f9ec92d962ddeca598f6f0d73fd505e8, type: 3}
+      Volume: 1
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 0972edd50e6e5d174beb2a776fac11b7, type: 3}
+      Volume: 1
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 2
+      FadeOut: 2
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 3a08f57de4e93690882d25b6ea3e1ee9, type: 3}
+      Volume: 1
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 2
+      FadeOut: 2
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 9423095bb5b5410a38d192d5b19744cc, type: 3}
+      Volume: 0.13059138
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 2
+      FadeOut: 2
+      Weight: 0
+    <MasterVolume>k__BackingField: 1
+    <Loop>k__BackingField: 1
+    <SeamlessLoop>k__BackingField: 0
+    <TransitionTime>k__BackingField: 0
+    <SpatialSetting>k__BackingField: {fileID: 0}
+    <Priority>k__BackingField: 128
+    <Pitch>k__BackingField: 1
+    <PitchRandomRange>k__BackingField: 0
+    <VolumeRandomRange>k__BackingField: 0
+    <RandomFlags>k__BackingField: 0
+    SeamlessTransitionType: 0
+    TransitionTempo:
+      BPM: 0
+      Beats: 0
+    SnapToFullVolume: 0
+  - <Name>k__BackingField: ShoppeRadioTrack
+    <ID>k__BackingField: 268435457
+    MulticlipsPlayMode: 0
+    _group: {fileID: 0}
+    Clips:
+    - AudioClip: {fileID: 8300000, guid: 0a81278f67a4ebaf7a59e6fe0f5ad000, type: 3}
+      Volume: 1
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 1
+      FadeOut: 1
+      Weight: 0
+    <MasterVolume>k__BackingField: 1
+    <Loop>k__BackingField: 1
+    <SeamlessLoop>k__BackingField: 0
+    <TransitionTime>k__BackingField: 0
+    <SpatialSetting>k__BackingField: {fileID: 0}
+    <Priority>k__BackingField: 128
+    <Pitch>k__BackingField: 1
+    <PitchRandomRange>k__BackingField: 0
+    <VolumeRandomRange>k__BackingField: 0
+    <RandomFlags>k__BackingField: 0
+    SeamlessTransitionType: 0
+    TransitionTempo:
+      BPM: 0
+      Beats: 0
+    SnapToFullVolume: 0
+  Group: {fileID: 11400000, guid: 9392283aee39281a0814bc7586e84c15, type: 2}
+  <AssetName>k__BackingField: MusicCollection
+  _assetGUID: 4166addeb8bde4b88a5367cae333c0d4

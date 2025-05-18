@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.InputSystem;
+using Ami.BroAudio;
 
 
 public sealed class RopeScript : MonoBehaviour
@@ -11,7 +12,7 @@ public sealed class RopeScript : MonoBehaviour
     public int currentLineLength;
 
     //FMOD sound
-    private FMOD.Studio.EventInstance reelTickInstance;
+    [SerializeField] private SoundID reelTickSound;
     
     //holds where the hook is going to
     [HideInInspector] public Vector2 destiny, lastAnchorPosition;
@@ -42,13 +43,7 @@ public sealed class RopeScript : MonoBehaviour
     //private Transform transform;
 
     private void Awake()
-    {
-        //get sound from FMOD
-        reelTickInstance = FMODUnity.RuntimeManager.CreateInstance("event:/SFX/reel_tick");
-        //Sound at rod
-        reelTickInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(transform.position));
-        
-        
+    {    
         if (instance == null)
         {
             instance = this;
@@ -87,7 +82,7 @@ public sealed class RopeScript : MonoBehaviour
         }
         
         // Define 3D attributes
-        FMODUnity.RuntimeManager.AttachInstanceToGameObject(reelTickInstance, rodtransform.transform);
+        BroAudio.Play(reelTickSound, rodtransform.transform);
     }
 
     void FixedUpdate() 
@@ -170,8 +165,7 @@ public sealed class RopeScript : MonoBehaviour
 
     public void CreateNode()
     {
-        reelTickInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(rodtransform.transform));
-        reelTickInstance.start(); // Play sound
+        BroAudio.Play(reelTickSound, rodtransform.transform);
     
         lastAnchorPosition = rodtransform.transform.position - new Vector3(0.05f,0.05f,0.0f);
         //finds position to create and creates node (vertex)
@@ -224,10 +218,7 @@ public sealed class RopeScript : MonoBehaviour
 
     public void DestroyNode()
     {
-        reelTickInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(rodtransform.transform));
-        reelTickInstance.start(); // Play sound
-        
-        List<Vector3> positions = new List<Vector3>();
+        BroAudio.Play(reelTickSound, rodtransform.transform);
 
         var go = Nodes.Last();
         Vector2 pos = go.transform.position;
@@ -239,7 +230,7 @@ public sealed class RopeScript : MonoBehaviour
         GameObject node = Nodes.Last();
         lastNode = node;
         node.GetComponent<SpringJoint2D>().connectedBody = rodtransform.GetComponent<Rigidbody2D>();
-        currentLineLength = ((int)Nodes.Count);
+        currentLineLength = Nodes.Count;
 
         if (Nodes.Count <= 1)
         {

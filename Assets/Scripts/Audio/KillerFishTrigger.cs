@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Ami.BroAudio;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 public class KillerFishTrigger : MonoBehaviour
 {
-    private FMOD.Studio.EventInstance statueEvent;
+    private SoundID statueEvent;
     private bool triggered = false;
     private Light2D[] eyeLight;
     private float lightValue;
@@ -16,9 +17,7 @@ public class KillerFishTrigger : MonoBehaviour
 
     private void Awake()
     {
-        statueEvent = FMODUnity.RuntimeManager.CreateInstance("event:/SFX/killerfish_statue");
         eyeLight = GetComponentsInChildren<Light2D>();
-        statueEvent.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(gameObject));
     }
 
     private void Update()
@@ -51,10 +50,8 @@ public class KillerFishTrigger : MonoBehaviour
     {
         if (other.CompareTag("Bait") && !triggered)
         {
-            Debug.Log("BAIT ENTERED " + gameObject);
             triggered = true;
-            statueEvent.start();
-            statueEvent.release();
+            statueEvent.Play();
         }
     }
 }

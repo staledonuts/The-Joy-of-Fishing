@@ -1,31 +1,25 @@
 using System;
+using Ami.BroAudio;
 using UnityEngine;
 
 /*
- * This script is for when you have cought a fish.
+ * This script is for when you have caught a fish.
  * It makes the fish a child of the transform the script is on.
  */
 
 [RequireComponent(typeof(Collider2D))]
 public class BaitScript : MonoBehaviour
 {
-    private FMOD.Studio.EventInstance fishHookedInstance;
-
+    [SerializeField] private SoundID fishHookedInstance;
     [SerializeField] private BaitScriptAbleObject[] bait;
-
     [SerializeField] private int currentBait;
-
     private GameObject CollectiveFish;
-
     //Used in BaitScrip and MoveAi
     public static Func<int> BaitLevel;
-
     //Used in BaitScript, CollectFish, MoneyEffect and MoveAi
     public static event Action<bool> BaitIsOut;
-
     //Used in BaitScript and MoneyEffect
     public static Action FishOnHook;
-
     //Used in BaitScript and CollectFish
     public static Action FishOfHook;
 
@@ -139,9 +133,6 @@ public class BaitScript : MonoBehaviour
 
     private void PlaySound()
     {
-        fishHookedInstance = FMODUnity.RuntimeManager.CreateInstance("event:/SFX/fish_hook");
-        fishHookedInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(gameObject));
-        fishHookedInstance.start();
-        fishHookedInstance.release();
+        fishHookedInstance.Play(transform);
     }
 }

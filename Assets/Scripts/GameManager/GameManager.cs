@@ -8,7 +8,29 @@ using Unity.Cinemachine;
 
 public sealed class GameManager : MonoBehaviour
 {
-    public static GameManager instance = null;
+    private static GameManager instance = null;
+
+    public static GameManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                // Find singleton of this type in the scene
+                instance = FindFirstObjectByType<GameManager>();
+                // If there is no singleton object in the scene, we have to add one
+                if (instance == null)
+                {
+                    GameObject obj = new GameObject("GameManager Singelton");
+                    instance = obj.AddComponent<GameManager>();
+                    // The singleton object shouldn't be destroyed when we switch between scenes
+                    DontDestroyOnLoad(obj);
+                }
+            }
+
+            return instance;
+        }
+    }
     [SerializeField] private CinemachinePositionComposer CMcamBody;
     [SerializeField] public RadioMusic radioMusic;
     
@@ -26,16 +48,6 @@ public sealed class GameManager : MonoBehaviour
     public float currentTime = 0f;
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Debug.LogWarning("More than one Gamemanager");
-            Destroy(instance.gameObject);
-            instance = this;
-        }
         Fadeimage.color = new Color(0, 0, 0, 255);
     }
 

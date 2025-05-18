@@ -1,19 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using Ami.BroAudio;
 using UnityEngine;
 
 public class bffEventTrigger : MonoBehaviour
 {
 
     public Animator bffanim;
-    private FMOD.Studio.EventInstance inst;
-    private MusicPlayer musicPlayer;
+    [SerializeField] private SoundID inst;
+
     private bool triggered;
 
     void Awake()
     {
-        inst = FMODUnity.RuntimeManager.CreateInstance("event:/SFX/bff_end2");
-        musicPlayer = FindAnyObjectByType<MusicPlayer>();
     }
 
 
@@ -21,17 +20,14 @@ public class bffEventTrigger : MonoBehaviour
     {
         if(other.tag == "Bait" && !triggered)
         {
-            bffanim.Play("Swimmer");
-            musicPlayer.StopMusic();
-            inst.start();
-            inst.release();
-            //Invoke("endgame", 5.5f);
+            inst.Play();
+            Invoke("endgame", 5.5f);
             triggered = true;
         }
     }
 
     public void endgame()
     {
-        GameManager.instance.UIScreenfadeout();
+        GameManager.Instance.UIScreenfadeout();
     }
 }
