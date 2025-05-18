@@ -7,6 +7,8 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
         _NormalMap("Normal Map", 2D) = "bump" {}
         _Color("Tint", Color) = (1,1,1,1)
         _Cutoff("Alpha CutOff", Range(0,1)) = 1
+        [Toggle(USE_VERTEXNOISE)] _Distortion("Enable Distortion", Float) = 0
+
     }
 
     SubShader
@@ -17,13 +19,27 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
         Cull Off
         ZWrite Off
 
+        HLSLINCLUDE
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            TEXTURE2D(_MainTex);
+            SAMPLER(sampler_MainTex);
+            TEXTURE2D(_MaskTex);
+            SAMPLER(sampler_MaskTex);
+
+            CBUFFER_START(UnityPerMaterial)
+                float4 _Color;
+                float2 _Flip;
+                float _Cutoff;
+                float _Distortion;
+            CBUFFER_END
+            #include "Noise/SimplexNoise3D.hlsl"
+        ENDHLSL
         Pass
         {
-            Name "Pass 1"
+            Name "LitPass"
             Tags { "LightMode" = "Universal2D" }
 
             HLSLPROGRAM
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
             #pragma vertex CombinedShapeLightVertex
             #pragma fragment CombinedShapeLightFragment
@@ -32,6 +48,7 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
             #pragma multi_compile USE_SHAPE_LIGHT_TYPE_1 __
             #pragma multi_compile USE_SHAPE_LIGHT_TYPE_2 __
             #pragma multi_compile USE_SHAPE_LIGHT_TYPE_3 __
+            #pragma multi_compile USE_VERTEXNOISE __
             #pragma multi_compile _ DEBUG_DISPLAY
 
             struct Attributes
@@ -56,17 +73,6 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/LightingUtility.hlsl"
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-            TEXTURE2D(_MaskTex);
-            SAMPLER(sampler_MaskTex);
-
-            CBUFFER_START(UnityPerMaterial)
-                float4 _Color;
-                float2 _Flip;
-                float _Cutoff;
-            CBUFFER_END
-
             #if USE_SHAPE_LIGHT_TYPE_0
             SHAPE_LIGHT(0)
             #endif
@@ -88,8 +94,16 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
                 Varyings o = (Varyings)0;
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-
-                o.positionCS = TransformObjectToHClip(v.positionOS);
+                float4 objectspace = TransformObjectToHClip(v.positionOS);
+                #ifdef USE_VERTEXNOISE
+                float4 noise = SimplexNoiseGrad((v.positionOS + (_Time.x * 0.002)).xyz);
+                noise -= 0.8;
+                noise *= 0.02;
+                noise *= v.uv.y;
+                objectspace = float4(objectspace.x + noise.w, objectspace.y, objectspace.z, objectspace.w);
+                #endif
+                o.positionCS = objectspace;
+                //o.positionCS = TransformObjectToHClip(v.positionOS);
                 #if defined(DEBUG_DISPLAY)
                 o.positionWS = TransformObjectToWorld(v.positionOS);
                 #endif
@@ -120,11 +134,10 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
 
         Pass
         {
-            Name "Pass 2"
+            Name "NormalsPass"
             Tags { "LightMode" = "NormalsRendering"}
 
             HLSLPROGRAM
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
             #pragma vertex NormalsRenderingVertex
             #pragma fragment NormalsRenderingFragment
@@ -149,23 +162,25 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
             TEXTURE2D(_NormalMap);
             SAMPLER(sampler_NormalMap);
-
-            CBUFFER_START(UnityPerMaterial)
-                float4 _Color;
-                float2 _Flip;
-                float _Cutoff;
-            CBUFFER_END
 
             Varyings NormalsRenderingVertex(Attributes attributes)
             {
                 Varyings o = (Varyings)0;
                 UNITY_SETUP_INSTANCE_ID(attributes);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-                o.positionCS = TransformObjectToHClip(attributes.positionOS);
+
+                float4 objectspace = TransformObjectToHClip(attributes.positionOS);
+                #ifdef USE_VERTEXNOISE
+                float4 noise = SimplexNoiseGrad((attributes.positionOS + (_Time.x * 0.02)).xyz);
+                noise -= 0.8;
+                noise *= 0.02;
+                noise *= attributes.uv.y;
+                objectspace = float4(objectspace.x + noise.w, objectspace.y + noise.y, objectspace.z, objectspace.w);
+                #endif
+                o.positionCS = objectspace;
+
                 o.uv = lerp(1.0 - attributes.uv, attributes.uv, _Flip);
                 o.color = attributes.color;
                 o.normalWS = -GetViewForwardDir();
@@ -188,11 +203,10 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
 
         Pass
         {
-            Name "Pass 3"
+            Name "UnlitPass"
             Tags { "LightMode" = "UniversalForward" "Queue"="Geometry" "RenderType"="Opaque" "CanUseSpriteAtlas"="True"}
 
             HLSLPROGRAM
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #pragma shader_feature_local_fragment _ALPHATEST_ON
             #pragma vertex UnlitVertex
             #pragma fragment UnlitFragment
@@ -216,24 +230,24 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-
-            CBUFFER_START(UnityPerMaterial)
-                float4 _Color;
-                float2 _Flip;
-                float _Cutoff;
-            CBUFFER_END
-
             Varyings UnlitVertex(Attributes attributes)
             {
                 Varyings o = (Varyings)0;
                 UNITY_SETUP_INSTANCE_ID(attributes);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-                o.positionCS = TransformObjectToHClip(attributes.positionOS);
+                float4 objectspace = TransformObjectToHClip(attributes.positionOS);
+                #ifdef USE_VERTEXNOISE
+                float4 noise = SimplexNoiseGrad((attributes.positionOS + (_Time.x * 0.002)).xyz);
+                noise -= 0.8;
+                noise *= 0.02;
+                noise *= attributes.uv.y;
+                objectspace = float4(objectspace.x + noise.w, objectspace.y, objectspace.z, objectspace.w);
+                #endif
+                o.positionCS = objectspace;
+                
                 #if defined(DEBUG_DISPLAY)
-                o.positionWS = TransformObjectToWorld(v.positionOS);
+                o.positionWS = TransformObjectToWorld(attributes.positionOS);
                 #endif
                 o.uv = lerp(1.0 - attributes.uv, attributes.uv, _Flip);
                 o.color = attributes.color * _Color;

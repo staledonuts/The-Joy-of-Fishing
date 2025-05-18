@@ -1,10 +1,8 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Unity.Cinemachine;
-using TMPro;
 
 
 
@@ -12,18 +10,17 @@ public sealed class GameManager : MonoBehaviour
 {
     public static GameManager instance = null;
     [SerializeField] private CinemachinePositionComposer CMcamBody;
-    public RadioMusic radioMusic;
+    [SerializeField] public RadioMusic radioMusic;
     
     [Header("UI Control Center")]
-    public CinemachineCamera CinemachineCam;
-    public GameObject pauseCanvas, callShopCanvas, goFishCanvas;
+    [SerializeField] private CinemachineCamera CinemachineCam;
+    [SerializeField] private GameObject pauseCanvas, callShopCanvas, goFishCanvas;
     [HideInInspector] public int moveCam = 1;
     [HideInInspector] public bool baitCam = false;
     [HideInInspector] public Transform ShoppeBoat, Player, Hook;
     [HideInInspector] public float CMcamOrthoSize;
     public Animator ShopUIAnimator;
-    BoatScript boatScript;
-
+    private BoatScript boatScript;
     [HideInInspector] public bool MindcontrolActive = false;
     public int currentLineLevel = 0, currentBait = 0, cashAmount = 0;
     public float currentTime = 0f;
@@ -41,6 +38,8 @@ public sealed class GameManager : MonoBehaviour
         }
         Fadeimage.color = new Color(0, 0, 0, 255);
     }
+
+
     // Start is called before the first frame update
     void Start()
     {

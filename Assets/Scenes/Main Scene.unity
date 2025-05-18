@@ -2496,6 +2496,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4518179710796696795, guid: 4768b34c54479b441af32aacd2aa619c, type: 3}
+      propertyPath: m_FlipX
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7814803752114734574, guid: 4768b34c54479b441af32aacd2aa619c, type: 3}
       propertyPath: m_UIInputModule
       value: 
