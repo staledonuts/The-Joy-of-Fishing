@@ -4,8 +4,6 @@ public class BoatScript : MonoBehaviour
 {
     //Privates
     [Min(0.02f)] [SerializeField] private float rampUpTime = 1f;
-
-    private float maxReelOutInterval = 0.4f, minReelOutInterval = 0.05f, maxReelInInterval = 0.4f, minReelInInterval = 0.10f, lastInstanceTime = 0;
     private float triggerValue;
     private Vector2 moveInput, hookInput;
     private bool BoatCanMove = true;
@@ -21,9 +19,7 @@ public class BoatScript : MonoBehaviour
 
     //public static event System.Action<bool> IsFishing;
     public static event System.Action DoneFishing;
-
-    //hook prefab
-    public GameObject hook;
+    [SerializeField] private CustomRopeSolver customRope;
 
     public Transform baitpoint, baitTransform, rodpoint;
 
@@ -95,8 +91,10 @@ public class BoatScript : MonoBehaviour
     }
     private void MoveLeftRight()
     {
-        if (!BoatCanMove) { return; }
-
+        if (!BoatCanMove)
+        {
+            return;
+        }
         else
         {
             bool playerhashorizontalspeed = Mathf.Abs(rig2d.linearVelocity.x) > Mathf.Epsilon;
@@ -116,20 +114,19 @@ public class BoatScript : MonoBehaviour
     {
         if(ropeActive && GameManager.Instance.MindcontrolActive)
         {
-            if (RopeScript.instance.hookRigidbody2D == null) 
+            if (CustomRopeSolver.Instance == null) 
             {  
                 return;
             }
-
-            else if (RopeScript.instance.hookRigidbody2D != null)
+            else if (CustomRopeSolver.Instance != null)
             {
-                RopeScript.instance.hookRigidbody2D.AddForce(new Vector2(hookInput.x, hookInput.y) * forcetoAdd * Time.deltaTime);
+                CustomRopeSolver.Instance.MoveHook(hookInput * forcetoAdd * Time.deltaTime);
             }
         }
     }
     public void ReelRope()
     {
-        if (!RopeScript.instance) 
+        if (!CustomRopeSolver.Instance) 
         {  
             return;   
         }
@@ -139,28 +136,13 @@ public class BoatScript : MonoBehaviour
             float rightTrigger = Mathf.Clamp(triggerValue, 0, 1);
             float leftTrigger = Mathf.Abs(Mathf.Clamp(triggerValue, -1, 0));
 
-            if (rightTrigger > 0 && RopeScript.instance.currentLineLength <= maxLineLength)
+            if (rightTrigger > 0 && CustomRopeSolver.Instance.maxNodes <= maxLineLength)
             {
-                // reel out
-                float nextTimeStamp = lastInstanceTime + Mathf.Lerp(maxReelOutInterval, minReelOutInterval, rightTrigger);
-                RopeScript.instance.nextAllowedInstanceTimeStamp = nextTimeStamp;
-                if (Time.time > nextTimeStamp)
-                {
-                    lastInstanceTime = Time.time;
-                    RopeScript.instance.lastInstanceTimeStamp = lastInstanceTime;
-                    RopeScript.instance.CreateNode();
-                }
+                CustomRopeSolver.Instance.ReelOut(rightTrigger);
             }
             else if (leftTrigger > 0)
             {
-                float nextTimeStamp = lastInstanceTime + Mathf.Lerp(maxReelInInterval, minReelInInterval, leftTrigger);
-                RopeScript.instance.nextAllowedInstanceTimeStamp = nextTimeStamp;
-                if (Time.time > nextTimeStamp)
-                {
-                    lastInstanceTime = Time.time;
-                    RopeScript.instance.lastInstanceTimeStamp = lastInstanceTime;
-                    RopeScript.instance.DestroyNode();
-                }
+                CustomRopeSolver.Instance.ReelIn(leftTrigger);
             }   
         }
 
@@ -172,18 +154,9 @@ public class BoatScript : MonoBehaviour
 //========================================Rope Stuff======================================================
     public void OnCastOut()
     {
-        //when rope is not activated
         if (ropeActive == false && GameManager.Instance.moveCam == 1)
         {
-
-            //destiny is where the mouse is
-            Vector2 destiny = baitpoint.position;
-            //creates a hook
-            curHook = (GameObject)Instantiate(hook, transform.position, Quaternion.identity);
-            curHook.transform.parent = transform;
-            //sets its destiny
-            curHook.GetComponent<RopeScript>().destiny = destiny;
-            GameManager.Instance.Hook = curHook.transform;
+            GameManager.Instance.Hook = CustomRopeSolver.Instance.GetHook();
             GameManager.Instance.baitCam = true;
             GameManager.Instance.moveCam = 3;
             //sets rope to enabled
