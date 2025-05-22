@@ -701,6 +701,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0080b820e18fdc92a0c40801e24ce58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1007758874 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 436910796753052847, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+  m_PrefabInstance: {fileID: 4962793760973506359}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1039891413 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3836749993169283931, guid: bfea0ddd656a2704abe0d417dbde0471, type: 3}
@@ -995,10 +1000,6 @@ PrefabInstance:
     - target: {fileID: 4909532425941253722, guid: ffcb1c54a31c73d319f122c7f551fde6, type: 3}
       propertyPath: m_Name
       value: MusicPlayer
-      objectReference: {fileID: 0}
-    - target: {fileID: 4909532425941253724, guid: ffcb1c54a31c73d319f122c7f551fde6, type: 3}
-      propertyPath: m_RootOrder
-      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 4909532425941253724, guid: ffcb1c54a31c73d319f122c7f551fde6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2140,6 +2141,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 436910797245889801, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+      propertyPath: mindControlCost
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 436910797245889801, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+      propertyPath: buyInst.<DebugObject>k__BackingField
+      value: 
+      objectReference: {fileID: 1007758874}
     - target: {fileID: 436910797487409231, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2529,10 +2538,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4518179710796696795, guid: 4768b34c54479b441af32aacd2aa619c, type: 3}
-      propertyPath: m_FlipX
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7814803752114734574, guid: 4768b34c54479b441af32aacd2aa619c, type: 3}
       propertyPath: m_UIInputModule
       value: 

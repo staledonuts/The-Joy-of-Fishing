@@ -2,18 +2,20 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public class BoatScript : MonoBehaviour
 {
-    //Privates
     [Min(0.02f)] [SerializeField] private float rampUpTime = 1f;
     private float triggerValue;
-    private Vector2 moveInput, hookInput;
+    private bool CanCatchFish = false;
     private bool BoatCanMove = true;
+    private Vector2 moveInput, hookInput;
     private GameObject curHook;
     private Rigidbody2D rig2d;
     private AnimationCurve moveAnimCurve;
-    public int maxLineLength;
+    private Transform fishInventory;
+    private GameObject fishCollective;
+    private BaitScript baitScript;
+    public static event System.Action DoneCollecting;
     public bool currentlyReelingUp;
 
-    //Publics
     [Header("Movement stuff")]
     [SerializeField] public float boatSpeed = 1f, BoatSpeedForce = 10f, forcetoAdd = 100;
 
@@ -54,7 +56,7 @@ public class BoatScript : MonoBehaviour
     private void FixedUpdate()
     {
         MoveLeftRight();
-        moveHook();
+        MoveHook();
         ReelRope();
     }
 
@@ -97,7 +99,7 @@ public class BoatScript : MonoBehaviour
         }
         else
         {
-            bool playerhashorizontalspeed = Mathf.Abs(rig2d.linearVelocity.x) > Mathf.Epsilon;
+            bool playerHasHorizontalSpeed = Mathf.Abs(rig2d.linearVelocity.x) > Mathf.Epsilon;
             Vector2 playerVelocity = new Vector2(moveInput.x * BoatSpeedForce, rig2d.linearVelocity.y);
             rig2d.linearVelocity = playerVelocity;
         }
@@ -110,7 +112,7 @@ public class BoatScript : MonoBehaviour
         }
     }
 
-    public void moveHook()
+    public void MoveHook()
     {
         if(ropeActive && GameManager.Instance.MindcontrolActive)
         {
@@ -120,7 +122,7 @@ public class BoatScript : MonoBehaviour
             }
             else if (CustomRopeSolver.Instance != null)
             {
-                CustomRopeSolver.Instance.MoveHook(hookInput * forcetoAdd * Time.deltaTime);
+                CustomRopeSolver.Instance.ApplyMovementToLastNode(hookInput * forcetoAdd * Time.deltaTime);
             }
         }
     }
@@ -130,23 +132,20 @@ public class BoatScript : MonoBehaviour
         {  
             return;   
         }
-
         else
         {
             float rightTrigger = Mathf.Clamp(triggerValue, 0, 1);
             float leftTrigger = Mathf.Abs(Mathf.Clamp(triggerValue, -1, 0));
 
-            if (rightTrigger > 0 && CustomRopeSolver.Instance.maxNodes <= maxLineLength)
+            if (rightTrigger > Mathf.Epsilon)
             {
                 CustomRopeSolver.Instance.ReelOut(rightTrigger);
             }
-            else if (leftTrigger > 0)
+            else if (leftTrigger > Mathf.Epsilon)
             {
                 CustomRopeSolver.Instance.ReelIn(leftTrigger);
             }   
         }
-
-    
     }
 
 
@@ -174,5 +173,64 @@ public class BoatScript : MonoBehaviour
 
         //Sends out a message for other scripts to listen
         DoneFishing?.Invoke();
+    }
+
+    private void OnEnable()
+    {
+        BaitScript.BaitIsOut += FindHookAndInventory;
+        MoneyEffect.DeleteFish += ClearFishCollection;
+        DoneFishing += AddFishToInventory;
+    }
+
+    private void OnDisable()
+    {
+        BaitScript.BaitIsOut -= FindHookAndInventory;
+        MoneyEffect.DeleteFish -= ClearFishCollection;
+        DoneFishing -= AddFishToInventory;
+    }
+
+    private void FindHookAndInventory(bool bait)
+    {
+        if (bait)
+        {
+            try { fishInventory = GameObject.FindGameObjectWithTag("FishInventory").transform; }
+            catch
+            {
+                GameObject fishGameObject = new GameObject();
+                fishGameObject.tag = "FishInventory";
+                fishGameObject.name = "FishCollection";
+                fishInventory = fishGameObject.transform;
+            }
+
+            baitScript = FindAnyObjectByType<BaitScript>();
+            CanCatchFish = bait;
+        }
+        else
+        {
+            CanCatchFish = bait;
+        }
+    }
+
+    private void AddFishToInventory()
+    {
+        fishCollective = GameObject.FindGameObjectWithTag("FishCollective");
+        for (int i = 0; i < fishCollective.transform.childCount; i++)
+        {
+            if (fishCollective.transform.GetChild(i).CompareTag("Fish"))
+            {
+                fishCollective.transform.GetChild(i).gameObject.SetActive(false);
+                fishCollective.transform.GetChild(i).parent = fishInventory;
+                BaitScript.FishOfHook?.Invoke();
+            }
+        }
+        DoneCollecting?.Invoke();
+    }
+
+    private void ClearFishCollection()
+    {
+        for (int i = 0; i < fishInventory.childCount; i++)
+        {
+            Destroy(fishInventory.GetChild(i).gameObject);
+        }
     }
 }

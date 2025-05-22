@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class MoneyEffect : MonoBehaviour
 {
-    private SoundID rarefishGet;
-    private SoundID commonfishGet;
-    private SoundID legendaryfishGet;
-    private SoundID lvl0coins;
-    private SoundID lvl1coins;
-    private SoundID lvl2coins;
-    private SoundID lvl3coins;
+    [SerializeField] private SoundID rarefishGet;
+    [SerializeField] private SoundID commonfishGet;
+    [SerializeField] private SoundID legendaryfishGet;
+    [SerializeField] private SoundID lvl0coins;
+    [SerializeField] private SoundID lvl1coins;
+    [SerializeField] private SoundID lvl2coins;
+    [SerializeField] private SoundID lvl3coins;
 
     [SerializeField] private ParticleSystem[] coinParticle;
 

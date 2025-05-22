@@ -43,7 +43,7 @@ public class BuyStuff : MonoBehaviour
         if (callMoneyEffectScript.totalMoney >= lvl1Cost)
         {
             lvl1Line.interactable = false;
-            callBoatScript.maxLineLength = lvl1Length;
+            CustomRopeSolver.Instance.maxNodes = lvl1Length;
             callMoneyEffectScript.totalMoney = callMoneyEffectScript.totalMoney - lvl1Cost;
         }
         else
@@ -58,7 +58,7 @@ public class BuyStuff : MonoBehaviour
         {
             lvl1Line.interactable = false;
             lvl2Line.interactable = false;
-            callBoatScript.maxLineLength = lvl2Length;
+            CustomRopeSolver.Instance.maxNodes = lvl2Length;
             callMoneyEffectScript.totalMoney = callMoneyEffectScript.totalMoney - lvl1Cost;
         }
         else
@@ -74,7 +74,7 @@ public class BuyStuff : MonoBehaviour
             lvl1Line.interactable = false;
             lvl2Line.interactable = false;
             lvl3Line.interactable = false;
-            callBoatScript.maxLineLength = lvl3Lenght;
+            CustomRopeSolver.Instance.maxNodes = lvl3Lenght;
             callMoneyEffectScript.totalMoney = callMoneyEffectScript.totalMoney - lvl1Cost;
         }
         else

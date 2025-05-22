@@ -11,18 +11,14 @@ public sealed class CustomRopeSolver : MonoBehaviour
         {
             if (instance == null)
             {
-                // Find singleton of this type in the scene
                 instance = FindFirstObjectByType<CustomRopeSolver>();
-                // If there is no singleton object in the scene, we have to add one
                 if (instance == null)
                 {
-                    GameObject obj = new GameObject("GameManager Singelton");
+                    GameObject obj = new GameObject("CustomRopeSolver_Singleton");
                     instance = obj.AddComponent<CustomRopeSolver>();
-                    // The singleton object shouldn't be destroyed when we switch between scenes
                     DontDestroyOnLoad(obj);
                 }
             }
-
             return instance;
         }
     }
@@ -30,225 +26,500 @@ public sealed class CustomRopeSolver : MonoBehaviour
     [System.Serializable]
     private struct RopeNode
     {
-        public Vector2 position;
+        public Vector2 position; // Physics target position
         public Vector2 prevPosition;
-        public Transform transform;
+        public Transform transform; // Visual representation of the node
+        public Vector2 visualPosition; // Current visual position for interpolation
     }
+
     public Transform rodTip;
-    public GameObject nodePrefab;
+    public GameObject nodePrefab; 
     public GameObject hookPrefab;
     public int maxNodes = 50;
     public float segmentLength = 0.3f;
-    public float tightenFactor = 0.5f;
-    public float gravityScale = 1f;
+    public float gravityScale = 1f; 
     public LineRenderer ropeLine;
     public LayerMask obstacleMask;
-    public float nodeRadius = 0.05f;
+    public float nodeRadius = 0.05f; 
+    public float collisionBounceFactor = 0.0f; 
+    [Range(0.8f, 1.0f)] 
+    public float lastNodeVelocityRetention = 0.95f; 
+
+    public float minSettleSpeedFactor = 1.0f; 
+    public float maxSettleSpeedFactor = 1.5f; 
+    public float settleSpeedEffectDuration = 0.25f; 
+
+    [Header("Visual Interpolation")]
+    public float visualInterpolationSpeed = 15f; // Speed for Lerp
 
     private List<RopeNode> nodes = new List<RopeNode>();
-    private Transform hook;
-    private Rigidbody2D hookRb;
-    private float gravity = -9.81f;
-    private HashSet<(int, int)> wrappedSegments = new();
+    private Transform hook; 
+    private Rigidbody2D hookRb; 
+    
+    private float worldGravity = -9.81f; 
 
     private float maxReelOutInterval = 0.4f, minReelOutInterval = 0.05f;
     private float maxReelInInterval = 0.4f, minReelInInterval = 0.10f;
     private float lastInstanceTime = 0;
 
+    private float currentReelOutSettleSpeedFactor = 1.0f;
+    private float reelSettleSpeedEffectTimer = 0f;
 
+    // For hook interpolation
+    private Vector2 hookPhysicsTargetPosition;
+    private Vector2 hookVisualPosition;
+    private Quaternion hookVisualRotation;
+
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Debug.LogWarning("Another instance of CustomRopeSolver found, destroying this one.");
+            Destroy(gameObject);
+            return;
+        }
+    }
 
     private void Start()
     {
-        Vector2 startPos = rodTip.position;
-
-        // Initialize static nodes
-        for (int i = 0; i < 3; i++)
+        if (rodTip == null)
         {
-            Vector2 pos = startPos - new Vector2(0, i * segmentLength);
-            GameObject nodeObj = Instantiate(nodePrefab, pos, Quaternion.identity, transform);
-            nodeObj.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
+            Debug.LogError("RodTip transform is not assigned in CustomRopeSolver!");
+            enabled = false; 
+            return;
+        }
+        if (hookPrefab == null)
+        {
+            Debug.LogError("Hook Prefab is not assigned in CustomRopeSolver!");
+            enabled = false;
+            return;
+        }
 
+        Vector2 startPos = rodTip.position;
+        // Initialize with at least one node: the rodTip anchor.
+        // The Start() method previously initialized 3 nodes. We'll keep node[0] as the anchor.
+        // And then add a couple of segments to start with a visible line.
+
+        // Add the anchor node (nodes[0])
+        nodes.Add(new RopeNode
+        {
+            position = startPos,
+            prevPosition = startPos,
+            transform = null, // Rod tip node doesn't need its own prefab instance usually
+            visualPosition = startPos 
+        });
+        
+        // Add 2 more nodes to make an initial line of 2 segments
+        for (int i = 0; i < 2; i++) 
+        {
+            if (nodes.Count >= maxNodes) break; 
+
+            RopeNode previousNode = nodes[nodes.Count - 1]; // Get the actual last node (which is nodes[0] then nodes[1])
+            Vector2 physPos = previousNode.position - new Vector2(0, segmentLength); // Extend downwards from previous
+            
+            GameObject nodeObj = null;
+            if (nodePrefab != null) 
+            {
+                nodeObj = Instantiate(nodePrefab, physPos, Quaternion.identity, transform);
+                Rigidbody2D nodeRb = nodeObj.GetComponent<Rigidbody2D>();
+                if (nodeRb != null) nodeRb.bodyType = RigidbodyType2D.Kinematic;
+            }
+            
             nodes.Add(new RopeNode
             {
-                position = pos,
-                prevPosition = pos,
-                transform = nodeObj.transform
+                position = physPos,
+                prevPosition = physPos,
+                transform = nodeObj?.transform,
+                visualPosition = physPos 
             });
         }
 
-        // Add the hook
-        GameObject hookObj = Instantiate(hookPrefab, startPos - new Vector2(0, 3 * segmentLength), Quaternion.identity, transform);
+
+        hookPhysicsTargetPosition = nodes.Count > 0 ? 
+                                 nodes[nodes.Count - 1].position + Vector2.down * segmentLength : 
+                                 startPos + Vector2.down * segmentLength;
+        hookVisualPosition = hookPhysicsTargetPosition;
+
+
+        GameObject hookObj = Instantiate(hookPrefab, hookVisualPosition, Quaternion.identity, transform);
         hookRb = hookObj.GetComponent<Rigidbody2D>();
-        hookRb.bodyType = RigidbodyType2D.Dynamic;
+        if (hookRb == null)
+        {
+            Debug.LogError("Hook prefab must have a Rigidbody2D component!", hookObj);
+            hookRb = hookObj.AddComponent<Rigidbody2D>(); 
+        }
+        hookRb.bodyType = RigidbodyType2D.Kinematic; 
         hook = hookObj.transform;
+        hookVisualRotation = hook.rotation; 
     }
 
     private void FixedUpdate()
     {
+        if (rodTip == null || hook == null) return; 
+        // Ensure there's at least the rodTip anchor node before proceeding
+        if (nodes.Count == 0 && rodTip == null) return; 
+
+        if (reelSettleSpeedEffectTimer > 0)
+        {
+            reelSettleSpeedEffectTimer -= Time.fixedDeltaTime;
+            if (reelSettleSpeedEffectTimer <= 0)
+            {
+                currentReelOutSettleSpeedFactor = 1.0f; 
+                reelSettleSpeedEffectTimer = 0f; 
+            }
+        }
+
         Simulate(Time.fixedDeltaTime);
         SolveConstraints();
-        CheckWrapping();
-        UpdateTransforms();
-        DrawRope();
+        CorrectCollisionsAfterConstraints(); 
+        
+        UpdateHookPhysicsTargetPosition();
     }
+
+    void Update() 
+    {
+        if (rodTip == null || hook == null) return;
+        if (nodes.Count == 0) return; // Need at least the anchor node
+
+        // Interpolate visual positions of nodes
+        // Node 0 (rodTip) visual position should always match rodTip.position
+        RopeNode rootNode = nodes[0];
+        rootNode.visualPosition = rodTip.position; // Directly set, no lerp for anchor
+        if (rootNode.transform != null) rootNode.transform.position = rootNode.visualPosition; // Should be null
+        nodes[0] = rootNode;
+
+        for (int i = 1; i < nodes.Count; i++) // Start lerping from the first actual segment node
+        {
+            RopeNode node = nodes[i];
+            if (node.transform != null)
+            {
+                node.visualPosition = Vector2.Lerp(node.visualPosition, node.position, Time.deltaTime * visualInterpolationSpeed);
+                node.transform.position = node.visualPosition;
+                nodes[i] = node; 
+            }
+            else 
+            {
+                 node.visualPosition = node.position;
+                 nodes[i] = node;
+            }
+        }
+
+        // Interpolate hook's visual position and rotation
+        hookVisualPosition = Vector2.Lerp(hookVisualPosition, hookPhysicsTargetPosition, Time.deltaTime * visualInterpolationSpeed);
+        hook.position = hookVisualPosition;
+
+        if (nodes.Count > 0) // Check if there are any nodes to determine hook rotation
+        {
+            // Hook rotation should be based on the last *segment's* visual orientation
+            // If only nodes[0] (rodTip) exists, there's no segment yet to orient from, use default.
+            Vector2 lastSegmentStartVisual = (nodes.Count > 1) ? nodes[nodes.Count - 2].visualPosition : nodes[0].visualPosition;
+            Vector2 lastNodeVisual = nodes[nodes.Count - 1].visualPosition;
+
+            // The direction for the hook should be from the last node to the hook itself
+            Vector2 directionToHookVisual = (hookVisualPosition - lastNodeVisual).normalized;
+
+            if (directionToHookVisual != Vector2.zero)
+            {
+                float targetAngle = Mathf.Atan2(directionToHookVisual.y, directionToHookVisual.x) * Mathf.Rad2Deg;
+                Quaternion targetRotation = Quaternion.AngleAxis(targetAngle - 90f, Vector3.forward);
+                hookVisualRotation = Quaternion.Lerp(hookVisualRotation, targetRotation, Time.deltaTime * visualInterpolationSpeed);
+                hook.rotation = hookVisualRotation;
+            } else if (nodes.Count == 1) { // Only rodTip node, hook hangs directly below
+                 Quaternion targetRotation = Quaternion.Euler(0,0,-90f);
+                 hookVisualRotation = Quaternion.Lerp(hookVisualRotation, targetRotation, Time.deltaTime * visualInterpolationSpeed);
+                 hook.rotation = hookVisualRotation;
+            }
+        } else if (rodTip != null) { // No nodes at all (should not happen if Start initializes one)
+             Quaternion targetRotation = Quaternion.Euler(0,0,-90f);
+             hookVisualRotation = Quaternion.Lerp(hookVisualRotation, targetRotation, Time.deltaTime * visualInterpolationSpeed);
+             hook.rotation = hookVisualRotation;
+        }
+
+
+        DrawRope(); 
+    }
+
 
     private void Simulate(float dt)
     {
-        for (int i = 1; i < nodes.Count; i++)
+        // Node 0 is the rod tip anchor, its physics position is set in SolveConstraints.
+        // So simulation starts from node 1.
+        for (int i = 1; i < nodes.Count; i++) 
         {
             RopeNode n = nodes[i];
-            Vector2 velocity = n.position - n.prevPosition;
-            n.prevPosition = n.position;
-            n.position += velocity;
-            n.position += Vector2.up * gravity * gravityScale * dt * dt;
+            Vector2 velocity = n.position - n.prevPosition; 
 
-            Collider2D hit = Physics2D.OverlapCircle(n.position, nodeRadius, obstacleMask);
-            if (hit)
+            if (i == nodes.Count - 1 && nodes.Count > 1) // Apply drag only if it's the actual last segment end 
             {
-                Vector2 closest = hit.ClosestPoint(n.position);
-                Vector2 pushDir = (n.position - closest).normalized;
-                n.position = closest + pushDir * nodeRadius;
+                velocity *= lastNodeVelocityRetention;
             }
+            
+            Vector2 currentPositionForCast = n.position; 
+            n.prevPosition = currentPositionForCast;     
 
+            Vector2 tentativePosition = currentPositionForCast + velocity + (Vector2.up * worldGravity * gravityScale * dt * dt);
+            
+            Vector2 movementVector = tentativePosition - currentPositionForCast;
+            float movementDistance = movementVector.magnitude;
+
+            if (movementDistance > 0.0001f) 
+            {
+                RaycastHit2D hit = Physics2D.CircleCast(currentPositionForCast, nodeRadius, movementVector.normalized, movementDistance, obstacleMask);
+
+                if (hit.collider != null)
+                {
+                    Vector2 collisionNormal = hit.normal; 
+                    if (hit.distance < 0.001f) 
+                    {
+                        n.position = currentPositionForCast + collisionNormal * (nodeRadius * 1.01f + 0.001f); 
+                    }
+                    else
+                    {
+                        n.position = hit.point + collisionNormal * (nodeRadius * 0.05f); 
+                    }
+
+                    float vn_scalar = Vector2.Dot(velocity, collisionNormal); 
+                    Vector2 v_normalComponent = vn_scalar * collisionNormal;    
+                    Vector2 v_tangentialComponent = velocity - v_normalComponent; 
+                    Vector2 velocityAfterCollision = v_tangentialComponent - (v_normalComponent * collisionBounceFactor);
+                    n.prevPosition = n.position - velocityAfterCollision; 
+                }
+                else
+                {
+                    n.position = tentativePosition;
+                }
+            }
+            else 
+            {
+                 n.position = tentativePosition; 
+            }
             nodes[i] = n;
         }
     }
 
-private void SolveConstraints()
-{
-    RopeNode root = nodes[0];
-    root.position = rodTip.position;
-    nodes[0] = root;
-
-    for (int iter = 0; iter < 5; iter++)
+    private void SolveConstraints()
     {
-        for (int i = 1; i < nodes.Count; i++)
+        if (nodes.Count == 0) return; // Should not happen if Start initializes nodes[0]
+
+        // Rod tip node (node 0) always follows the rodTip transform directly (physics position)
+        RopeNode rootNode = nodes[0];
+        rootNode.position = rodTip.position;
+        rootNode.prevPosition = rodTip.position; 
+        nodes[0] = rootNode;
+
+
+        for (int iter = 0; iter < 15; iter++) 
         {
-            Vector2 a = nodes[i - 1].position;
-            Vector2 b = nodes[i].position;
-            float dist = Vector2.Distance(a, b);
-            Vector2 dir = (b - a).normalized;
-            float error = dist - segmentLength;
-            Vector2 correction = dir * error * 0.5f;
-
-            if (i != 1)
+            // Constraint solving starts from the segment between nodes[0] and nodes[1]
+            for (int i = 0; i < nodes.Count - 1; i++) 
             {
-                RopeNode prevNode = nodes[i - 1];
-                prevNode.position += correction;
-                nodes[i - 1] = prevNode;
-            }
+                RopeNode nodeA = nodes[i];
+                RopeNode nodeB = nodes[i + 1];
 
-            RopeNode node = nodes[i];
-            node.position -= correction;
-            nodes[i] = node;
+                Vector2 delta = nodeB.position - nodeA.position;
+                float currentDistance = delta.magnitude;
+                float error = 0f;
+
+                if (currentDistance > 0.0001f) 
+                   error = (currentDistance - segmentLength) / currentDistance;
+                else 
+                {
+                     error = (currentDistance - segmentLength) / (segmentLength + 0.0001f); 
+                }
+
+                Vector2 correction = delta * 0.5f * error; 
+
+                // Apply settle speed factor to the first segment (between rodTip and first free node)
+                // if the effect is active and it's trying to expand.
+                if (i == 0 && reelSettleSpeedEffectTimer > 0 && nodes.Count > 1) // nodes.Count > 1 ensures nodeB (nodes[1]) exists
+                {
+                    if (currentDistance < segmentLength) 
+                    {
+                        correction *= currentReelOutSettleSpeedFactor;
+                    }
+                }
+
+                // nodeA is nodes[0] (rodTip), its position is fixed and should not be moved by constraints from below.
+                // So, only nodeB (which is nodes[i+1]) gets the full correction in the opposite direction.
+                // If i > 0, then nodeA is a free node and moves.
+                if (i != 0) 
+                {
+                    nodeA.position += correction;
+                    nodes[i] = nodeA;
+                }
+                nodeB.position -= correction; // nodeB always moves
+                nodes[i + 1] = nodeB;
+            }
         }
     }
 
-    // Final constraint: hook
-    Vector2 endDir = (Vector2)hook.position - nodes[nodes.Count - 1].position;
-    float hookDist = endDir.magnitude;
-    if (hookDist > segmentLength)
+    private void CorrectCollisionsAfterConstraints()
     {
-        Vector2 correction = endDir.normalized * (hookDist - segmentLength);
-        hookRb.AddForce(-correction * 500f);
-    }
-}
-private void CheckWrapping()
-    {
-        for (int i = 0; i < nodes.Count - 1; i++)
+        // Start from 1, node 0 is rod tip and its position is sacred
+        for (int i = 1; i < nodes.Count; i++) 
         {
-            Vector2 a = nodes[i].position;
-            Vector2 b = nodes[i + 1].position;
-            float dist = Vector2.Distance(a, b);
-            Vector2 dir = (b - a).normalized;
+            RopeNode n = nodes[i];
+            Collider2D hit = Physics2D.OverlapCircle(n.position, nodeRadius, obstacleMask);
 
-            if (!wrappedSegments.Contains((i, i + 1)))
+            if (hit != null) 
             {
-                RaycastHit2D hit = Physics2D.Raycast(a, dir, dist, obstacleMask);
-                if (hit.collider)
+                Vector2 closestPointOnCollider = hit.ClosestPoint(n.position);
+                Vector2 directionFromCollider = (n.position - closestPointOnCollider).normalized;
+                if (directionFromCollider.sqrMagnitude < 0.0001f)
                 {
-                    Vector2 hitPoint = hit.point;
-                    GameObject wrapObj = Instantiate(nodePrefab, hitPoint, Quaternion.identity, transform);
-                    wrapObj.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
-
-                    RopeNode wrapNode = new RopeNode
+                    directionFromCollider = (n.position - (Vector2)hit.bounds.center).normalized;
+                    if (directionFromCollider.sqrMagnitude < 0.0001f) 
                     {
-                        position = hitPoint,
-                        prevPosition = hitPoint,
-                        transform = wrapObj.transform
-                    };
+                        directionFromCollider = Vector2.up; 
+                    }
+                }
+                n.position = closestPointOnCollider + directionFromCollider * (nodeRadius + 0.001f); 
+                nodes[i] = n; 
+            }
+        }
+    }
+    
+    private void UpdateHookPhysicsTargetPosition() 
+    {
+        if (nodes.Count > 0) // Check if there's at least the rodTip node
+        {
+            RopeNode lastPhysicsNode = nodes[nodes.Count - 1]; 
+            Vector2 directionFromPreviousPhysicsNode;
 
-                    nodes.Insert(i + 1, wrapNode);
-                    wrappedSegments.Add((i, i + 1));
-                    break;
+            if (nodes.Count > 1) // If there's an actual segment before the last node
+            {
+                RopeNode secondLastPhysicsNode = nodes[nodes.Count - 2];
+                if (Vector2.SqrMagnitude(lastPhysicsNode.position - secondLastPhysicsNode.position) > 0.00001f)
+                {
+                    directionFromPreviousPhysicsNode = (lastPhysicsNode.position - secondLastPhysicsNode.position).normalized;
+                }
+                else 
+                {
+                    // Fallback: direction from rodTip to last node if secondLast and last are coincident
+                    directionFromPreviousPhysicsNode = (lastPhysicsNode.position - nodes[0].position).normalized; 
+                    if (directionFromPreviousPhysicsNode == Vector2.zero) 
+                    {
+                        directionFromPreviousPhysicsNode = Vector2.down; // Absolute fallback
+                    }
                 }
             }
+            else // Only one node (nodes[0], the rodTip anchor), hook hangs directly below it
+            {
+                directionFromPreviousPhysicsNode = Vector2.down; 
+            }
+            
+            hookPhysicsTargetPosition = lastPhysicsNode.position + directionFromPreviousPhysicsNode * segmentLength;
         }
-    }
-
-    private void UpdateTransforms()
-    {
-        for (int i = 0; i < nodes.Count; i++)
+        else if (rodTip != null) // Should not be reached if Start() guarantees nodes[0]
         {
-            nodes[i].transform.position = nodes[i].position;
+            hookPhysicsTargetPosition = rodTip.position;
         }
     }
 
-    private void DrawRope()
+    private void DrawRope() 
     {
         if (!ropeLine) return;
-
-        ropeLine.positionCount = nodes.Count + 1;
-        for (int i = 0; i < nodes.Count; i++)
-        {
-            ropeLine.SetPosition(i, nodes[i].position);
+        if (nodes.Count == 0) { // Need at least the anchor for drawing to hook
+             ropeLine.positionCount = 0;
+             return;
         }
-        ropeLine.SetPosition(nodes.Count, hook.position);
+
+
+        // LineRenderer uses visual positions
+        int pointCount = nodes.Count + 1; // nodes[0]...nodes[N-1] + hook
+
+        ropeLine.positionCount = pointCount;
+        
+        // First point of LineRenderer is always nodes[0].visualPosition (rodTip)
+        ropeLine.SetPosition(0, nodes[0].visualPosition);
+
+        for (int i = 1; i < nodes.Count; i++) // Draw segments from nodes[1] onwards
+        {
+            ropeLine.SetPosition(i, nodes[i].visualPosition); 
+        }
+        // Last point of LineRenderer is the hook's visual position
+        ropeLine.SetPosition(nodes.Count, hookVisualPosition); 
     }
 
-    public void ReelIn(float inputAmount)
+    public void ReelIn(float inputAmount) 
     {
-        float nextTimeStamp = lastInstanceTime + Mathf.Lerp(maxReelInInterval, minReelInInterval, inputAmount);
-        if (Time.time > nextTimeStamp && nodes.Count > 2)
+        float interval = Mathf.Lerp(maxReelInInterval, minReelInInterval, inputAmount);
+        if (Time.time < lastInstanceTime + interval) return;
+        
+        // We need at least nodes[0] (rodTip) and nodes[1] (first segment) to remove nodes[1].
+        // So, nodes.Count must be greater than 1.
+        if (nodes.Count > 1) 
         {
             lastInstanceTime = Time.time;
-            Destroy(nodes[^1].transform.gameObject);
-            nodes.RemoveAt(nodes.Count - 1);
+            RopeNode removedNode = nodes[1]; // Remove the node right after the rodTip anchor
+            if (removedNode.transform != null) 
+            {
+                Destroy(removedNode.transform.gameObject);
+            }
+            nodes.RemoveAt(1); // Remove at index 1
         }
     }
 
-    public void ReelOut(float inputAmount)
+    public void ReelOut(float inputAmount) 
     {
+        // Check if we can add more nodes (maxNodes includes the anchor node at index 0)
         if (nodes.Count >= maxNodes) return;
 
-        float nextTimeStamp = lastInstanceTime + Mathf.Lerp(maxReelOutInterval, minReelOutInterval, inputAmount);
-        if (Time.time > nextTimeStamp)
+        float interval = Mathf.Lerp(maxReelOutInterval, minReelOutInterval, inputAmount);
+        if (Time.time < lastInstanceTime + interval) return;
+        
+        // This should only be called if nodes[0] (rodTip anchor) exists.
+        // Start() ensures nodes.Count is at least 1.
+        if (nodes.Count > 0 && nodes.Count < maxNodes) 
         {
             lastInstanceTime = Time.time;
-            Vector2 lastDir = nodes[^1].position - nodes[^2].position;
-            Vector2 newPos = nodes[^1].position + lastDir.normalized * segmentLength;
+            
+            RopeNode rodTipNode = nodes[0]; // The anchor point
+            
+            // New node's physics position starts at the rod tip
+            Vector2 initialNewNodePhysicsPos = rodTipNode.position; 
+            // New node's visual position also starts at the rod tip's visual position
+            Vector2 initialVisualPos = rodTipNode.visualPosition; 
 
-            GameObject nodeObj = Instantiate(nodePrefab, newPos, Quaternion.identity, transform);
-            nodeObj.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
+            GameObject nodeObj = null;
+            if (nodePrefab != null)
+            {
+                // Instantiate at the visual starting point
+                nodeObj = Instantiate(nodePrefab, initialVisualPos, Quaternion.identity, transform);
+                Rigidbody2D nodeRb = nodeObj.GetComponent<Rigidbody2D>();
+                if (nodeRb != null) nodeRb.bodyType = RigidbodyType2D.Kinematic;
+            }
 
             RopeNode newNode = new RopeNode
             {
-                position = newPos,
-                prevPosition = newPos,
-                transform = nodeObj.transform
+                position = initialNewNodePhysicsPos, 
+                prevPosition = initialNewNodePhysicsPos, // Start with zero velocity relative to spawn
+                transform = nodeObj?.transform,
+                visualPosition = initialVisualPos 
             };
 
-            nodes.Add(newNode);
+            nodes.Insert(1, newNode); // Insert the new node at index 1 (after rodTip anchor)
+
+            currentReelOutSettleSpeedFactor = Mathf.Lerp(minSettleSpeedFactor, maxSettleSpeedFactor, inputAmount);
+            reelSettleSpeedEffectTimer = settleSpeedEffectDuration;
         }
     }
 
     public Transform GetHook() => hook;
 
-    public void MoveHook(Vector2 vec2)
+    public void ApplyMovementToLastNode(Vector2 displacementThisFrame)
     {
-        if (hookRb != null)
+        if (nodes.Count > 0) // Check if there's at least the rodTip node
         {
-            hookRb.AddForce(vec2 * 50f);
+            // Apply movement to the actual last node in the list
+            RopeNode lastNode = nodes[nodes.Count - 1];
+            lastNode.position += displacementThisFrame; 
+            nodes[nodes.Count - 1] = lastNode;
         }
     }
 }
