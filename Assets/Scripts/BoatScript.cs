@@ -1,8 +1,8 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class BoatScript : MonoBehaviour
 {
-    [Min(0.02f)] [SerializeField] private float rampUpTime = 1f;
     private float triggerValue;
     private bool CanCatchFish = false;
     private bool BoatCanMove = true;
@@ -11,23 +11,16 @@ public class BoatScript : MonoBehaviour
     private Rigidbody2D rig2d;
     private Transform fishInventory;
     private GameObject fishCollective;
-    private BaitScript baitScript;
-    public static event System.Action DoneCollecting;
+    public static event Action DoneCollecting;
+    public static event Action DoneFishing;
     public bool currentlyReelingUp;
 
     [Header("Movement stuff")]
     [SerializeField] public float boatSpeed = 1f, BoatSpeedForce = 10f, forcetoAdd = 100;
-
-    //public static event System.Action<bool> IsFishing;
-    public static event System.Action DoneFishing;
     [SerializeField] private CustomRopeSolver customRope;
-
     public Transform baitpoint, baitTransform, rodpoint;
-
-    //holds whether rope is active or not
     [HideInInspector] public bool ropeActive, boostbool;
 
-    //current hook on the scene
 
     private void Awake()
     {
@@ -40,9 +33,6 @@ public class BoatScript : MonoBehaviour
         MoveHook();
         ReelRope();
     }
-
-
-//=============================================Input Stuff========================================
 
     public void GetInput(InputAction.CallbackContext context)
     {
@@ -129,9 +119,6 @@ public class BoatScript : MonoBehaviour
         }
     }
 
-
-
-//========================================Rope Stuff======================================================
     public void OnCastOut()
     {
         if (ropeActive == false && GameManager.Instance.moveCam == 1)
@@ -174,7 +161,10 @@ public class BoatScript : MonoBehaviour
     {
         if (bait)
         {
-            try { fishInventory = GameObject.FindGameObjectWithTag("FishInventory").transform; }
+            try
+            {
+                fishInventory = GameObject.FindGameObjectWithTag("FishInventory").transform;
+            }
             catch
             {
                 GameObject fishGameObject = new GameObject();
@@ -182,8 +172,6 @@ public class BoatScript : MonoBehaviour
                 fishGameObject.name = "FishCollection";
                 fishInventory = fishGameObject.transform;
             }
-
-            baitScript = FindAnyObjectByType<BaitScript>();
             CanCatchFish = bait;
         }
         else

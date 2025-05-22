@@ -1,17 +1,25 @@
+using System;
 using Ami.BroAudio;
 using UnityEngine;
 
 public class MoneyEffect : MonoBehaviour
 {
-    [SerializeField] private SoundID rarefishGet;
-    [SerializeField] private SoundID commonfishGet;
-    [SerializeField] private SoundID legendaryfishGet;
-    [SerializeField] private SoundID lvl0coins;
-    [SerializeField] private SoundID lvl1coins;
-    [SerializeField] private SoundID lvl2coins;
-    [SerializeField] private SoundID lvl3coins;
+    [Serializable]
+    private class FishRanking
+    {
+        public SoundID FishGetAudio;
+        public SoundID CoinGetAudio;
+        public ParticleSystem CoinParticle;
 
-    [SerializeField] private ParticleSystem[] coinParticle;
+        public void Play(Transform transform)
+        {
+            CoinGetAudio.Play(transform);
+            FishGetAudio.Play(transform);
+            CoinParticle.Play();
+        }
+    }
+
+    [SerializeField] private FishRanking[] fishRanking;
 
     private GameObject FishCollector;
 
@@ -21,17 +29,13 @@ public class MoneyEffect : MonoBehaviour
 
     private bool hookedFish = false;
 
-    public static event System.Action DeleteFish;
-    public static event System.Func<uint> TheMoney;
+    public static event Action DeleteFish;
+    public static event Func<uint> TheMoney;
 
     BankAccountScript callBankAccountScript;
 
     private void Awake()
     {
-        //FMODUnity.RuntimeManager.AttachInstanceToGameObject(fishGetInstance, gameObject.transform);
-        //FMODUnity.RuntimeManager.AttachInstanceToGameObject(coinsInstnace, gameObject.transform);
-        //coinsInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(gameObject));
-        //fishGetInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(gameObject));
         callBankAccountScript = FindAnyObjectByType<BankAccountScript>();
     }
 
@@ -95,47 +99,9 @@ public class MoneyEffect : MonoBehaviour
         //Debug.Log(totalMoney);
 
 
-        coinParticle[a].Play();
-        PlaySound(a);
+        fishRanking[a].Play(transform);
 
         DeleteFish?.Invoke();
         TheMoney?.Invoke();
     }
-
-    private void PlaySound(int level)
-    {
-        // Levels 0 1 2 3 small to big.
-        switch (level)
-        {
-            default:
-            case 0:
-            {
-                lvl0coins.Play(transform);
-                commonfishGet.Play(transform);
-                break;
-            }
-            case 1:
-            {
-                lvl1coins.Play(transform);
-                commonfishGet.Play(transform);
-                break;
-            }
-            case 2:
-            {
-                lvl2coins.Play(transform);
-                rarefishGet.Play(transform);
-                break;
-            }
-            case 3:
-            {
-                lvl3coins.Play(transform);
-                legendaryfishGet.Play(transform);
-
-                break;
-            }
-        }
-
-    }
-
-
 }

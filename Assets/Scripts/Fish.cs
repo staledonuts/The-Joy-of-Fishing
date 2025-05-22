@@ -8,37 +8,25 @@ using UnityEngine;
 public class Fish : ScriptableObject
 {
     public Sprite sprite;
-
     public RuntimeAnimatorController animatorController;
-
     public string fishName = "";
-
     [Header("The length and weight affects " +
         "excitementLevel, struggleCount, baitLevel")]
     [Tooltip("In cg")]
     public float weight;
-
     [Tooltip("In dm")]
     public float length;
-
     [Tooltip("The amount of money you get when the fish is sold")]
     public uint value = 10;
-
     public float baitAttractionRadius = 10f;
-
     public Color fishColor = Color.white;
-
     public int struggleCount;
-
     public int excitementLevel;
-
     public int baitLevel;
-
     private void OnValidate()
     {
         CheckValue();
     }
-
     private void CheckValue()
     {
         var wlValue = weight + length;

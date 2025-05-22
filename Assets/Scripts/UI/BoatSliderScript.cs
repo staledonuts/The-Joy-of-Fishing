@@ -47,10 +47,8 @@ public class BoatSliderScript : MonoBehaviour
         playerIniPos = playerTransform.position.x;
         playerIniPosY = playerTransform.position.y;
 
-
         boatScript = FindAnyObjectByType<BoatScript>();
         cache = false;
-
 
         if(thisIsBoatSlider == true || thisIsHookSliderHorizontal == true)
         {
