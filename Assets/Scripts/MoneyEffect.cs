@@ -37,7 +37,7 @@ public class MoneyEffect : MonoBehaviour
 
     private void OnEnable()
     {
-        CollectFish.DoneCollecting += EarnMoney;
+        BoatScript.DoneCollecting += EarnMoney;
         BaitScript.BaitIsOut += FindFishCollector;
         BaitScript.FishOnHook += IsFishOnHook;
         TheMoney = delegate () { return totalMoney; };
@@ -45,7 +45,7 @@ public class MoneyEffect : MonoBehaviour
 
     private void OnDisable()
     {
-        CollectFish.DoneCollecting -= EarnMoney;
+        BoatScript.DoneCollecting -= EarnMoney;
         BaitScript.BaitIsOut -= FindFishCollector;
         BaitScript.FishOnHook -= IsFishOnHook;
     }

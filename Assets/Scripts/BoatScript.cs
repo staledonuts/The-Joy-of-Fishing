@@ -9,7 +9,6 @@ public class BoatScript : MonoBehaviour
     private Vector2 moveInput, hookInput;
     private GameObject curHook;
     private Rigidbody2D rig2d;
-    private AnimationCurve moveAnimCurve;
     private Transform fishInventory;
     private GameObject fishCollective;
     private BaitScript baitScript;
@@ -34,24 +33,6 @@ public class BoatScript : MonoBehaviour
     {
         rig2d = GetComponent<Rigidbody2D>();
     }
-
-    private void Start()
-    {
-        //MakeAnimationCurve();
-        //GetKey = new TheJoyofFishing();
-        //GetKey.Enable();
-    }
-
-    #region Make a animation curve
-
-    private void MakeAnimationCurve()
-    {
-        moveAnimCurve = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(rampUpTime, 1f));
-        moveAnimCurve.preWrapMode = WrapMode.PingPong;
-        moveAnimCurve.postWrapMode = WrapMode.PingPong;
-    }
-
-    #endregion Make a animation curve
 
     private void FixedUpdate()
     {

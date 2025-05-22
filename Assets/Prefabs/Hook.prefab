@@ -168,8 +168,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fishHookedInstance:
-    ID: 0
-    _sourceAsset: {fileID: 0}
+    ID: 1073741824
+    _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
     <DebugObject>k__BackingField: {fileID: 1000012688847204}
   bait:
   - {fileID: 11400000, guid: 3cb2a833816582f48b62062c90a1df16, type: 2}
