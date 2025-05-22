@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 5883369509628922158}
   - component: {fileID: 3107338935538063745}
   - component: {fileID: 1678891643821340272}
-  - component: {fileID: 709717564203911704}
   - component: {fileID: -4851215850341437973}
   m_Layer: 12
   m_Name: CatFish
@@ -120,7 +119,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df30e90a46919864ca79b124c882e5f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fishStats: {fileID: 11400000, guid: a4763f56f034231488d23b52810d6009, type: 2}
+  _sprite: {fileID: -1670033504, guid: feb06b1dd1eb2044ab3aea80fd95beb5, type: 3}
+  _animatorController: {fileID: 9100000, guid: bc17b9af815b1aa449024bcd07a5b723, type: 2}
+  _fishName: CatFish
+  _weight: 0
+  _length: 0
+  _value: 10
+  _baitAttractionRadius: 10
+  _fishColor: {r: 1, g: 1, b: 1, a: 1}
+  _struggleCount: 0
+  _excitementLevel: 0
+  _baitLevel: 0
   wanderRadius: 12
   wanderJitter: 1
 --- !u!58 &1678891643821340272
@@ -159,19 +168,6 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 1.35
---- !u!114 &709717564203911704
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6181217008843519828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98caa799924fb004c9de084cd196e5df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fishStats: {fileID: 11400000, guid: a4763f56f034231488d23b52810d6009, type: 2}
 --- !u!50 &-4851215850341437973
 Rigidbody2D:
   serializedVersion: 5

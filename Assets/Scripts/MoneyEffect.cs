@@ -4,21 +4,6 @@ using UnityEngine;
 
 public class MoneyEffect : MonoBehaviour
 {
-    [Serializable]
-    private class FishRanking
-    {
-        public SoundID FishGetAudio;
-        public SoundID CoinGetAudio;
-        public ParticleSystem CoinParticle;
-
-        public void Play(Transform transform)
-        {
-            CoinGetAudio.Play(transform);
-            FishGetAudio.Play(transform);
-            CoinParticle.Play();
-        }
-    }
-
     [SerializeField] private FishRanking[] fishRanking;
 
     private GameObject FishCollector;
@@ -75,10 +60,10 @@ public class MoneyEffect : MonoBehaviour
 
         for (int i = 0; i < FishCollector.transform.childCount; i++)
         {
-            b[i] = FishCollector.transform.GetChild(i).GetComponent<FishStats>().fishStats.value;
-            if (FishCollector.transform.GetChild(i).GetComponent<FishStats>().fishStats.baitLevel > a)
+            b[i] = FishCollector.transform.GetChild(i).GetComponent<FishStats>().Value;
+            if (FishCollector.transform.GetChild(i).GetComponent<FishStats>().BaitLevel > a)
             {
-                a = FishCollector.transform.GetChild(i).GetComponent<FishStats>().fishStats.baitLevel;
+                a = FishCollector.transform.GetChild(i).GetComponent<FishStats>().BaitLevel;
             }
         }
 
@@ -96,9 +81,6 @@ public class MoneyEffect : MonoBehaviour
             }
 
         }
-        //Debug.Log(totalMoney);
-
-
         fishRanking[a].Play(transform);
 
         DeleteFish?.Invoke();

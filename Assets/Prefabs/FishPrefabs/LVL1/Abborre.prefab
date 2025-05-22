@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8898945665741332746}
   - component: {fileID: 8898945665741332789}
   - component: {fileID: 8898945665741332788}
-  - component: {fileID: 2944203013556537439}
   - component: {fileID: 8898945665741332791}
   - component: {fileID: 883294983081264371}
   m_Layer: 12
@@ -144,19 +143,6 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.25
---- !u!114 &2944203013556537439
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8898945665741332790}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98caa799924fb004c9de084cd196e5df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fishStats: {fileID: 11400000, guid: b6c377b4baee9c441af8d56440698186, type: 2}
 --- !u!114 &8898945665741332791
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -169,7 +155,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df30e90a46919864ca79b124c882e5f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fishStats: {fileID: 11400000, guid: b6c377b4baee9c441af8d56440698186, type: 2}
+  _sprite: {fileID: -1197886520, guid: 8799b7b2c2f30244e8c6c774a6e67ea2, type: 3}
+  _animatorController: {fileID: 9100000, guid: cc4d78189f436084e8f54619ee591b6a, type: 2}
+  _fishName: Abborre
+  _weight: 20
+  _length: 20
+  _value: 70
+  _baitAttractionRadius: 3
+  _fishColor: {r: 1, g: 1, b: 1, a: 1}
+  _struggleCount: 2
+  _excitementLevel: 1
+  _baitLevel: 1
   wanderRadius: 10
   wanderJitter: 1
 --- !u!50 &883294983081264371

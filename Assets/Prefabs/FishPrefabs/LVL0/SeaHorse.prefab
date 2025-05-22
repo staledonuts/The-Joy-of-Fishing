@@ -13,10 +13,9 @@ GameObject:
   - component: {fileID: 5883369509628922158}
   - component: {fileID: 3107338935538063745}
   - component: {fileID: 9164648288193007119}
-  - component: {fileID: -6993411566774172578}
   - component: {fileID: 3087103351359647395}
   m_Layer: 12
-  m_Name: SeaHourse
+  m_Name: SeaHorse
   m_TagString: Fish
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -120,7 +119,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df30e90a46919864ca79b124c882e5f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fishStats: {fileID: 11400000, guid: db62c51b4be8fcc4eb81bacd2c178e17, type: 2}
+  _sprite: {fileID: 1419070592, guid: d72cca1dc3990864a93ba5809aa167a8, type: 3}
+  _animatorController: {fileID: 9100000, guid: df5dcb15564abdf4dbbdcb3c4649cf58, type: 2}
+  _fishName: SeaHorse
+  _weight: 5
+  _length: 8
+  _value: 15
+  _baitAttractionRadius: 3
+  _fishColor: {r: 1, g: 1, b: 1, a: 1}
+  _struggleCount: 0
+  _excitementLevel: 0
+  _baitLevel: 0
   wanderRadius: 5
   wanderJitter: 1
 --- !u!58 &9164648288193007119
@@ -159,19 +168,6 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.35
---- !u!114 &-6993411566774172578
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6181217008843519828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98caa799924fb004c9de084cd196e5df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fishStats: {fileID: 11400000, guid: db62c51b4be8fcc4eb81bacd2c178e17, type: 2}
 --- !u!50 &3087103351359647395
 Rigidbody2D:
   serializedVersion: 5

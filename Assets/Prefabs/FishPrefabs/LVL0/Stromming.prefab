@@ -123,7 +123,6 @@ GameObject:
   - component: {fileID: 923512008135150396}
   - component: {fileID: 923512008135150397}
   - component: {fileID: 923512008135150386}
-  - component: {fileID: 7992369584329481837}
   - component: {fileID: -1082486864483556446}
   m_Layer: 12
   m_Name: Stromming
@@ -266,22 +265,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df30e90a46919864ca79b124c882e5f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fishStats: {fileID: 11400000, guid: 8b94fe352fb74dd439d2fbacfcda3faf, type: 2}
+  _sprite: {fileID: 0}
+  _animatorController: {fileID: 0}
+  _fishName: Stromming
+  _weight: 11
+  _length: 9
+  _value: 45
+  _baitAttractionRadius: 3
+  _fishColor: {r: 1, g: 1, b: 1, a: 1}
+  _struggleCount: 0
+  _excitementLevel: 0
+  _baitLevel: 0
   wanderRadius: 10
   wanderJitter: 1
---- !u!114 &7992369584329481837
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 923512008135150387}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98caa799924fb004c9de084cd196e5df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fishStats: {fileID: 11400000, guid: 8b94fe352fb74dd439d2fbacfcda3faf, type: 2}
 --- !u!50 &-1082486864483556446
 Rigidbody2D:
   serializedVersion: 5

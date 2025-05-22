@@ -7,7 +7,7 @@ using UnityEngine;
  * Uses the AStar pathfinding prodject to get the walkable surfaces.
  */
 
-[RequireComponent(typeof(Seeker), typeof(AIPath), typeof(FishStats))]
+[RequireComponent(typeof(Seeker), typeof(AIPath))]
 public class MoveAi : FishStats
 {
     private Seeker agent;
@@ -105,17 +105,17 @@ public class MoveAi : FishStats
     private void HookOut()
     {
         dist = Vector3.Distance(this.transform.position, player.position);
-        if (dist > base.fishStats.baitAttractionRadius)
+        if (dist > BaitAttractionRadius)
         {
             if (path.reachedEndOfPath)
             {
                 Wander();
             }
         }
-        if (dist < base.fishStats.baitAttractionRadius)
+        if (dist < BaitAttractionRadius)
         {
             path.canMove = true;
-            if (BaitScript.BaitLevel() == fishStats.baitLevel)
+            if (BaitScript.BaitLevel() == BaitLevel)
             {
                 agent.StartPath(this.transform.position, player.position);
             }

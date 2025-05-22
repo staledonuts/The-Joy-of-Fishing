@@ -51,7 +51,7 @@ public class BaitScript : MonoBehaviour
 
         if (!collision.collider.CompareTag("Fish")) { return; }
 
-        if (collision.transform.GetComponent<FishStats>().fishStats.baitLevel != currentBait) { return; }
+        if (collision.transform.GetComponent<FishStats>().BaitLevel != currentBait) { return; }
 
         #endregion Return if:s
 
@@ -100,7 +100,7 @@ public class BaitScript : MonoBehaviour
         int LowestBaitLevel = 0;
         for (int i = 0; i < CollectiveFish.transform.childCount; i++)
         {
-            if (CollectiveFish.transform.GetChild(i).GetComponent<FishStats>().fishStats.baitLevel < LowestBaitLevel)
+            if (CollectiveFish.transform.GetChild(i).GetComponent<FishStats>().BaitLevel < LowestBaitLevel)
             {
                 LowestBaitLevel = i;
             }
@@ -114,13 +114,13 @@ public class BaitScript : MonoBehaviour
         int highesBaitLevel = 0;
         for (int i = 0; i < CollectiveFish.transform.childCount; i++)
         {
-            if (CollectiveFish.transform.GetChild(i).GetComponent<FishStats>().fishStats.baitLevel > highesBaitLevel)
+            if (CollectiveFish.transform.GetChild(i).GetComponent<FishStats>().BaitLevel > highesBaitLevel)
             {
                 highesBaitLevel = i;
             }
         }
         
-        currentBait = CollectiveFish.transform.GetChild(highesBaitLevel).GetComponent<FishStats>().fishStats.baitLevel + 1;
+        currentBait = CollectiveFish.transform.GetChild(highesBaitLevel).GetComponent<FishStats>().BaitLevel + 1;
         currentBait = Mathf.Clamp(currentBait, 0, 4);
 
         if (CollectiveFish.transform.childCount == 0)

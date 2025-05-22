@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 5883369509628922158}
   - component: {fileID: 3107338935538063745}
   - component: {fileID: 1287631276213243781}
-  - component: {fileID: 5023515390090069303}
   - component: {fileID: -4499709092373924714}
   m_Layer: 12
   m_Name: Char
@@ -120,7 +119,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df30e90a46919864ca79b124c882e5f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fishStats: {fileID: 11400000, guid: 06d2810858ae18b49912236c896dff5f, type: 2}
+  _sprite: {fileID: -1007938043, guid: a9259cc0acca095428de96a41174a874, type: 3}
+  _animatorController: {fileID: 9100000, guid: c73a5b2a571103c4291cc61e39bb3d2d, type: 2}
+  _fishName: Char
+  _weight: 30
+  _length: 10
+  _value: 75
+  _baitAttractionRadius: 3
+  _fishColor: {r: 1, g: 1, b: 1, a: 1}
+  _struggleCount: 2
+  _excitementLevel: 1
+  _baitLevel: 1
   wanderRadius: 5
   wanderJitter: 1
 --- !u!70 &1287631276213243781
@@ -160,19 +169,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 0.5, y: 2}
   m_Direction: 0
---- !u!114 &5023515390090069303
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6181217008843519828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98caa799924fb004c9de084cd196e5df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fishStats: {fileID: 11400000, guid: 06d2810858ae18b49912236c896dff5f, type: 2}
 --- !u!50 &-4499709092373924714
 Rigidbody2D:
   serializedVersion: 5
