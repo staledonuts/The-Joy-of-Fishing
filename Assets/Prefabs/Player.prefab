@@ -723,39 +723,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46ecd890e78a02142bf27350e2dd1a97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rarefishGet:
-    ID: 0
-    _sourceAsset: {fileID: 0}
-    <DebugObject>k__BackingField: {fileID: 0}
-  commonfishGet:
-    ID: 0
-    _sourceAsset: {fileID: 0}
-    <DebugObject>k__BackingField: {fileID: 0}
-  legendaryfishGet:
-    ID: 0
-    _sourceAsset: {fileID: 0}
-    <DebugObject>k__BackingField: {fileID: 0}
-  lvl0coins:
-    ID: 0
-    _sourceAsset: {fileID: 0}
-    <DebugObject>k__BackingField: {fileID: 0}
-  lvl1coins:
-    ID: 0
-    _sourceAsset: {fileID: 0}
-    <DebugObject>k__BackingField: {fileID: 0}
-  lvl2coins:
-    ID: 0
-    _sourceAsset: {fileID: 0}
-    <DebugObject>k__BackingField: {fileID: 0}
-  lvl3coins:
-    ID: 0
-    _sourceAsset: {fileID: 0}
-    <DebugObject>k__BackingField: {fileID: 0}
-  coinParticle:
-  - {fileID: 2261238947880879149}
-  - {fileID: 490540109590172885}
-  - {fileID: 2880228523093164176}
-  - {fileID: 1723046611083399176}
+  fishRanking:
+  - FishGetAudio:
+      ID: 1073741824
+      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
+      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
+    CoinGetAudio:
+      ID: 1073741828
+      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
+      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
+    CoinParticle: {fileID: 2261238947880879149}
+  - FishGetAudio:
+      ID: 1073741824
+      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
+      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
+    CoinGetAudio:
+      ID: 1073741828
+      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
+      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
+    CoinParticle: {fileID: 490540109590172885}
+  - FishGetAudio:
+      ID: 1073741826
+      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
+      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
+    CoinGetAudio:
+      ID: 1073741827
+      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
+      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
+    CoinParticle: {fileID: 2880228523093164176}
+  - FishGetAudio:
+      ID: 1073741825
+      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
+      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
+    CoinGetAudio:
+      ID: 1073741827
+      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
+      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
+    CoinParticle: {fileID: 1723046611083399176}
   totalMoney: 0
   fractionMoney: 0
   gainedNow: 0
