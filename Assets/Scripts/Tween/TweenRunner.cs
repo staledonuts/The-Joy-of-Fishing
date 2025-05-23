@@ -7,6 +7,10 @@ using UnityEngine;
 [AddComponentMenu("")] // Hides it from the Add Component menu
 internal sealed class TweenRunner : MonoBehaviour
 {
-    // This class is intentionally left empty.
-    // Its sole purpose is to provide a MonoBehaviour context for StartCoroutine.
+    private void OnDestroy()
+    {
+        // If the runner is destroyed, attempt to clean up active tweens
+        // to prevent issues if tweens were ongoing.
+        Tween.StopAndClearAllManagedTweens();
+    }
 }
