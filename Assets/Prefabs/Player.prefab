@@ -684,7 +684,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3537222930539192029}
-  - component: {fileID: 185634712220478161}
   m_Layer: 0
   m_Name: Coin effect collection
   m_TagString: Untagged
@@ -711,58 +710,6 @@ Transform:
   - {fileID: 1723046611083399183}
   m_Father: {fileID: 7824927940298590364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &185634712220478161
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7180776406139281315}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46ecd890e78a02142bf27350e2dd1a97, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fishRanking:
-  - FishGetAudio:
-      ID: 1073741824
-      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
-    CoinGetAudio:
-      ID: 1073741828
-      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
-    CoinParticle: {fileID: 2261238947880879149}
-  - FishGetAudio:
-      ID: 1073741824
-      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
-    CoinGetAudio:
-      ID: 1073741828
-      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
-    CoinParticle: {fileID: 490540109590172885}
-  - FishGetAudio:
-      ID: 1073741826
-      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
-    CoinGetAudio:
-      ID: 1073741827
-      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
-    CoinParticle: {fileID: 2880228523093164176}
-  - FishGetAudio:
-      ID: 1073741825
-      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
-    CoinGetAudio:
-      ID: 1073741827
-      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7180776406139281315}
-    CoinParticle: {fileID: 1723046611083399176}
-  totalMoney: 0
-  fractionMoney: 0
-  gainedNow: 0
 --- !u!1 &7824927940298590366
 GameObject:
   m_ObjectHideFlags: 0
@@ -777,6 +724,7 @@ GameObject:
   - component: {fileID: 6041324265593011362}
   - component: {fileID: 7814803752114734574}
   - component: {fileID: 3702878219176956517}
+  - component: {fileID: 4173030885101621883}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -864,7 +812,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8e8324945a6bef42834a76c619b9d5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rampUpTime: 1
   currentlyReelingUp: 0
   boatSpeed: 1000
   BoatSpeedForce: 60
@@ -1078,6 +1025,55 @@ MonoBehaviour:
   maxSettleSpeedFactor: 1.5
   settleSpeedEffectDuration: 0.4
   visualInterpolationSpeed: 15
+--- !u!114 &4173030885101621883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7824927940298590366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9687dbf2186e8f799ce6282883582a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fishRanking:
+  - FishGetAudio:
+      ID: 1073741824
+      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
+      <DebugObject>k__BackingField: {fileID: 7824927940298590366}
+    CoinGetAudio:
+      ID: 1073741828
+      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
+      <DebugObject>k__BackingField: {fileID: 7824927940298590366}
+    CoinParticle: {fileID: 2261238947880879149}
+  - FishGetAudio:
+      ID: 1073741824
+      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
+      <DebugObject>k__BackingField: {fileID: 0}
+    CoinGetAudio:
+      ID: 1073741828
+      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
+      <DebugObject>k__BackingField: {fileID: 0}
+    CoinParticle: {fileID: 490540109590172885}
+  - FishGetAudio:
+      ID: 1073741826
+      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
+      <DebugObject>k__BackingField: {fileID: 0}
+    CoinGetAudio:
+      ID: 1073741827
+      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
+      <DebugObject>k__BackingField: {fileID: 0}
+    CoinParticle: {fileID: 2880228523093164176}
+  - FishGetAudio:
+      ID: 1073741825
+      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
+      <DebugObject>k__BackingField: {fileID: 0}
+    CoinGetAudio:
+      ID: 1073741827
+      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
+      <DebugObject>k__BackingField: {fileID: 0}
+    CoinParticle: {fileID: 1723046611083399176}
 --- !u!1001 &577352465420165216
 PrefabInstance:
   m_ObjectHideFlags: 0

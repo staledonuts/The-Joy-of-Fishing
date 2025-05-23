@@ -32,7 +32,6 @@ public sealed class GameManager : MonoBehaviour
         }
     }
     [SerializeField] private CinemachinePositionComposer CMcamBody;
-    [SerializeField] public RadioMusic radioMusic;
     
     [Header("UI Control Center")]
     [SerializeField] private CinemachineCamera CinemachineCam;
@@ -122,13 +121,13 @@ public sealed class GameManager : MonoBehaviour
         {
             ChangeInteger(); // Change to shop cam
             ShopUIAnimator.Play("ShopUIRollIn");
-            radioMusic.PlayRadio();
+            SoundManager.Instance.TransitionToShopMusic(true);
         }
         else if (moveCam == 2) // ShopCamTrue
         {
             ChangeIntegerAgain(); // Change to boat cam
             ShopUIAnimator.Play("ShopUIRollOut");
-            radioMusic.StopRadio();
+            SoundManager.Instance.TransitionToShopMusic(false);
         }
     }
 

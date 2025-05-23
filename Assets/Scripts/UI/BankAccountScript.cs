@@ -26,8 +26,7 @@ public class BankAccountScript : MonoBehaviour
         TextMeshParentTransform = GameObject.Find("MoneyGainedCanvas").GetComponent<RectTransform>();
 
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
 
@@ -35,10 +34,6 @@ public class BankAccountScript : MonoBehaviour
         {
             BankText.text = "Savings: " + callMoneyEffectScript.totalMoney.ToString() + "c";
         }
-        //else if (GameManager.instance.moveCam == 3)
-        //{
-        //    BankText.text = "";
-        //}
 
         if (thisIs2 && callMoneyEffectScript.totalMoney > 0 && callMoneyEffectScript.gainedNow == true)
         {
@@ -63,28 +58,6 @@ public class BankAccountScript : MonoBehaviour
            
             
         }
-        //Debug.Log(TextMeshParentTransform.rect.position);
-        //thisIs2transform.rect.position.x = 
-        //else if (thisIs2 && callMoneyEffectScript.gainedNow == false)
-        //{
-        //    elapsed += Time.deltaTime;
-        //    if (elapsed >= 3 && elapsed <= 6)
-        //    {
-        //        BankText.color = new Color(1, 1, 1, 0);
-        //        thisIs2rb.velocity = new Vector2(0, -1);
-        //    }
-        //    if (elapsed > 6)
-        //    {
-        //        thisIs2rb.velocity = Vector2.zero;
-        //    }
-        //    //thisIs2rb.velocity = Vector2.zero;
-        //    //elapsed = 0f;
-        //    //Debug.Log("elapsed reset to: " + elapsed);
-        //}
-        ////else if (GameManager.instance.moveCam == 3)
-        ////{
-        ////    BankText.text = "";
-        ////}
     }
 
     IEnumerator MoneyGainedTextVector()

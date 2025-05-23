@@ -36,18 +36,34 @@ public class SoundManager : MonoBehaviour
     // Any sliders connected to these values must on start have the same in insepctor component.
     // Slider component's "Value" setting Must match these float values.
 
-    [SerializeField] private SoundID musicTracks;
-    [SerializeField] private SoundID radioTrack;
-    private IAudioPlayer musicPlayer;
+    [SerializeField] private SoundID _musicTracks;
+    [SerializeField] private SoundID _radioTrack;
+    private IMusicPlayer _musicPlayer;
+
+    private IMusicPlayer _shopMusicPlayer;
 
     private void Start()
     {
-        musicPlayer = musicTracks.Play();
+        _musicPlayer = _musicTracks.Play().AsBGM();
+        _shopMusicPlayer = _radioTrack.Play().AsBGM();
+        _shopMusicPlayer.SetVolume(0);
     }
 
     public void NextMusicTrack()
     {
-        musicPlayer = musicTracks.Play();
+        _musicPlayer = _musicTracks.Play().AsBGM();
+    }
+
+    public void TransitionToShopMusic(bool shopActive)
+    {
+        if(shopActive)
+        {
+            
+        }
+        else
+        {
+
+        }
     }
 
 
