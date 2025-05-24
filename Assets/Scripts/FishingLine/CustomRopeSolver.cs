@@ -35,7 +35,7 @@ public sealed class CustomRopeSolver : MonoBehaviour
     public Transform rodTip;
     public GameObject nodePrefab; 
     public GameObject hookPrefab;
-    public int maxNodes = 50;
+    public uint maxNodes => Inventory.Instance.CurrentMaxLineLength;
     public float segmentLength = 0.3f;
     public float gravityScale = 1f; 
     public LineRenderer ropeLine;

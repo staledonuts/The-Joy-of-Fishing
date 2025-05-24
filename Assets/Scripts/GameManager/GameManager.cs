@@ -4,8 +4,6 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Unity.Cinemachine;
 
-
-
 public sealed class GameManager : MonoBehaviour
 {
     private static GameManager instance = null;
@@ -112,22 +110,6 @@ public sealed class GameManager : MonoBehaviour
             {
                 SceneManager.LoadScene("End Scene");
             }
-        }
-    }
-
-    public void onShopSwitch()
-    {
-        if (moveCam == 1) // ShopCamFalse
-        {
-            ChangeInteger(); // Change to shop cam
-            ShopUIAnimator.Play("ShopUIRollIn");
-            SoundManager.Instance.TransitionToShopMusic(true);
-        }
-        else if (moveCam == 2) // ShopCamTrue
-        {
-            ChangeIntegerAgain(); // Change to boat cam
-            ShopUIAnimator.Play("ShopUIRollOut");
-            SoundManager.Instance.TransitionToShopMusic(false);
         }
     }
 

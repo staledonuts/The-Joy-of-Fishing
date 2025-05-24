@@ -51,6 +51,26 @@ public static class Tween
         return newCoroutine;
     }
 
+    public static Coroutine Vector2(object owner, string tweenIdentifierTag, Action<Vector2> setter, Vector2 startValue, Vector2 endValue, float duration, Action onComplete = null, Func<float, float> easeFunction = null)
+    {
+        var key = CreateKey(owner, tweenIdentifierTag);
+        StopTweenForKey(key);
+
+        if (duration <= 0)
+        {
+            setter(endValue);
+            onComplete?.Invoke();
+            return null;
+        }
+
+        Coroutine newCoroutine = Runner.StartCoroutine(TweenValueCoroutine(key, startValue, endValue, duration, setter, UnityEngine.Vector2.LerpUnclamped, onComplete, easeFunction));
+        if (newCoroutine != null)
+        {
+            _activeTweens[key] = newCoroutine;
+        }
+        return newCoroutine;
+    }
+
     public static Coroutine Vector3(object owner, string tweenIdentifierTag, Action<Vector3> setter, Vector3 startValue, Vector3 endValue, float duration, Action onComplete = null, Func<float, float> easeFunction = null)
     {
         var key = CreateKey(owner, tweenIdentifierTag);
@@ -64,6 +84,26 @@ public static class Tween
         }
 
         Coroutine newCoroutine = Runner.StartCoroutine(TweenValueCoroutine(key, startValue, endValue, duration, setter, UnityEngine.Vector3.LerpUnclamped, onComplete, easeFunction));
+        if (newCoroutine != null)
+        {
+            _activeTweens[key] = newCoroutine;
+        }
+        return newCoroutine;
+    }
+    
+    public static Coroutine Quaternion(object owner, string tweenIdentifierTag, Action<Quaternion> setter, Quaternion startValue, Quaternion endValue, float duration, Action onComplete = null, Func<float, float> easeFunction = null)
+    {
+        var key = CreateKey(owner, tweenIdentifierTag);
+        StopTweenForKey(key);
+
+        if (duration <= 0)
+        {
+            setter(endValue);
+            onComplete?.Invoke();
+            return null;
+        }
+        
+        Coroutine newCoroutine = Runner.StartCoroutine(TweenValueCoroutine(key, startValue, endValue, duration, setter, UnityEngine.Quaternion.SlerpUnclamped, onComplete, easeFunction));
         if (newCoroutine != null)
         {
             _activeTweens[key] = newCoroutine;
@@ -94,17 +134,14 @@ public static class Tween
     {
         if (_activeTweens.TryGetValue(key, out Coroutine existingCoroutine))
         {
-            if (existingCoroutine != null && Runner != null) // Check Runner in case it's being destroyed
+            if (existingCoroutine != null && Runner != null && Runner.gameObject.activeInHierarchy) // Check Runner and its active state
             {
                 Runner.StopCoroutine(existingCoroutine);
             }
-            _activeTweens.Remove(key); // Remove even if coroutine was null or runner was null
+            _activeTweens.Remove(key); 
         }
     }
 
-    /// <summary>
-    /// Stops a specific tween managed by this system.
-    /// </summary>
     public static void StopTween(object owner, string tweenIdentifierTag)
     {
         var key = CreateKey(owner, tweenIdentifierTag);
@@ -120,35 +157,49 @@ public static class Tween
         {
             while (elapsedTime < duration)
             {
+                if (Runner == null || !Runner.gameObject.activeInHierarchy) yield break;
+
                 elapsedTime += Time.deltaTime;
                 float progress = Mathf.Clamp01(elapsedTime / duration);
                 float easedProgress = easeFunction(progress);
-                setter(interpolator(from, to, easedProgress));
+                
+                // Safety check for setter target (owner of the tween)
+                var owner = key.Item1 as UnityEngine.Object;
+                if (owner == null && key.Item1 != null) // Owner is not a UnityEngine.Object, cannot check if destroyed easily. Assume it's alive.
+                {
+                     setter(interpolator(from, to, easedProgress));
+                }
+                else if (owner != null) // It is a UnityEngine.Object, check if it was destroyed
+                {
+                    setter(interpolator(from, to, easedProgress));
+                }
+                else // Owner was null from the start, or became null (if not UnityEngine.Object and GC'd)
+                {
+                     yield break; // Stop if owner is gone
+                }
                 yield return null;
             }
-            setter(to); // Ensure final value
+
+            var finalOwner = key.Item1 as UnityEngine.Object;
+            if (finalOwner != null || (key.Item1 != null && !(key.Item1 is UnityEngine.Object))) // Check if owner still valid for final set
+            {
+                setter(to); 
+            }
             onComplete?.Invoke();
         }
         finally
         {
-            // Remove from active tweens if this coroutine instance was the one stored.
-            // This handles natural completion. External stops are handled by StopTweenForKey.
-            if (_activeTweens.TryGetValue(key, out Coroutine currentCoroutine) && currentCoroutine == _activeTweens[key]) // Check if it's still THIS coroutine
+            if (_activeTweens.TryGetValue(key, out Coroutine currentCoroutine) && ReferenceEquals(currentCoroutine, _activeTweens[key]))
             {
                  _activeTweens.Remove(key);
             }
         }
     }
     
-    /// <summary>
-    /// Stops all tweens managed by this Tween system and clears tracking.
-    /// Called by TweenRunner.OnDestroy().
-    /// </summary>
     public static void StopAndClearAllManagedTweens()
     {
-        if (_runner != null) // Check if runner still exists
+        if (_runner != null && _runner.gameObject.activeInHierarchy) 
         {
-            // Iterate over a copy of keys if StopCoroutine modifies the dictionary via the finally block
             List<Tuple<object, string>> keys = new List<Tuple<object, string>>(_activeTweens.Keys);
             foreach (var key in keys)
             {
@@ -162,7 +213,6 @@ public static class Tween
             }
         }
         _activeTweens.Clear();
-        // Note: onComplete callbacks for tweens stopped this way will not be called.
     }
 
     public static class Easing

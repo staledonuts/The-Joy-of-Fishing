@@ -59,7 +59,7 @@ public class BoatScript : MonoBehaviour
     {
         if (context.performed)
         {
-            GameManager.Instance.onShopSwitch();
+            UIManager.Instance.OnShopSwitch();
         }
     }
     private void MoveLeftRight()
@@ -146,14 +146,12 @@ public class BoatScript : MonoBehaviour
     private void OnEnable()
     {
         BaitScript.BaitIsOut += FindHookAndInventory;
-        MoneyEffect.DeleteFish += ClearFishCollection;
         DoneFishing += AddFishToInventory;
     }
 
     private void OnDisable()
     {
         BaitScript.BaitIsOut -= FindHookAndInventory;
-        MoneyEffect.DeleteFish -= ClearFishCollection;
         DoneFishing -= AddFishToInventory;
     }
 

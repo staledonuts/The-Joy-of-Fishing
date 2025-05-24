@@ -1011,14 +1011,13 @@ MonoBehaviour:
   rodTip: {fileID: 4523062822712388105}
   nodePrefab: {fileID: 1867930385899082835, guid: 9fdce2363d22cc2a7b9771621b8f51a0, type: 3}
   hookPrefab: {fileID: 1000012688847204, guid: ddbf897f9a3f2a04c82360e94d84e7d1, type: 3}
-  maxNodes: 800
-  segmentLength: 0.35
-  gravityScale: 0.5
+  segmentLength: 0.25
+  gravityScale: 1.5
   ropeLine: {fileID: 6517916741040835105}
   obstacleMask:
     serializedVersion: 2
     m_Bits: 512
-  nodeRadius: 0.05
+  nodeRadius: 0.2
   collisionBounceFactor: 0
   lastNodeVelocityRetention: 0.8
   minSettleSpeedFactor: 0.5
@@ -1037,6 +1036,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9687dbf2186e8f799ce6282883582a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerData:
+    money: 50
+    caughtFishes: []
+    currentMaxLineLength: 100
+    equippedLureID: BasicLureID
+    ownedLureIDs:
+    - BasicLureID
+  allAvailableLures: []
   fishRanking:
   - FishGetAudio:
       ID: 1073741824

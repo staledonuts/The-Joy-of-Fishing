@@ -46,7 +46,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CMcamBody: {fileID: 1696228068550993406}
-  radioMusic: {fileID: 0}
   CinemachineCam: {fileID: 4742105706383511628}
   pauseCanvas: {fileID: 0}
   callShopCanvas: {fileID: 4962793761969066188}
@@ -536,14 +535,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68622c55de5528f4386f35a5582e4d3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  musicTracks:
-    ID: 268435456
-    _sourceAsset: {fileID: 11400000, guid: 4166addeb8bde4b88a5367cae333c0d4, type: 2}
-    <DebugObject>k__BackingField: {fileID: 5105503721067358441}
-  radioTrack:
-    ID: 268435457
-    _sourceAsset: {fileID: 11400000, guid: 4166addeb8bde4b88a5367cae333c0d4, type: 2}
-    <DebugObject>k__BackingField: {fileID: 5105503721067358441}
+  _musicTracks:
+    ID: 0
+    _sourceAsset: {fileID: 0}
+    <DebugObject>k__BackingField: {fileID: 0}
+  _radioTrack:
+    ID: 0
+    _sourceAsset: {fileID: 0}
+    <DebugObject>k__BackingField: {fileID: 0}
 --- !u!1 &5861164604636302331
 GameObject:
   m_ObjectHideFlags: 0
@@ -943,7 +942,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5434117884590766392, guid: e2cad811a20449895a8bf24288372b57, type: 3}
       propertyPath: m_Size
-      value: 0.99999994
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5434117884590766392, guid: e2cad811a20449895a8bf24288372b57, type: 3}
       propertyPath: m_Value
@@ -1006,7 +1005,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 70372226, guid: e2cad811a20449895a8bf24288372b57, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2cad811a20449895a8bf24288372b57, type: 3}

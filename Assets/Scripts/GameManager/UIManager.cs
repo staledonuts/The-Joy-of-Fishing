@@ -26,9 +26,15 @@ public sealed class UIManager : MonoBehaviour
             return instance;
         }
     }
+    private readonly Vector2 SHOPPANELOFFPOS = new Vector2(-1000f, 0f);
+    private readonly Vector2 SHOPPANELONPOS = new Vector2(-0f, 0f);
+    private const float UITWEENSPEED = 0.8f;
+    [SerializeField] private GameObject _pauseCanvas;
+    [SerializeField] private GameObject _callShopCanvas;
+    [SerializeField] private RectTransform _shopPanel;
+    [SerializeField] private GameObject _goFishCanvas;
 
-    [SerializeField] private SoundID buyInst;
-
+    [SerializeField] private SoundID _buySfx;
     [SerializeField] private Image _GameStartLogo;
     [SerializeField] private Button _mindcontrol; 
     [SerializeField] private Button _lvl1Line; 
@@ -38,9 +44,9 @@ public sealed class UIManager : MonoBehaviour
     [SerializeField] private uint _lvl1Cost; 
     [SerializeField] private uint _lvl2Cost; 
     [SerializeField] private uint _lvl3Cost;
-    [SerializeField] private int _lvl1Length; 
-    [SerializeField] private int _lvl2Length;
-    [SerializeField] private int _lvl3Lenght;
+    [SerializeField] private uint _lvl1Length; 
+    [SerializeField] private uint _lvl2Length;
+    [SerializeField] private uint _lvl3Lenght;
 
     private void Awake()
     {   
@@ -51,22 +57,21 @@ public sealed class UIManager : MonoBehaviour
         }
         else if (instance != this)
         {
-            Debug.LogWarning("Another instance of UIManager found, destroying this new one.");
+            //Debug.LogWarning("Another instance of UIManager found, destroying this new one.");
             Destroy(gameObject);
         }
     }
 
-    
-
-    private void Start() 
+    void Start()
     {
-
+        _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, 0.2f, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutQuad);
     }
 
     public void BuyMindControlLure()
     {
         if (Inventory.Instance.SpendMoney(_mindControlCost))
         {
+            _buySfx.Play();
             _mindcontrol.interactable = false;
             GameManager.Instance.MindcontrolActive = true;
         }
@@ -78,10 +83,10 @@ public sealed class UIManager : MonoBehaviour
 
     public void BuyLineLVL1()
     {
-        if (Inventory.Instance.SpendMoney(_lvl1Cost))
+        if (Inventory.Instance.UpgradeLineLength(_lvl1Length, _lvl1Cost))
         {
+            _buySfx.Play();
             _lvl1Line.interactable = false;
-            CustomRopeSolver.Instance.maxNodes = _lvl1Length;
         }
         else
         {
@@ -91,11 +96,10 @@ public sealed class UIManager : MonoBehaviour
 
     public void BuyLineLVL2()
     {
-        if (Inventory.Instance.SpendMoney(_lvl2Cost))
+        if (Inventory.Instance.UpgradeLineLength(_lvl2Length, _lvl2Cost))
         {
-            _lvl1Line.interactable = false;
+            _buySfx.Play();
             _lvl2Line.interactable = false;
-            CustomRopeSolver.Instance.maxNodes = _lvl2Length;
         }
         else
         {
@@ -105,12 +109,10 @@ public sealed class UIManager : MonoBehaviour
 
     public void BuyLineLVL3()
     {
-        if (Inventory.Instance.SpendMoney(_lvl3Cost))
+        if (Inventory.Instance.UpgradeLineLength(_lvl3Lenght, _lvl3Cost))
         {
-            _lvl1Line.interactable = false;
-            _lvl2Line.interactable = false;
+            _buySfx.Play();
             _lvl3Line.interactable = false;
-            CustomRopeSolver.Instance.maxNodes = _lvl3Lenght;
         }
         else
         {
@@ -124,12 +126,28 @@ public sealed class UIManager : MonoBehaviour
         {
             if(_GameStartLogo.material.GetInstanceID() == _GameStartLogo.materialForRendering.GetInstanceID())
             {
-                Debug.Log("Creating a new material instance");
+                //Debug.Log("Creating a new material instance");
                 _GameStartLogo.material = Instantiate(_GameStartLogo.material);
             }
             _GameStartLogo.material.TweenMaterialFloat("_Dissolve", 0f, 2f, () => {
                 _GameStartLogo.gameObject.SetActive(false);
             }, Tween.Easing.EaseInOutQuad);
+        }
+    }
+    private bool shopbool = false;
+    public void OnShopSwitch()
+    {
+        if (!shopbool)
+        {
+            shopbool = true;
+            _shopPanel.TweenAnchoredPosition(SHOPPANELONPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutQuad);
+            SoundManager.Instance.TransitionToShopMusic(true);
+        }
+        else
+        {
+            shopbool = false;
+            _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutQuad);
+            SoundManager.Instance.TransitionToShopMusic(false);
         }
     }
 }
