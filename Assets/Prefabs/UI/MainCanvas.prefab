@@ -1907,8 +1907,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2085616018069552896}
   m_HandleRect: {fileID: 7774472133251696928}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.9999999
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4287,7 +4287,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7662885546978897313, guid: aec341e7505bb4a0384fe422872be82d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7662885546978897314, guid: aec341e7505bb4a0384fe422872be82d, type: 3}
       propertyPath: m_BlockingMask.m_Bits
