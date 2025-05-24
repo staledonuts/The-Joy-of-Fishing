@@ -71,8 +71,6 @@ public sealed class CustomRopeSolver : MonoBehaviour
     private Vector2 hookVisualPosition;
     private Quaternion hookVisualRotation;
 
-    [SerializeField] private CircleCollider2D _catchPoint;
-
 
     private void Awake()
     {

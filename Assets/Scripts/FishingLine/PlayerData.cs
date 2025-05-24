@@ -1,26 +1,21 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 [System.Serializable]
 public class PlayerData
 {
     public uint money;
     public List<CaughtFishData> caughtFishes;
-
-    // Fishing line and lure data
     public uint currentMaxLineLength;
     public string equippedLureID;
-    public List<string> ownedLureIDs; // Stores the lureID strings
+    public List<string> ownedLureIDs;
 
-    // Default values for a new game
     public PlayerData()
     {
-        money = 50; // Starting money
+        money = 50;
         caughtFishes = new List<CaughtFishData>();
-        currentMaxLineLength = 300; // Default starting line length
+        currentMaxLineLength = 300;
         
-        // Assuming a "BasicLure" exists and is owned by default
-        equippedLureID = "BasicLureID"; // Make sure this ID matches a Lure defined in your game
+        equippedLureID = "BasicLureID";
         ownedLureIDs = new List<string> { "BasicLureID" };
     }
 }

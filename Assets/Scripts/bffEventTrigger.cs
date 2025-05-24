@@ -28,6 +28,6 @@ public class bffEventTrigger : MonoBehaviour
 
     public void endgame()
     {
-        GameManager.Instance.UIScreenfadeout();
+        UIManager.Instance.UIScreenfadeout();
     }
 }

@@ -45,14 +45,13 @@ public sealed class GameManager : MonoBehaviour
     public float currentTime = 0f;
     private void Awake()
     {
-        Fadeimage.color = new Color(0, 0, 0, 255);
+        
     }
 
 
     // Start is called before the first frame update
     void Start()
     {
-        UIScreenfadein();
         ShoppeBoat = GameObject.Find("ShoppeBoat").GetComponent<Transform>();
         Player = GameObject.Find("Player").GetComponent<Transform>();
         boatScript = FindAnyObjectByType<BoatScript>();
@@ -150,54 +149,4 @@ public sealed class GameManager : MonoBehaviour
         }
 
     }
-
-    /*public void UnPause()
-    {
-        Time.timeScale = 1;
-        pauseCanvas.SetActive(false);
-        SetPause = false;
-    }*/
-
-//============================ ScreenFader ============================
-    public Image Fadeimage;
-    public GameObject FadeCanvas;
-    public void UIScreenfadeout() 
-    {
-        StartCoroutine(FadeOutCR());
-    }
-    public void UIScreenfadein() 
-    {
-        StartCoroutine(FadeInCR());
-
-    } 
-    private IEnumerator FadeOutCR()
-    {
-        float duration = 4f; //0.5 secs
-        currentTime = 0f;
-        FadeCanvas.SetActive(true);
-        while (currentTime < duration)
-        {
-            currentTime += Time.deltaTime;
-            float alpha = Mathf.MoveTowards(0f, 1f, currentTime/duration);
-            Fadeimage.color = new Color(Fadeimage.color.r, Fadeimage.color.g, Fadeimage.color.b, alpha);
-        }
-        yield break;
-
-    }
-
-    private IEnumerator FadeInCR()
-    {
-        float duration = 2f; //0.5 secs
-        float currentTime = 0f;
-        while(currentTime < duration)
-        {
-            currentTime += Time.deltaTime;
-            float alpha = Mathf.MoveTowards(1f, 0f, currentTime/duration);
-            Fadeimage.color = new Color(0, 0, 0, alpha);
-            yield return null;
-        }
-        FadeCanvas.SetActive(false);
-        yield break;
-    }
-
 }

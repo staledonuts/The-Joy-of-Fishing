@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public static class TweenExtensions
 {
@@ -136,5 +137,17 @@ public static class TweenExtensions
         float startValue = material.GetFloat(propertyName);
         Action<float> setter = value => { if(material != null) material.SetFloat(propertyName, value); };
         return Tween.Float(material, $"MaterialFloat_{propertyName}", setter, startValue, targetValue, duration, onComplete, easeFunction);
+    }
+
+    public static Coroutine TweenImageColor(this Image image, Color targetColor, float duration, Action onComplete = null, Func<float, float> easeFunction = null)
+    {
+        if (image == null)
+        {
+            Debug.LogError("Image is null. Cannot tween Color.");
+            return null;
+        }
+        Color startColor = image.color;
+        Action<Color> setter = color => { if(image != null) image.color = color; };
+        return Tween.Color(image, "Color", setter, startColor, targetColor, duration, onComplete, easeFunction);
     }
 }

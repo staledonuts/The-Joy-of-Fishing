@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Ami.BroAudio;
 using UnityEngine;
@@ -60,10 +61,12 @@ public sealed class UIManager : MonoBehaviour
             //Debug.LogWarning("Another instance of UIManager found, destroying this new one.");
             Destroy(gameObject);
         }
+        _fadeimage.color = FADEOUTCOLOR;
     }
 
     void Start()
     {
+        StartGameFadeIN();
         _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, 0.2f, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutQuad);
     }
 
@@ -149,5 +152,28 @@ public sealed class UIManager : MonoBehaviour
             _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutQuad);
             SoundManager.Instance.TransitionToShopMusic(false);
         }
+    }
+
+    [SerializeField] private Image _fadeimage;
+    [SerializeField] private GameObject _fadeCanvas;
+    private readonly Color FADEOUTCOLOR = new(0,0,0,1);
+    private readonly Color FADEINCOLOR = new(0,0,0,0);
+
+    public void UIScreenfadeout() 
+    {
+        if(!_fadeCanvas.activeSelf)
+        {
+            _fadeCanvas.SetActive(true);
+        }
+        _fadeimage.TweenImageColor(FADEOUTCOLOR, UITWEENSPEED, null, Tween.Easing.EaseInOutQuad);
+    }
+    public void UIScreenfadein() 
+    {
+        _fadeimage.TweenImageColor(FADEINCOLOR, 2f, () => _fadeCanvas.SetActive(false), Tween.Easing.EaseInQuad);
+    }
+
+    public void StartGameFadeIN()
+    {
+        _fadeimage.TweenImageColor(FADEINCOLOR, 2f, () => { _fadeCanvas.SetActive(false); TweenLogo(); }, Tween.Easing.EaseInQuad);
     }
 }
