@@ -4,7 +4,10 @@ public class FishSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject[] fishPrefabs;
 
-    public Transform spawnerPoint;
+    public Transform spawnerPoint
+    {
+        get => this.transform;
+    }
 
     private Vector2 RandTarget = Vector2.zero;
 
