@@ -103,6 +103,8 @@ public sealed class Inventory : MonoBehaviour
 
             OnInventoryChanged?.Invoke();
             SaveData();
+            Destroy(fishCaught.gameObject);
+            
         }
         else
         {

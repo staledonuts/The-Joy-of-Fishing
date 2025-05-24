@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public sealed class CustomRopeSolver : MonoBehaviour
@@ -69,6 +70,8 @@ public sealed class CustomRopeSolver : MonoBehaviour
     private Vector2 hookPhysicsTargetPosition;
     private Vector2 hookVisualPosition;
     private Quaternion hookVisualRotation;
+
+    [SerializeField] private CircleCollider2D _catchPoint;
 
 
     private void Awake()
@@ -453,7 +456,7 @@ public sealed class CustomRopeSolver : MonoBehaviour
         
         // We need at least nodes[0] (rodTip) and nodes[1] (first segment) to remove nodes[1].
         // So, nodes.Count must be greater than 1.
-        if (nodes.Count > 1) 
+        if (nodes.Count > 1)
         {
             lastInstanceTime = Time.time;
             RopeNode removedNode = nodes[1]; // Remove the node right after the rodTip anchor
@@ -462,6 +465,10 @@ public sealed class CustomRopeSolver : MonoBehaviour
                 Destroy(removedNode.transform.gameObject);
             }
             nodes.RemoveAt(1); // Remove at index 1
+        }
+        else
+        {
+            TryCatchFish();
         }
     }
 
@@ -511,6 +518,25 @@ public sealed class CustomRopeSolver : MonoBehaviour
     }
 
     public Transform GetHook() => hook;
+
+    
+    public void TryCatchFish()
+    {
+        if(hook.childCount > 0)
+        {
+            try
+            {
+                FishStats fish = GetComponentInChildren<FishStats>();
+                Inventory.Instance.AddCaughtFish(fish);
+            }
+            catch
+            {
+                Debug.Log("tried to catch a fish but failed.");
+            }
+        }
+    }
+
+
 
     public void ApplyMovementToLastNode(Vector2 displacementThisFrame)
     {

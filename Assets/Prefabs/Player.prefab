@@ -235,74 +235,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &1973759246931036699
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2794254112950225140}
-  - component: {fileID: 5371128981039574035}
-  m_Layer: 0
-  m_Name: BaitPoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2794254112950225140
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1973759246931036699}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.986, y: -1.2, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7824927940298590364}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!58 &5371128981039574035
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1973759246931036699}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 8192
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
 --- !u!1 &3234611529062391127
 GameObject:
   m_ObjectHideFlags: 0
@@ -747,7 +679,6 @@ Transform:
   m_Children:
   - {fileID: 3239065537959043001}
   - {fileID: 4523062822712388105}
-  - {fileID: 2794254112950225140}
   - {fileID: 3537222930539192029}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -817,8 +748,8 @@ MonoBehaviour:
   BoatSpeedForce: 60
   forcetoAdd: 3
   customRope: {fileID: 3702878219176956517}
-  baitpoint: {fileID: 2794254112950225140}
-  baitTransform: {fileID: 2794254112950225140}
+  baitpoint: {fileID: 0}
+  baitTransform: {fileID: 0}
   rodpoint: {fileID: 4523062822712388105}
   ropeActive: 0
   boostbool: 0
@@ -1024,6 +955,7 @@ MonoBehaviour:
   maxSettleSpeedFactor: 1.5
   settleSpeedEffectDuration: 0.4
   visualInterpolationSpeed: 15
+  _catchPoint: {fileID: 0}
 --- !u!114 &4173030885101621883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1066,16 +998,16 @@ MonoBehaviour:
   - FishGetAudio:
       ID: 1073741826
       _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
-      <DebugObject>k__BackingField: {fileID: 0}
+      <DebugObject>k__BackingField: {fileID: 7824927940298590366}
     CoinGetAudio:
       ID: 1073741827
       _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
-      <DebugObject>k__BackingField: {fileID: 0}
+      <DebugObject>k__BackingField: {fileID: 7824927940298590366}
     CoinParticle: {fileID: 2880228523093164176}
   - FishGetAudio:
       ID: 1073741825
       _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
-      <DebugObject>k__BackingField: {fileID: 0}
+      <DebugObject>k__BackingField: {fileID: 7824927940298590366}
     CoinGetAudio:
       ID: 1073741827
       _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}

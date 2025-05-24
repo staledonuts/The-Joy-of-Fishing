@@ -4,10 +4,8 @@ using UnityEngine.InputSystem;
 public class BoatScript : MonoBehaviour
 {
     private float triggerValue;
-    private bool CanCatchFish = false;
     private bool BoatCanMove = true;
     private Vector2 moveInput, hookInput;
-    private GameObject curHook;
     private Rigidbody2D rig2d;
     private Transform fishInventory;
     private GameObject fishCollective;
@@ -131,73 +129,15 @@ public class BoatScript : MonoBehaviour
         }
     }
 
-    public void DeleteRope()
-    {
-        Destroy(curHook);
-        GameManager.Instance.baitCam = false;
-        GameManager.Instance.moveCam = 1;
-        //sets rope to disabled
-        ropeActive = false;
-
-        //Sends out a message for other scripts to listen
-        DoneFishing?.Invoke();
-    }
-
     private void OnEnable()
     {
-        BaitScript.BaitIsOut += FindHookAndInventory;
-        DoneFishing += AddFishToInventory;
+        //BaitScript.BaitIsOut += FindHookAndInventory;
+        //DoneFishing += AddFishToInventory;
     }
 
     private void OnDisable()
     {
-        BaitScript.BaitIsOut -= FindHookAndInventory;
-        DoneFishing -= AddFishToInventory;
-    }
-
-    private void FindHookAndInventory(bool bait)
-    {
-        if (bait)
-        {
-            try
-            {
-                fishInventory = GameObject.FindGameObjectWithTag("FishInventory").transform;
-            }
-            catch
-            {
-                GameObject fishGameObject = new GameObject();
-                fishGameObject.tag = "FishInventory";
-                fishGameObject.name = "FishCollection";
-                fishInventory = fishGameObject.transform;
-            }
-            CanCatchFish = bait;
-        }
-        else
-        {
-            CanCatchFish = bait;
-        }
-    }
-
-    private void AddFishToInventory()
-    {
-        fishCollective = GameObject.FindGameObjectWithTag("FishCollective");
-        for (int i = 0; i < fishCollective.transform.childCount; i++)
-        {
-            if (fishCollective.transform.GetChild(i).CompareTag("Fish"))
-            {
-                fishCollective.transform.GetChild(i).gameObject.SetActive(false);
-                fishCollective.transform.GetChild(i).parent = fishInventory;
-                BaitScript.FishOfHook?.Invoke();
-            }
-        }
-        DoneCollecting?.Invoke();
-    }
-
-    private void ClearFishCollection()
-    {
-        for (int i = 0; i < fishInventory.childCount; i++)
-        {
-            Destroy(fishInventory.GetChild(i).gameObject);
-        }
+        //BaitScript.BaitIsOut -= FindHookAndInventory;
+        //DoneFishing -= AddFishToInventory;
     }
 }
