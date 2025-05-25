@@ -55,12 +55,10 @@ MonoBehaviour:
   Player: {fileID: 0}
   Hook: {fileID: 0}
   CMcamOrthoSize: 0
-  MindcontrolActive: 0
   currentLineLevel: 0
   currentBait: 0
   cashAmount: 5000
   currentTime: 0
-  SetPause: 0
 --- !u!222 &234532257306780616
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -175,7 +173,6 @@ GameObject:
   - component: {fileID: 4962793760303239591}
   - component: {fileID: 4742105706383511628}
   - component: {fileID: 1696228068550993406}
-  - component: {fileID: 5511318969405032454}
   m_Layer: 6
   m_Name: PlayerCineMachineCam
   m_TagString: Untagged
@@ -272,14 +269,6 @@ MonoBehaviour:
     Time: 0
     Smoothing: 0
     IgnoreY: 0
---- !u!81 &5511318969405032454
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4962793760303239608}
-  m_Enabled: 1
 --- !u!1 &4962793761883621277
 GameObject:
   m_ObjectHideFlags: 0
@@ -433,6 +422,7 @@ GameObject:
   - component: {fileID: 4962793762173381915}
   - component: {fileID: 4962793762173381917}
   - component: {fileID: 8853354375463655448}
+  - component: {fileID: 6944473495392426336}
   m_Layer: 0
   m_Name: Pixel Perfect Camera
   m_TagString: MainCamera
@@ -582,6 +572,14 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!81 &6944473495392426336
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4962793762173381919}
+  m_Enabled: 1
 --- !u!1 &5105503721067358441
 GameObject:
   m_ObjectHideFlags: 0
@@ -1085,8 +1083,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5434117884590766392, guid: e2cad811a20449895a8bf24288372b57, type: 3}
+      propertyPath: m_Size
+      value: 0.9999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 5434117884590766392, guid: e2cad811a20449895a8bf24288372b57, type: 3}
       propertyPath: m_Value
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6446278378137342664, guid: e2cad811a20449895a8bf24288372b57, type: 3}
       propertyPath: m_AnchorMax.x

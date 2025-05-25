@@ -1,4 +1,5 @@
 using System;
+using Ami.BroAudio;
 using UnityEngine;
 using UnityEngine.UI; // Required for Image extension if you still have it
 
@@ -14,6 +15,18 @@ public static class TweenExtensions
         float startVolume = audioSource.volume;
         Action<float> setter = volume => { if(audioSource != null) audioSource.volume = volume; }; 
         return Tween.Float(audioSource, "Volume", setter, startVolume, targetVolume, duration, onComplete, easeFunction);
+    }
+
+    public static Coroutine TweenVolume(this IAudioPlayer audioPlayer, float targetVolume, float duration, Action onComplete = null, Func<float, float> easeFunction = null)
+    {
+        if (audioPlayer == null)
+        {
+            Debug.LogError("BroAudio, IAudioPlayer is null. Cannot tween volume.");
+            return null;
+        }
+        float startVolume = audioPlayer.CurrentPlayingClip.Volume;
+        Action<float> setter = volume => { if(audioPlayer != null) audioPlayer.SetVolume(volume); }; 
+        return Tween.Float(audioPlayer, "Volume", setter, startVolume, targetVolume, duration, onComplete, easeFunction);
     }
 
     public static Coroutine TweenAlpha(this CanvasGroup canvasGroup, float targetAlpha, float duration, Action onComplete = null, Func<float, float> easeFunction = null)

@@ -65,34 +65,6 @@ MonoBehaviour:
       BPM: 0
       Beats: 0
     SnapToFullVolume: 0
-  - <Name>k__BackingField: ShoppeRadioTrack
-    <ID>k__BackingField: 268435457
-    MulticlipsPlayMode: 0
-    _group: {fileID: 0}
-    Clips:
-    - AudioClip: {fileID: 8300000, guid: 0a81278f67a4ebaf7a59e6fe0f5ad000, type: 3}
-      Volume: 1
-      Delay: 0
-      StartPosition: 0
-      EndPosition: 0
-      FadeIn: 1
-      FadeOut: 1
-      Weight: 0
-    <MasterVolume>k__BackingField: 1
-    <Loop>k__BackingField: 1
-    <SeamlessLoop>k__BackingField: 0
-    <TransitionTime>k__BackingField: 0
-    <SpatialSetting>k__BackingField: {fileID: 0}
-    <Priority>k__BackingField: 128
-    <Pitch>k__BackingField: 1
-    <PitchRandomRange>k__BackingField: 0
-    <VolumeRandomRange>k__BackingField: 0
-    <RandomFlags>k__BackingField: 0
-    SeamlessTransitionType: 0
-    TransitionTempo:
-      BPM: 0
-      Beats: 0
-    SnapToFullVolume: 0
   Group: {fileID: 11400000, guid: 9392283aee39281a0814bc7586e84c15, type: 2}
   <AssetName>k__BackingField: MusicCollection
   _assetGUID: 4166addeb8bde4b88a5367cae333c0d4

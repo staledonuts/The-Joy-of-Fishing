@@ -82,7 +82,6 @@ public class MoveAi : FishStats
     {
         Vector3 currTarget = this.transform.position + target;
         _agent.StartPath(this.transform.position, currTarget);
-        _fishMoveSFX.Play(transform);
     }
 
     //Does the exact opposite of Seek()

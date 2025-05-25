@@ -29,7 +29,7 @@ public class SoundManager : MonoBehaviour
             return instance;
         }
     }
-    private float musicVolume = 0.25f;
+    private float musicVolume = 0.5f;
     private float sfxVolume = 0.5f;
     private float masterVolume = 1f;
     private float ambienceVolume = 0.05f;
@@ -38,31 +38,34 @@ public class SoundManager : MonoBehaviour
 
     [SerializeField] private SoundID _musicTracks;
     [SerializeField] private SoundID _radioTrack;
-    private IMusicPlayer _musicPlayer;
+    private IAudioPlayer _musicPlayer;
 
-    private IMusicPlayer _shopMusicPlayer;
+    private IAudioPlayer _shopRadioAmbience;
 
     private void Start()
     {
-        _musicPlayer = _musicTracks.Play().AsBGM();
-        _shopMusicPlayer = _radioTrack.Play().AsBGM();
-        _shopMusicPlayer.SetVolume(0);
+        _musicPlayer = (IAudioPlayer)_musicTracks.Play().AsBGM();
+        GameObject shoppeBoatObj = GameObject.Find("ShoppeBoat");
+        _shopRadioAmbience = _radioTrack.Play(shoppeBoatObj.transform);
+        _shopRadioAmbience.SetVolume(0);
     }
 
     public void NextMusicTrack()
     {
-        _musicPlayer = _musicTracks.Play().AsBGM();
+        _musicPlayer = (IAudioPlayer)_musicTracks.Play().AsBGM();
     }
 
     public void TransitionToShopMusic(bool shopActive)
     {
         if(shopActive)
         {
-            
+            _shopRadioAmbience.TweenVolume(1f, 2f, null, Tween.Easing.EaseInQuad);
+            _musicPlayer.TweenVolume(0f, 2f, null, Tween.Easing.EaseOutQuad);
         }
         else
         {
-
+            _musicPlayer.TweenVolume(1f, 2f, null, Tween.Easing.EaseInQuad);
+            _shopRadioAmbience.TweenVolume(0f, 2f, null, Tween.Easing.EaseOutQuad);
         }
     }
 
