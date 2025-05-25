@@ -1,3 +1,4 @@
+using Ami.BroAudio;
 using Pathfinding;
 using UnityEngine;
 
@@ -10,26 +11,25 @@ using UnityEngine;
 [RequireComponent(typeof(Seeker), typeof(AIPath))]
 public class MoveAi : FishStats
 {
-    private Seeker agent;
-    private AIPath path;
-    private Transform player;
+    private Seeker _agent;
+    private AIPath _path;
+    private Transform _player;
+    private float dist = 0f;
+    private bool CanFish = false;
 
-    private Vector3 wander = Vector3.zero;
 
-    //Max distance from the Ai it can wander
+    private Vector3 _wander = Vector3.zero;
+
+    [SerializeField] private SoundID _fishMoveSFX;
     [SerializeField] private float wanderRadius = 5f;
-
-    //The amount of random movment when moveing towards the destination
     [SerializeField] private float wanderJitter = 1f;
 
-    private float dist = 0f;
 
-    private bool CanFish = false;
 
     private void Awake()
     {
-        agent = GetComponent<Seeker>();
-        path = GetComponent<AIPath>();
+        _agent = GetComponent<Seeker>();
+        _path = GetComponent<AIPath>();
     }
 
     private void OnEnable()
@@ -37,7 +37,7 @@ public class MoveAi : FishStats
         Wander();
         BaitScript.BaitIsOut += delegate (bool theBait)
         {
-            player = FindAnyObjectByType<BaitScript>().transform;
+            _player = FindAnyObjectByType<BaitScript>().transform;
 
             CanFish = theBait;
         };
@@ -46,7 +46,7 @@ public class MoveAi : FishStats
     {
         BaitScript.BaitIsOut -= delegate (bool theBait)
         {
-            player = FindAnyObjectByType<BaitScript>().transform;
+            _player = FindAnyObjectByType<BaitScript>().transform;
 
             CanFish = theBait;
         };
@@ -67,12 +67,12 @@ public class MoveAi : FishStats
     //Method that gets a random position in the world and sets the destination
     private void Wander()
     {
-        wander += new Vector3(Random.Range(-1f, 1f) * wanderJitter, Random.Range(-1f, 1f) * wanderJitter);
+        _wander += new Vector3(Random.Range(-1f, 1f) * wanderJitter, Random.Range(-1f, 1f) * wanderJitter);
 
-        wander = wander.normalized;
-        wander *= wanderRadius;
+        _wander = _wander.normalized;
+        _wander *= wanderRadius;
 
-        Vector3 targetWorld = this.gameObject.transform.InverseTransformVector(wander);
+        Vector3 targetWorld = this.gameObject.transform.InverseTransformVector(_wander);
 
         Seek(targetWorld);
     }
@@ -81,7 +81,8 @@ public class MoveAi : FishStats
     private void Seek(Vector3 target)
     {
         Vector3 currTarget = this.transform.position + target;
-        agent.StartPath(this.transform.position, currTarget);
+        _agent.StartPath(this.transform.position, currTarget);
+        _fishMoveSFX.Play(transform);
     }
 
     //Does the exact opposite of Seek()
@@ -89,12 +90,12 @@ public class MoveAi : FishStats
     {
         Vector3 fleeVector = position - this.transform.position;
         Vector3 fleePos = this.transform.position - fleeVector;
-        agent.StartPath(this.transform.position, fleePos);
+        _agent.StartPath(this.transform.position, fleePos);
     }
 
     private void HookIn()
     {
-        if (path.reachedEndOfPath)
+        if (_path.reachedEndOfPath)
         {
             Wander();
         }
@@ -104,24 +105,24 @@ public class MoveAi : FishStats
 
     private void HookOut()
     {
-        dist = Vector3.Distance(this.transform.position, player.position);
+        dist = Vector3.Distance(this.transform.position, _player.position);
         if (dist > BaitAttractionRadius)
         {
-            if (path.reachedEndOfPath)
+            if (_path.reachedEndOfPath)
             {
                 Wander();
             }
         }
         if (dist < BaitAttractionRadius)
         {
-            path.canMove = true;
+            _path.canMove = true;
             if (BaitScript.BaitLevel() == BaitLevel)
             {
-                agent.StartPath(this.transform.position, player.position);
+               _agent.StartPath(this.transform.position, _player.position);
             }
             else
             {
-                Flee(player.position);
+                Flee(_player.position);
             }
         }
 

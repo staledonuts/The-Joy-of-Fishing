@@ -130,6 +130,10 @@ MonoBehaviour:
   _struggleCount: 3
   _excitementLevel: 2
   _baitLevel: 2
+  _fishMoveSFX:
+    ID: 1073741832
+    _sourceAsset: {fileID: 11400000, guid: 47f0fe6c535435382bee9218b4ac5d25, type: 2}
+    <DebugObject>k__BackingField: {fileID: 6181217008843519828}
   wanderRadius: 13
   wanderJitter: 1
 --- !u!58 &1678891643821340272

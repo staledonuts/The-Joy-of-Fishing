@@ -3,19 +3,20 @@ using System.Collections.Generic;
 [System.Serializable]
 public class PlayerData
 {
-    public uint money;
-    public List<CaughtFishData> caughtFishes;
-    public uint currentMaxLineLength;
-    public string equippedLureID;
-    public List<string> ownedLureIDs;
+    public uint Money;
+    public List<CaughtFishData> CaughtFishes;
+    public uint CurrentMaxLineLength;
+    public bool RadioControlLure;
+    public string EquippedLureID;
+    public List<string> OwnedLureIDs;
 
     public PlayerData()
     {
-        money = 50;
-        caughtFishes = new List<CaughtFishData>();
-        currentMaxLineLength = 300;
-        
-        equippedLureID = "BasicLureID";
-        ownedLureIDs = new List<string> { "BasicLureID" };
+        Money = 50;
+        CaughtFishes = new List<CaughtFishData>();
+        CurrentMaxLineLength = 300;
+        RadioControlLure = false;
+        EquippedLureID = "BasicLureID";
+        OwnedLureIDs = new List<string> { "BasicLureID" };
     }
 }

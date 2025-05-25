@@ -37,7 +37,7 @@ public class OverworldParallaxScript : MonoBehaviour
 
         transform.position = new Vector3(startPos + xDistance, startPos + yoffset_select_all_objs_w_this_script + yDistance, transform.position.z) ;
 
-        if(GameManager.Instance.moveCam == 3)
+        /*if(GameManager.Instance.moveCam == 3)
         {
             SetXParallax = true;
             SetYParallax = false;
@@ -162,7 +162,7 @@ public class OverworldParallaxScript : MonoBehaviour
             //yoffset_select_all_objs_w_this_script = -19.2f;
         }
 
-        /*void ParallaxAmountTransitionNeg()
+        void ParallaxAmountTransitionNeg()
         {
             parallaxAmount -= Time.deltaTime;
             

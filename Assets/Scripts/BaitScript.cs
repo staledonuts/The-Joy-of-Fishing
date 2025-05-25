@@ -14,13 +14,9 @@ public class BaitScript : MonoBehaviour
     [SerializeField] private BaitScriptAbleObject[] bait;
     [SerializeField] private int currentBait;
     private GameObject CollectiveFish;
-    //Used in BaitScrip and MoveAi
     public static Func<int> BaitLevel;
-    //Used in BaitScript, CollectFish, MoneyEffect and MoveAi
     public static event Action<bool> BaitIsOut;
-    //Used in BaitScript and MoneyEffect
     public static Action FishOnHook;
-    //Used in BaitScript and CollectFish
     public static Action FishOfHook;
 
     private void OnEnable()

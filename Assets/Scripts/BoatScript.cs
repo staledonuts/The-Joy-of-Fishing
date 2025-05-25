@@ -4,13 +4,8 @@ using UnityEngine.InputSystem;
 public class BoatScript : MonoBehaviour
 {
     private float triggerValue;
-    private bool BoatCanMove = true;
     private Vector2 moveInput, hookInput;
     private Rigidbody2D rig2d;
-    private Transform fishInventory;
-    private GameObject fishCollective;
-    public static event Action DoneCollecting;
-    public static event Action DoneFishing;
     public bool currentlyReelingUp;
 
     [Header("Movement stuff")]
@@ -36,6 +31,7 @@ public class BoatScript : MonoBehaviour
     {
         moveInput = context.ReadValue<Vector2>();
     }
+
     public void GetTriggerValues(InputAction.CallbackContext context)
     {
         triggerValue = context.ReadValue<float>();
@@ -45,6 +41,7 @@ public class BoatScript : MonoBehaviour
     {
         hookInput = context.ReadValue<Vector2>();
     }
+
     public void CastOutButton(InputAction.CallbackContext context)
     {
         if(context.performed && ropeActive == false)
@@ -57,22 +54,24 @@ public class BoatScript : MonoBehaviour
     {
         if (context.performed)
         {
-            UIManager.Instance.OnShopSwitch();
+            if(UIManager.Instance.OnShopSwitch())
+            {
+                GameManager.Instance.CameraSwitcher(CameraModes.Shop);
+            }
+            else
+            {
+                GameManager.Instance.CameraSwitcher(CameraModes.Hook);
+            }
         }
     }
+
     private void MoveLeftRight()
     {
-        if (!BoatCanMove)
-        {
-            return;
-        }
-        else
-        {
-            bool playerHasHorizontalSpeed = Mathf.Abs(rig2d.linearVelocity.x) > Mathf.Epsilon;
-            Vector2 playerVelocity = new Vector2(moveInput.x * BoatSpeedForce, rig2d.linearVelocity.y);
-            rig2d.linearVelocity = playerVelocity;
-        }
+        //bool playerHasHorizontalSpeed = Mathf.Abs(rig2d.linearVelocity.x) > Mathf.Epsilon;
+        Vector2 playerVelocity = new Vector2(moveInput.x * BoatSpeedForce, rig2d.linearVelocity.y);
+        rig2d.linearVelocity = playerVelocity;
     }
+
     public void PauseButton(InputAction.CallbackContext context)
     {
         if(context.performed)
@@ -83,16 +82,9 @@ public class BoatScript : MonoBehaviour
 
     public void MoveHook()
     {
-        if(ropeActive && GameManager.Instance.MindcontrolActive)
+        if(Inventory.Instance.playerData.RadioControlLure)
         {
-            if (CustomRopeSolver.Instance == null) 
-            {  
-                return;
-            }
-            else if (CustomRopeSolver.Instance != null)
-            {
-                CustomRopeSolver.Instance.ApplyMovementToLastNode(hookInput * forcetoAdd * Time.deltaTime);
-            }
+            CustomRopeSolver.Instance.ApplyMovementToLastNode(hookInput * forcetoAdd * Time.deltaTime);
         }
     }
     public void ReelRope()
@@ -119,25 +111,7 @@ public class BoatScript : MonoBehaviour
 
     public void OnCastOut()
     {
-        if (ropeActive == false && GameManager.Instance.moveCam == 1)
-        {
-            GameManager.Instance.Hook = CustomRopeSolver.Instance.GetHook();
-            GameManager.Instance.baitCam = true;
-            GameManager.Instance.moveCam = 3;
-            //sets rope to enabled
-            ropeActive = true;
-        }
-    }
-
-    private void OnEnable()
-    {
-        //BaitScript.BaitIsOut += FindHookAndInventory;
-        //DoneFishing += AddFishToInventory;
-    }
-
-    private void OnDisable()
-    {
-        //BaitScript.BaitIsOut -= FindHookAndInventory;
-        //DoneFishing -= AddFishToInventory;
+        GameManager.Instance.Hook = CustomRopeSolver.Instance.GetHook();
+        GameManager.Instance.CameraSwitcher(CameraModes.Hook);
     }
 }

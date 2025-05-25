@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public sealed class CustomRopeSolver : MonoBehaviour
@@ -102,26 +101,21 @@ public sealed class CustomRopeSolver : MonoBehaviour
         }
 
         Vector2 startPos = rodTip.position;
-        // Initialize with at least one node: the rodTip anchor.
-        // The Start() method previously initialized 3 nodes. We'll keep node[0] as the anchor.
-        // And then add a couple of segments to start with a visible line.
-
-        // Add the anchor node (nodes[0])
+        
         nodes.Add(new RopeNode
         {
             position = startPos,
             prevPosition = startPos,
-            transform = null, // Rod tip node doesn't need its own prefab instance usually
+            transform = null,
             visualPosition = startPos 
         });
         
-        // Add 2 more nodes to make an initial line of 2 segments
         for (int i = 0; i < 2; i++) 
         {
             if (nodes.Count >= maxNodes) break; 
 
-            RopeNode previousNode = nodes[nodes.Count - 1]; // Get the actual last node (which is nodes[0] then nodes[1])
-            Vector2 physPos = previousNode.position - new Vector2(0, segmentLength); // Extend downwards from previous
+            RopeNode previousNode = nodes[nodes.Count - 1];
+            Vector2 physPos = previousNode.position - new Vector2(0, segmentLength);
             
             GameObject nodeObj = null;
             if (nodePrefab != null) 
@@ -141,9 +135,7 @@ public sealed class CustomRopeSolver : MonoBehaviour
         }
 
 
-        hookPhysicsTargetPosition = nodes.Count > 0 ? 
-                                 nodes[nodes.Count - 1].position + Vector2.down * segmentLength : 
-                                 startPos + Vector2.down * segmentLength;
+        hookPhysicsTargetPosition = nodes.Count > 0 ? nodes[nodes.Count - 1].position + Vector2.down * segmentLength : startPos + Vector2.down * segmentLength;
         hookVisualPosition = hookPhysicsTargetPosition;
 
 
@@ -185,16 +177,14 @@ public sealed class CustomRopeSolver : MonoBehaviour
     void Update() 
     {
         if (rodTip == null || hook == null) return;
-        if (nodes.Count == 0) return; // Need at least the anchor node
+        if (nodes.Count == 0) return;
 
-        // Interpolate visual positions of nodes
-        // Node 0 (rodTip) visual position should always match rodTip.position
         RopeNode rootNode = nodes[0];
-        rootNode.visualPosition = rodTip.position; // Directly set, no lerp for anchor
+        rootNode.visualPosition = rodTip.position;
         if (rootNode.transform != null) rootNode.transform.position = rootNode.visualPosition; // Should be null
         nodes[0] = rootNode;
 
-        for (int i = 1; i < nodes.Count; i++) // Start lerping from the first actual segment node
+        for (int i = 1; i < nodes.Count; i++)
         {
             RopeNode node = nodes[i];
             if (node.transform != null)

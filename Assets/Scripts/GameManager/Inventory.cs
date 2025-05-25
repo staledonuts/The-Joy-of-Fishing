@@ -70,11 +70,11 @@ public sealed class Inventory : MonoBehaviour
     }
 
 
-    public uint Money => playerData.money;
-    public List<CaughtFishData> CaughtFishes => playerData.caughtFishes;
-    public uint CurrentMaxLineLength => playerData.currentMaxLineLength;
-    public string EquippedLureID => playerData.equippedLureID;
-    public List<string> OwnedLureIDs => playerData.ownedLureIDs;
+    public uint Money => playerData.Money;
+    public List<CaughtFishData> CaughtFishes => playerData.CaughtFishes;
+    public uint CurrentMaxLineLength => playerData.CurrentMaxLineLength;
+    public string EquippedLureID => playerData.EquippedLureID;
+    public List<string> OwnedLureIDs => playerData.OwnedLureIDs;
 
 
     /// <summary>
@@ -93,7 +93,7 @@ public sealed class Inventory : MonoBehaviour
             float weight = size * 10f; // Example: calculate weight
 
             CaughtFishData newFishData = new CaughtFishData(typeID, size, weight, value);
-            playerData.caughtFishes.Add(newFishData);
+            playerData.CaughtFishes.Add(newFishData);
             Debug.Log($"Caught a {typeID} (Size: {size}, Weight: {weight}, Value: {value})! Added to inventory.");
             
             // Play fish ranking audio/particles if applicable
@@ -124,8 +124,8 @@ public sealed class Inventory : MonoBehaviour
 
     public void AddMoney(uint amount)
     {
-        playerData.money += amount;
-        Debug.Log($"Added {amount} money. Total money: {playerData.money}");
+        playerData.Money += amount;
+        Debug.Log($"Added {amount} money. Total money: {playerData.Money}");
         OnMoneyChanged?.Invoke();
         OnInventoryChanged?.Invoke();
         SaveData();
@@ -133,10 +133,10 @@ public sealed class Inventory : MonoBehaviour
 
     public bool SpendMoney(uint amount)
     {
-        if (playerData.money >= amount)
+        if (playerData.Money >= amount)
         {
-            playerData.money -= amount;
-            Debug.Log($"Spent {amount} money. Remaining money: {playerData.money}");
+            playerData.Money -= amount;
+            Debug.Log($"Spent {amount} money. Remaining money: {playerData.Money}");
             OnMoneyChanged?.Invoke();
             OnInventoryChanged?.Invoke();
             SaveData();
@@ -144,16 +144,16 @@ public sealed class Inventory : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"Attempted to spend {amount} money, but only have {playerData.money}. Transaction failed.");
+            Debug.LogWarning($"Attempted to spend {amount} money, but only have {playerData.Money}. Transaction failed.");
             return false;
         }
     }
 
     public void SellFish(CaughtFishData fishToSell)
     {
-        if (playerData.caughtFishes.Contains(fishToSell))
+        if (playerData.CaughtFishes.Contains(fishToSell))
         {
-            playerData.caughtFishes.Remove(fishToSell);
+            playerData.CaughtFishes.Remove(fishToSell);
             AddMoney(fishToSell.value); 
             Debug.Log($"Sold {fishToSell.fishTypeID} for {fishToSell.value}.");
             OnInventoryChanged?.Invoke();
@@ -168,9 +168,9 @@ public sealed class Inventory : MonoBehaviour
     // Example: Sell fish by index if you have a UI list
     public void SellFishByIndex(int index)
     {
-        if (index >= 0 && index < playerData.caughtFishes.Count)
+        if (index >= 0 && index < playerData.CaughtFishes.Count)
         {
-            CaughtFishData fishToSell = playerData.caughtFishes[index];
+            CaughtFishData fishToSell = playerData.CaughtFishes[index];
             SellFish(fishToSell); // Uses the method above
         }
         else
@@ -182,8 +182,8 @@ public sealed class Inventory : MonoBehaviour
     {
         if (SpendMoney(cost))
         {
-            playerData.currentMaxLineLength += additionalLength;
-            Debug.Log($"Line length upgraded by {additionalLength}. New max length: {playerData.currentMaxLineLength}");
+            playerData.CurrentMaxLineLength += additionalLength;
+            Debug.Log($"Line length upgraded by {additionalLength}. New max length: {playerData.CurrentMaxLineLength}");
             OnEquipmentChanged?.Invoke();
             OnInventoryChanged?.Invoke();
             SaveData();
@@ -200,13 +200,13 @@ public sealed class Inventory : MonoBehaviour
     
     public Lure GetEquippedLure()
     {
-        if (string.IsNullOrEmpty(playerData.equippedLureID)) return null;
-        return GetLureByID(playerData.equippedLureID);
+        if (string.IsNullOrEmpty(playerData.EquippedLureID)) return null;
+        return GetLureByID(playerData.EquippedLureID);
     }
 
     public bool IsLureOwned(string lureID)
     {
-        return playerData.ownedLureIDs.Contains(lureID);
+        return playerData.OwnedLureIDs.Contains(lureID);
     }
 
     public bool BuyLure(string lureID)
@@ -226,7 +226,7 @@ public sealed class Inventory : MonoBehaviour
 
         if (SpendMoney(lureToBuy.cost))
         {
-            playerData.ownedLureIDs.Add(lureID);
+            playerData.OwnedLureIDs.Add(lureID);
             Debug.Log($"Bought lure: {lureToBuy.lureName} (ID: {lureID})");
             OnEquipmentChanged?.Invoke(); // Or a specific OnLuresChanged event
             OnInventoryChanged?.Invoke();
@@ -244,7 +244,7 @@ public sealed class Inventory : MonoBehaviour
             return false;
         }
 
-        if (playerData.equippedLureID == lureID)
+        if (playerData.EquippedLureID == lureID)
         {
             Debug.Log($"Lure '{lureID}' is already equipped.");
             return true; // Or false if you want to indicate no change happened
@@ -258,7 +258,7 @@ public sealed class Inventory : MonoBehaviour
         }
 
 
-        playerData.equippedLureID = lureID;
+        playerData.EquippedLureID = lureID;
         Debug.Log($"Equipped lure: {GetLureByID(lureID)?.lureName}");
         OnEquipmentChanged?.Invoke();
         OnInventoryChanged?.Invoke();

@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UI; // Required for Image extension if you still have it
 
 public static class TweenExtensions
 {
@@ -40,6 +40,21 @@ public static class TweenExtensions
         return Tween.Vector3(transform, "LocalPosition", setter, startPosition, targetPosition, duration, onComplete, easeFunction);
     }
 
+    /// <summary>
+    /// Tweens the world position of a Transform.
+    /// </summary>
+    public static Coroutine TweenPosition(this Transform transform, Vector3 targetPosition, float duration, Action onComplete = null, Func<float, float> easeFunction = null)
+    {
+        if (transform == null)
+        {
+            Debug.LogError("Transform is null. Cannot tween world position.");
+            return null;
+        }
+        Vector3 startPosition = transform.position;
+        Action<Vector3> setter = pos => { if(transform != null) transform.position = pos; };
+        return Tween.Vector3(transform, "Position", setter, startPosition, targetPosition, duration, onComplete, easeFunction);
+    }
+
     public static Coroutine TweenLocalScale(this Transform transform, Vector3 targetScale, float duration, Action onComplete = null, Func<float, float> easeFunction = null)
     {
         if (transform == null)
@@ -52,9 +67,6 @@ public static class TweenExtensions
         return Tween.Vector3(transform, "LocalScale", setter, startScale, targetScale, duration, onComplete, easeFunction);
     }
 
-    /// <summary>
-    /// Tweens the local rotation of a Transform using Quaternions for smooth interpolation.
-    /// </summary>
     public static Coroutine TweenLocalRotation(this Transform transform, Quaternion targetRotation, float duration, Action onComplete = null, Func<float, float> easeFunction = null)
     {
         if (transform == null)
@@ -67,11 +79,6 @@ public static class TweenExtensions
         return Tween.Quaternion(transform, "LocalRotation", setter, startRotation, targetRotation, duration, onComplete, easeFunction);
     }
 
-    /// <summary>
-    /// Tweens the local rotation of a Transform using Euler angles.
-    /// Note: Tweening Euler angles directly can sometimes lead to gimbal lock or unexpected paths for large rotations.
-    /// Prefer TweenLocalRotation (Quaternion) for complex or large rotations.
-    /// </summary>
     public static Coroutine TweenLocalEulerAngles(this Transform transform, Vector3 targetEulerAngles, float duration, Action onComplete = null, Func<float, float> easeFunction = null)
     {
         if (transform == null)
@@ -81,15 +88,9 @@ public static class TweenExtensions
         }
         Vector3 startEulerAngles = transform.localEulerAngles;
         Action<Vector3> setter = euler => { if(transform != null) transform.localEulerAngles = euler; };
-        // Internally, this will Lerp the Vector3 Euler angles.
         return Tween.Vector3(transform, "LocalEulerAngles", setter, startEulerAngles, targetEulerAngles, duration, onComplete, easeFunction);
     }
 
-    // --- RectTransform Specific Extensions ---
-
-    /// <summary>
-    /// Tweens the anchoredPosition of a RectTransform.
-    /// </summary>
     public static Coroutine TweenAnchoredPosition(this RectTransform rectTransform, Vector2 targetPosition, float duration, Action onComplete = null, Func<float, float> easeFunction = null)
     {
         if (rectTransform == null)
@@ -102,9 +103,6 @@ public static class TweenExtensions
         return Tween.Vector2(rectTransform, "AnchoredPosition", setter, startPosition, targetPosition, duration, onComplete, easeFunction);
     }
 
-    /// <summary>
-    /// Tweens the sizeDelta of a RectTransform.
-    /// </summary>
     public static Coroutine TweenSizeDelta(this RectTransform rectTransform, Vector2 targetSize, float duration, Action onComplete = null, Func<float, float> easeFunction = null)
     {
         if (rectTransform == null)

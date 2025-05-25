@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 8898945665741332790}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.572832, y: -49.22038, z: 0}
+  m_LocalPosition: {x: -10.619828, y: -49.19696, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -166,6 +166,10 @@ MonoBehaviour:
   _struggleCount: 2
   _excitementLevel: 1
   _baitLevel: 1
+  _fishMoveSFX:
+    ID: 1073741832
+    _sourceAsset: {fileID: 11400000, guid: 47f0fe6c535435382bee9218b4ac5d25, type: 2}
+    <DebugObject>k__BackingField: {fileID: 8898945665741332790}
   wanderRadius: 10
   wanderJitter: 1
 --- !u!50 &883294983081264371

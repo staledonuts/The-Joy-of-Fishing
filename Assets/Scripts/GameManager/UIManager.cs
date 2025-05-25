@@ -76,7 +76,7 @@ public sealed class UIManager : MonoBehaviour
         {
             _buySfx.Play();
             _mindcontrol.interactable = false;
-            GameManager.Instance.MindcontrolActive = true;
+            Inventory.Instance.playerData.RadioControlLure = true;
         }
         else
         {
@@ -138,7 +138,7 @@ public sealed class UIManager : MonoBehaviour
         }
     }
     private bool shopbool = false;
-    public void OnShopSwitch()
+    public bool OnShopSwitch()
     {
         if (!shopbool)
         {
@@ -152,6 +152,7 @@ public sealed class UIManager : MonoBehaviour
             _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutQuad);
             SoundManager.Instance.TransitionToShopMusic(false);
         }
+        return shopbool;
     }
 
     [SerializeField] private Image _fadeimage;
@@ -169,11 +170,11 @@ public sealed class UIManager : MonoBehaviour
     }
     public void UIScreenfadein() 
     {
-        _fadeimage.TweenImageColor(FADEINCOLOR, 2f, () => _fadeCanvas.SetActive(false), Tween.Easing.EaseInQuad);
+        _fadeimage.TweenImageColor(FADEINCOLOR, UITWEENSPEED, () => _fadeCanvas.SetActive(false), Tween.Easing.EaseInQuad);
     }
 
     public void StartGameFadeIN()
     {
-        _fadeimage.TweenImageColor(FADEINCOLOR, 2f, () => { _fadeCanvas.SetActive(false); TweenLogo(); }, Tween.Easing.EaseInQuad);
+        _fadeimage.TweenImageColor(FADEINCOLOR, 1.2f, () => { _fadeCanvas.SetActive(false); TweenLogo(); }, Tween.Easing.EaseInQuad);
     }
 }

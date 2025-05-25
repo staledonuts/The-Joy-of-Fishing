@@ -1,152 +1,183 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using Unity.Cinemachine;
 
 public sealed class GameManager : MonoBehaviour
 {
     private static GameManager instance = null;
-
-    public static GameManager Instance
+    public static GameManager Instance 
     {
         get
         {
             if (instance == null)
             {
-                // Find singleton of this type in the scene
                 instance = FindFirstObjectByType<GameManager>();
-                // If there is no singleton object in the scene, we have to add one
                 if (instance == null)
                 {
-                    GameObject obj = new GameObject("GameManager Singelton");
+                    GameObject obj = new GameObject("GameManager_Singleton");
                     instance = obj.AddComponent<GameManager>();
-                    // The singleton object shouldn't be destroyed when we switch between scenes
                     DontDestroyOnLoad(obj);
                 }
             }
-
             return instance;
         }
     }
-    [SerializeField] private CinemachinePositionComposer CMcamBody;
+
+    [Header("Cinemachine Virtual Cameras")]
+    [SerializeField] private CinemachineVirtualCameraBase vcamPlayer;
+    [SerializeField] private CinemachineVirtualCameraBase vcamShop;
+    [SerializeField] private CinemachineVirtualCameraBase vcamHook;
+
+    private const int ACTIVE_VCAM_PRIORITY = 10;
+    private const int INACTIVE_VCAM_PRIORITY = 0;
     
     [Header("UI Control Center")]
-    [SerializeField] private CinemachineCamera CinemachineCam;
-    [SerializeField] private GameObject pauseCanvas, callShopCanvas, goFishCanvas;
-    [HideInInspector] public int moveCam = 1;
-    [HideInInspector] public bool baitCam = false;
+    [SerializeField] private GameObject pauseCanvas;
+    [SerializeField] private GameObject callShopCanvas;
+    [SerializeField] private GameObject goFishCanvas;
     [HideInInspector] public Transform ShoppeBoat, Player, Hook;
     [HideInInspector] public float CMcamOrthoSize;
-    public Animator ShopUIAnimator;
-    private BoatScript boatScript;
-    [HideInInspector] public bool MindcontrolActive = false;
     public int currentLineLevel = 0, currentBait = 0, cashAmount = 0;
     public float currentTime = 0f;
+
     private void Awake()
     {
-        
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
     }
 
-
-    // Start is called before the first frame update
     void Start()
     {
-        ShoppeBoat = GameObject.Find("ShoppeBoat").GetComponent<Transform>();
-        Player = GameObject.Find("Player").GetComponent<Transform>();
-        boatScript = FindAnyObjectByType<BoatScript>();
-        CMcamBody = (CinemachinePositionComposer)CinemachineCam.GetCinemachineComponent(CinemachineCore.Stage.Body);
-    }
-
-    void Update()
-    {
-        CameraSwitcher();
-    }
-
-
-
-    public void CameraSwitcher()
-    {
-        if (moveCam == 1)
+        GameObject shoppeBoatObj = GameObject.Find("ShoppeBoat");
+        if (shoppeBoatObj != null) 
         {
-            callShopCanvas.SetActive(true);
-            goFishCanvas.SetActive(true);
-            CinemachineCam.Lens.OrthographicSize += Time.deltaTime * 3;
-            if (CinemachineCam.Lens.OrthographicSize >= 9)
-            {
-                CinemachineCam.Lens.OrthographicSize = 9;
-            }
-            CinemachineCam.Follow = Player;
-            CMcamBody.TargetOffset.y = 3;
+            ShoppeBoat = shoppeBoatObj.transform;
+            vcamShop.Follow = ShoppeBoat;
+            vcamShop.LookAt = ShoppeBoat;
+        }
+        else Debug.LogError("ShoppeBoat GameObject not found!");
+
+        GameObject playerObj = GameObject.Find("Player");
+        if (playerObj != null) 
+        {
+            Player = playerObj.transform;
+            vcamPlayer.Follow = Player;
+            vcamPlayer.LookAt = Player;
+        }
+        else Debug.LogError("Player GameObject not found!");
+        
+        GameObject hookObj = GameObject.Find("Hook");
+        if (hookObj != null) 
+        {
+            Hook = hookObj.transform;
+            vcamHook.Follow = Hook;
+            vcamHook.LookAt = Hook;
         }
 
-        else if (moveCam == 2)
+        if (Player != null && vcamPlayer != null)
         {
-            callShopCanvas.SetActive(true);
-            goFishCanvas.SetActive(false);
-            CinemachineCam.Lens.OrthographicSize -= Time.deltaTime * 3;
-            if (CinemachineCam.Lens.OrthographicSize <= 5)
-            {
-                CinemachineCam.Lens.OrthographicSize = 5;
-            }
-            CinemachineCam.Follow = ShoppeBoat;
-            CMcamBody.TargetOffset.y = 3;
+            CameraSwitcher(CameraModes.Player);
         }
-
-        else if (moveCam == 3)
+        else if (vcamPlayer == null)
         {
-            callShopCanvas.SetActive(false);
-            goFishCanvas.SetActive(false);
-            CinemachineCam.Lens.OrthographicSize += Time.deltaTime * 3;
-            if (CinemachineCam.Lens.OrthographicSize >= 9)
-            {
-                CinemachineCam.Lens.OrthographicSize = 9;
-            }
-            CinemachineCam.Follow = BaitCam();
-
-            CMcamBody.TargetOffset.y = 0;
-            if(currentTime >= 3f)
-            {
-                SceneManager.LoadScene("End Scene");
-            }
+            Debug.LogError("Player Virtual Camera (vcamPlayer) is not assigned in GameManager!");
         }
     }
 
-    public void ChangeInteger()
-    {
-        moveCam = 2;
-    }
+    // Removed Update() as it was empty
 
-    public void ChangeIntegerAgain()
+    public void CameraSwitcher(CameraModes cameraMode)
     {
-        moveCam = 1;
-    }
-    public Transform BaitCam()
-    {
-        Transform currenthook;
-        currenthook = GameObject.FindGameObjectWithTag("Bait").GetComponent<Transform>();
-        if(currenthook == null)
+        // Reset all VCam priorities to inactive
+        if (vcamPlayer != null) vcamPlayer.Priority = INACTIVE_VCAM_PRIORITY;
+        if (vcamShop != null) vcamShop.Priority = INACTIVE_VCAM_PRIORITY;
+        if (vcamHook != null) vcamHook.Priority = INACTIVE_VCAM_PRIORITY;
+
+        // Activate the desired VCam by setting its priority higher
+        // and manage UI visibility
+        switch (cameraMode)
         {
-            return boatScript.transform;
-        }
-        return currenthook;
-    }
+            case CameraModes.Player:
+                if (vcamPlayer != null) vcamPlayer.Priority = ACTIVE_VCAM_PRIORITY;
+                else Debug.LogError("vcamPlayer not assigned!");
 
-//============================ PauseScreen ============================
-    public bool SetPause;
+                if(callShopCanvas != null) callShopCanvas.SetActive(true);
+                if(goFishCanvas != null) goFishCanvas.SetActive(true);
+                Debug.Log("Switched to Player Camera");
+                break;
+            
+            case CameraModes.Hook:
+                if (vcamHook != null)
+                {
+                    if (Hook == null) // Try to find hook if not assigned yet
+                    {
+                        GameObject hookObj = CustomRopeSolver.Instance.GetHook().gameObject;
+                        if (hookObj != null) Hook = hookObj.transform;
+                    }
+
+                    if (Hook != null) // Ensure Hook transform is available for VCam
+                    {
+                        // If VCam_Hook's Follow/LookAt target is dynamic, ensure it's set
+                        vcamHook.Follow = Hook; 
+                        vcamHook.LookAt = Hook;
+                        vcamHook.Priority = ACTIVE_VCAM_PRIORITY;
+                    }
+                    else Debug.LogError("Hook Transform not found or assigned for vcamHook!");
+                }
+                else Debug.LogError("vcamHook not assigned!");
+
+                if(callShopCanvas != null) callShopCanvas.SetActive(true);
+                if(goFishCanvas != null) goFishCanvas.SetActive(false);
+                Debug.Log("Switched to Hook Camera");
+                break;
+            
+            case CameraModes.Shop:
+                if (vcamShop != null) vcamShop.Priority = ACTIVE_VCAM_PRIORITY;
+                else Debug.LogError("vcamShop not assigned!");
+
+                if(callShopCanvas != null) callShopCanvas.SetActive(false);
+                if(goFishCanvas != null) goFishCanvas.SetActive(false);
+                Debug.Log("Switched to Shop Camera");
+                break;
+            
+            default:
+                Debug.LogWarning("Unknown CameraMode specified: " + cameraMode);
+                // Optionally default to player camera
+                if (vcamPlayer != null) vcamPlayer.Priority = ACTIVE_VCAM_PRIORITY;
+                if(callShopCanvas != null) callShopCanvas.SetActive(true);
+                if(goFishCanvas != null) goFishCanvas.SetActive(true);
+                break;
+        }
+    }        
+    
+    //============================ PauseScreen ============================
+    private bool _setPause;
     public void Pause()
     {
         if (Time.timeScale == 1)
         {
             Time.timeScale = 0;
-            pauseCanvas.SetActive(true);
-            SetPause = true;
+            if(pauseCanvas != null) pauseCanvas.SetActive(true);
+            _setPause = true;
         } 
         else 
         {
-            Time.timeScale = 1; pauseCanvas.SetActive(false);
-            SetPause = false; 
+            Time.timeScale = 1; 
+            if(pauseCanvas != null) pauseCanvas.SetActive(false);
+            _setPause = false; 
         }
-
     }
+}
+public enum CameraModes
+{
+    Shop,
+    Player,
+    Hook
 }
