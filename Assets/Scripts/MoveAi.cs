@@ -14,8 +14,8 @@ public class MoveAi : FishStats
     private Seeker _agent;
     private AIPath _path;
     private Transform _player;
-    private float dist = 0f;
-    private bool CanFish = false;
+    private float _dist = 0f;
+    private bool _canFish = false;
 
 
     private Vector3 _wander = Vector3.zero;
@@ -39,7 +39,7 @@ public class MoveAi : FishStats
         {
             _player = FindAnyObjectByType<BaitScript>().transform;
 
-            CanFish = theBait;
+            _canFish = theBait;
         };
     }
     private void OnDisable()
@@ -48,13 +48,13 @@ public class MoveAi : FishStats
         {
             _player = FindAnyObjectByType<BaitScript>().transform;
 
-            CanFish = theBait;
+            _canFish = theBait;
         };
     }
 
     private void LateUpdate()
     {
-        if (CanFish)
+        if (_canFish)
         {
             HookOut();
         }
@@ -104,15 +104,15 @@ public class MoveAi : FishStats
 
     private void HookOut()
     {
-        dist = Vector3.Distance(this.transform.position, _player.position);
-        if (dist > BaitAttractionRadius)
+        _dist = Vector3.Distance(this.transform.position, _player.position);
+        if (_dist > BaitAttractionRadius)
         {
             if (_path.reachedEndOfPath)
             {
                 Wander();
             }
         }
-        if (dist < BaitAttractionRadius)
+        if (_dist < BaitAttractionRadius)
         {
             _path.canMove = true;
             if (BaitScript.BaitLevel() == BaitLevel)
