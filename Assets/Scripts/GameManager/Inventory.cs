@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using Ami.BroAudio;
+using System.IO; 
+using Ami.BroAudio; 
 using UnityEngine;
 
 public sealed class Inventory : MonoBehaviour
@@ -24,21 +24,17 @@ public sealed class Inventory : MonoBehaviour
         }
     }
 
-    public PlayerData playerData; // This will hold all player-specific data
+    public PlayerData playerData; 
 
-    // --- Lure Management ---
-    // This would ideally come from a game data manager or ScriptableObjects
     [Header("Lure Configuration")]
-    public List<Lure> allAvailableLures = new List<Lure>();
+    public List<Lure> allAvailableLures = new List<Lure>(); 
 
-    // --- Fish Ranking (from your original script) ---
     [Header("Fish Catch Feedback")]
-    [SerializeField] private FishRanking[] fishRanking;
+    [SerializeField] private FishRanking[] fishRanking; 
 
-    // --- Events for UI updates ---
-    public static event Action OnInventoryChanged; // For general changes
+    public static event Action OnInventoryChanged; 
     public static event Action OnMoneyChanged;
-    public static event Action OnEquipmentChanged; // For line length or lure changes
+    public static event Action OnEquipmentChanged; 
 
     private string _savePath;
 
@@ -49,7 +45,7 @@ public sealed class Inventory : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
             _savePath = Path.Combine(Application.persistentDataPath, "playerData.json");
-            LoadData(); // Load data when the inventory is initialized
+            LoadData(); 
         }
         else if (instance != this)
         {
@@ -60,51 +56,38 @@ public sealed class Inventory : MonoBehaviour
 
     private void Start()
     {
-        // Initialize lure list if empty (example, better to use ScriptableObjects)
         if (allAvailableLures.Count == 0)
         {
+            // Ensure the string IDs here match what PlayerData constructor hashes for defaults
             allAvailableLures.Add(new Lure("BasicLureID", "Basic Lure", "A simple, reliable lure.", 0));
             allAvailableLures.Add(new Lure("ShinySpinnerID", "Shiny Spinner", "Attracts fish with its sparkle.", 100));
             allAvailableLures.Add(new Lure("DeepDiverID", "Deep Diver", "Gets to the bottom quickly.", 150));
         }
     }
 
-
     public uint Money => playerData.Money;
     public List<CaughtFishData> CaughtFishes => playerData.CaughtFishes;
     public uint CurrentMaxLineLength => playerData.CurrentMaxLineLength;
-    public string EquippedLureID => playerData.EquippedLureID;
-    public List<string> OwnedLureIDs => playerData.OwnedLureIDs;
+    public uint EquippedLureID => playerData.EquippedLureID;
+    public List<uint> OwnedLureIDs => playerData.OwnedLureIDs;
 
-
-    /// <summary>
-    /// Adds a caught fish to the inventory.
-    /// Assumes FishStats has a way to provide FishTypeID, Value, and dynamic properties like size/weight.
-    /// </summary>
-    public void AddCaughtFish(FishStats fishCaught) // FishStats is your MonoBehaviour on the fish GameObject
+    public void AddCaughtFish(FishStats fishCaught) 
     {
-        if (fishCaught != null) // Assuming fishStats is your ScriptableObject Fish
+        if (fishCaught != null) 
         {
             string typeID = fishCaught.FishName;
             uint value = fishCaught.Value;
-
-            // Dynamic properties might come from FishStats itself or be calculated
-            float size = fishCaught.transform.localScale.x; // Example: get size
-            float weight = size * 10f; // Example: calculate weight
+            float size = fishCaught.transform.localScale.x; 
+            float weight = size * 10f; 
 
             CaughtFishData newFishData = new CaughtFishData(typeID, size, weight, value);
             playerData.CaughtFishes.Add(newFishData);
-            Debug.Log($"Caught a {typeID} (Size: {size}, Weight: {weight}, Value: {value})! Added to inventory.");
+            Debug.Log($"Caught a {typeID} (Value: {value})! Added to inventory.");
             
-            // Play fish ranking audio/particles if applicable
-            // This part depends on your FishRanking setup and how it correlates to the caught fish
-            // For example, find a matching FishRanking based on value or typeID
-            PlayFishCatchFeedback(fishCaught.transform); // Pass transform for particle/audio position
+            PlayFishCatchFeedback(fishCaught.transform); 
 
             OnInventoryChanged?.Invoke();
             SaveData();
-            Destroy(fishCaught.gameObject);
-            
         }
         else
         {
@@ -114,18 +97,15 @@ public sealed class Inventory : MonoBehaviour
     
     private void PlayFishCatchFeedback(Transform fishTransform)
     {
-        // Example: Play the first ranking's feedback. You'll need more specific logic.
         if (fishRanking != null && fishRanking.Length > 0)
         {
-            fishRanking[0].Play(fishTransform); // Or select based on fish rarity/value
+            fishRanking[0].Play(fishTransform); 
         }
     }
-
 
     public void AddMoney(uint amount)
     {
         playerData.Money += amount;
-        Debug.Log($"Added {amount} money. Total money: {playerData.Money}");
         OnMoneyChanged?.Invoke();
         OnInventoryChanged?.Invoke();
         SaveData();
@@ -136,54 +116,37 @@ public sealed class Inventory : MonoBehaviour
         if (playerData.Money >= amount)
         {
             playerData.Money -= amount;
-            Debug.Log($"Spent {amount} money. Remaining money: {playerData.Money}");
             OnMoneyChanged?.Invoke();
             OnInventoryChanged?.Invoke();
             SaveData();
             return true;
         }
-        else
-        {
-            Debug.LogWarning($"Attempted to spend {amount} money, but only have {playerData.Money}. Transaction failed.");
-            return false;
-        }
+        return false;
     }
 
     public void SellFish(CaughtFishData fishToSell)
     {
-        if (playerData.CaughtFishes.Contains(fishToSell))
+        if (playerData.CaughtFishes.Remove(fishToSell))
         {
-            playerData.CaughtFishes.Remove(fishToSell);
             AddMoney(fishToSell.value); 
-            Debug.Log($"Sold {fishToSell.fishTypeID} for {fishToSell.value}.");
             OnInventoryChanged?.Invoke();
             SaveData();
         }
-        else
-        {
-            Debug.LogWarning($"Attempted to sell {fishToSell.fishTypeID}, but it's not in the inventory.");
-        }
     }
     
-    // Example: Sell fish by index if you have a UI list
     public void SellFishByIndex(int index)
     {
         if (index >= 0 && index < playerData.CaughtFishes.Count)
         {
-            CaughtFishData fishToSell = playerData.CaughtFishes[index];
-            SellFish(fishToSell); // Uses the method above
-        }
-        else
-        {
-            Debug.LogWarning($"Attempted to sell fish at invalid index: {index}");
+            SellFish(playerData.CaughtFishes[index]);
         }
     }
+
     public bool UpgradeLineLength(uint additionalLength, uint cost)
     {
         if (SpendMoney(cost))
         {
             playerData.CurrentMaxLineLength += additionalLength;
-            Debug.Log($"Line length upgraded by {additionalLength}. New max length: {playerData.CurrentMaxLineLength}");
             OnEquipmentChanged?.Invoke();
             OnInventoryChanged?.Invoke();
             SaveData();
@@ -192,88 +155,119 @@ public sealed class Inventory : MonoBehaviour
         return false;
     }
 
-    // --- Lure Management ---
-    public Lure GetLureByID(string lureID)
+    // --- Lure Management (Using Hashed IDs) ---
+    public Lure GetLureByHashedID(uint hashedLureID)
     {
-        return allAvailableLures.Find(lure => lure.lureID == lureID);
+        if (hashedLureID == 0) return null; // Assuming 0 is not a valid hashed ID
+        return allAvailableLures.Find(lure => lure.HashedID == hashedLureID);
     }
     
     public Lure GetEquippedLure()
     {
-        if (string.IsNullOrEmpty(playerData.EquippedLureID)) return null;
-        return GetLureByID(playerData.EquippedLureID);
+        if (playerData.EquippedLureID == 0) return null; // Assuming 0 means no lure equipped
+        return GetLureByHashedID(playerData.EquippedLureID);
     }
 
-    public bool IsLureOwned(string lureID)
+    public bool IsLureOwned(uint hashedLureID)
     {
-        return playerData.OwnedLureIDs.Contains(lureID);
+        if (hashedLureID == 0) return false;
+        return playerData.OwnedLureIDs.Contains(hashedLureID);
     }
 
-    public bool BuyLure(string lureID)
+    // BuyLure now takes the Lure object directly, or you can keep a string ID version
+    // that finds the lure in allAvailableLures first.
+    public bool BuyLure(Lure lureToBuy)
     {
-        if (IsLureOwned(lureID))
-        {
-            Debug.Log($"Already own lure: {lureID}");
-            return false;
-        }
-
-        Lure lureToBuy = GetLureByID(lureID);
         if (lureToBuy == null)
         {
-            Debug.LogError($"Lure with ID '{lureID}' not found in allAvailableLures.");
+            Debug.LogError("Lure to buy is null.");
+            return false;
+        }
+        
+        uint hashedLureID = lureToBuy.HashedID;
+        if (hashedLureID == 0) {
+             Debug.LogError($"Lure '{lureToBuy.lureName}' has an invalid HashedID (0). Cannot buy.");
+             return false;
+        }
+
+        if (IsLureOwned(hashedLureID))
+        {
+            Debug.Log($"Already own lure: {lureToBuy.lureName} (ID: {hashedLureID})");
             return false;
         }
 
         if (SpendMoney(lureToBuy.cost))
         {
-            playerData.OwnedLureIDs.Add(lureID);
-            Debug.Log($"Bought lure: {lureToBuy.lureName} (ID: {lureID})");
-            OnEquipmentChanged?.Invoke(); // Or a specific OnLuresChanged event
+            playerData.OwnedLureIDs.Add(hashedLureID);
+            Debug.Log($"Bought lure: {lureToBuy.lureName} (Hashed ID: {hashedLureID})");
+            OnEquipmentChanged?.Invoke(); 
             OnInventoryChanged?.Invoke();
             SaveData();
             return true;
         }
         return false;
     }
-
-    public bool EquipLure(string lureID)
+    
+    // Overload to buy by string ID (which then gets hashed)
+    public bool BuyLureByStringID(string stringLureID)
     {
-        if (!IsLureOwned(lureID))
+        Lure lureToBuy = allAvailableLures.Find(l => l.lureID == stringLureID);
+        if (lureToBuy == null)
         {
-            Debug.LogWarning($"Cannot equip lure '{lureID}'. Player does not own it.");
+            Debug.LogError($"Lure with string ID '{stringLureID}' not found in allAvailableLures.");
+            return false;
+        }
+        return BuyLure(lureToBuy); // Calls the other BuyLure method
+    }
+
+
+    public bool EquipLure(uint hashedLureID)
+    {
+        if (hashedLureID == 0) {
+            Debug.LogWarning("Cannot equip lure with HashedID 0.");
             return false;
         }
 
-        if (playerData.EquippedLureID == lureID)
+        if (!IsLureOwned(hashedLureID))
         {
-            Debug.Log($"Lure '{lureID}' is already equipped.");
-            return true; // Or false if you want to indicate no change happened
+            Debug.LogWarning($"Cannot equip lure with HashedID '{hashedLureID}'. Player does not own it.");
+            return false;
+        }
+
+        if (playerData.EquippedLureID == hashedLureID)
+        {
+            Debug.Log($"Lure with HashedID '{hashedLureID}' is already equipped.");
+            return true; 
         }
         
-        Lure lureToEquip = GetLureByID(lureID);
-        if (lureToEquip == null)
-        {
-             Debug.LogError($"Cannot equip lure: Lure with ID '{lureID}' not found in allAvailableLures, even though it was marked as owned. Data inconsistency?");
-            return false;
-        }
-
-
-        playerData.EquippedLureID = lureID;
-        Debug.Log($"Equipped lure: {GetLureByID(lureID)?.lureName}");
+        playerData.EquippedLureID = hashedLureID;
+        Lure equippedLure = GetLureByHashedID(hashedLureID);
+        Debug.Log($"Equipped lure: {equippedLure?.lureName} (HashedID: {hashedLureID})");
         OnEquipmentChanged?.Invoke();
         OnInventoryChanged?.Invoke();
         SaveData();
         return true;
     }
+    
+    // Overload to equip by string ID
+    public bool EquipLureByStringID(string stringLureID)
+    {
+        Lure lureToEquip = allAvailableLures.Find(l => l.lureID == stringLureID);
+        if (lureToEquip == null)
+        {
+            Debug.LogError($"Lure with string ID '{stringLureID}' not found for equipping.");
+            return false;
+        }
+        return EquipLure(lureToEquip.HashedID);
+    }
 
-    // --- Data Persistence (Basic Example) ---
+
     public void SaveData()
     {
         try
         {
-            string json = JsonUtility.ToJson(playerData, true); // true for pretty print
+            string json = JsonUtility.ToJson(playerData, true); 
             File.WriteAllText(_savePath, json);
-            Debug.Log($"Player data saved to {_savePath}");
         }
         catch (Exception e)
         {
@@ -292,34 +286,28 @@ public sealed class Inventory : MonoBehaviour
                 if (loadedData != null)
                 {
                     playerData = loadedData;
-                    Debug.Log("Player data loaded successfully.");
                 }
                 else
                 {
-                     Debug.LogWarning("Failed to parse player data from JSON. Using new PlayerData.");
-                    playerData = new PlayerData(); // Fallback to new data
+                    playerData = new PlayerData(); 
                 }
             }
             catch (Exception e)
             {
                 Debug.LogError($"Failed to load player data: {e.Message}. Creating new PlayerData.");
-                playerData = new PlayerData(); // Fallback to new data
+                playerData = new PlayerData(); 
             }
         }
         else
         {
-            Debug.Log("No save file found. Creating new PlayerData.");
-            playerData = new PlayerData(); // Create new data if no save file
+            playerData = new PlayerData(); 
         }
-        // Invoke events to update UI after loading
         OnMoneyChanged?.Invoke();
         OnEquipmentChanged?.Invoke();
         OnInventoryChanged?.Invoke();
     }
 }
 
-// FishRanking class from your original script (ensure it's defined or move it here)
-// If FishRanking is in another file and accessible, you don't need to redefine it.
 [System.Serializable]
 public class FishRanking
 {

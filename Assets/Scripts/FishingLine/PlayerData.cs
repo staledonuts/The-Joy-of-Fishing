@@ -7,8 +7,9 @@ public class PlayerData
     public List<CaughtFishData> CaughtFishes;
     public uint CurrentMaxLineLength;
     public bool RadioControlLure;
-    public string EquippedLureID;
-    public List<string> OwnedLureIDs;
+    public uint EquippedLureID;
+    public List<uint> OwnedLureIDs;
+    public List<uint> DestroyedBlockerIDs;
 
     public PlayerData()
     {
@@ -16,7 +17,8 @@ public class PlayerData
         CaughtFishes = new List<CaughtFishData>();
         CurrentMaxLineLength = 300;
         RadioControlLure = false;
-        EquippedLureID = "BasicLureID";
-        OwnedLureIDs = new List<string> { "BasicLureID" };
+        EquippedLureID = 0;
+        OwnedLureIDs = new List<uint>();
+        DestroyedBlockerIDs = new List<uint>();
     }
 }
