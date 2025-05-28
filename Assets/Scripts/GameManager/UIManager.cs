@@ -129,7 +129,6 @@ public sealed class UIManager : MonoBehaviour
         {
             if(_GameStartLogo.material.GetInstanceID() == _GameStartLogo.materialForRendering.GetInstanceID())
             {
-                //Debug.Log("Creating a new material instance");
                 _GameStartLogo.material = Instantiate(_GameStartLogo.material);
             }
             _GameStartLogo.material.TweenMaterialFloat("_Dissolve", 0f, 2f, () => {
@@ -143,13 +142,13 @@ public sealed class UIManager : MonoBehaviour
         if (!shopbool)
         {
             shopbool = true;
-            _shopPanel.TweenAnchoredPosition(SHOPPANELONPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutQuad);
+            _shopPanel.TweenAnchoredPosition(SHOPPANELONPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutCirc);
             SoundManager.Instance.TransitionToShopMusic(true);
         }
         else
         {
             shopbool = false;
-            _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutQuad);
+            _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutCirc);
             SoundManager.Instance.TransitionToShopMusic(false);
         }
         return shopbool;

@@ -22,7 +22,7 @@
 #ifndef _INCLUDE_JP_KEIJIRO_NOISESHADER_CLASSIC_NOISE_3D_HLSL_
 #define _INCLUDE_JP_KEIJIRO_NOISESHADER_CLASSIC_NOISE_3D_HLSL_
 
-#include "Packages/jp.keijiro.noiseshader/Shader/Common.hlsl"
+#include "Common.hlsl"
 
 float ClassicNoise_impl(float3 pi0, float3 pf0, float3 pi1, float3 pf1)
 {

@@ -8,6 +8,7 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
         _Color("Tint", Color) = (1,1,1,1)
         _Cutoff("Alpha CutOff", Range(0,1)) = 1
         [Toggle(USE_VERTEXNOISE)] _Distortion("Enable Distortion", Float) = 0
+        _DistortionTimeMultiplier("Distorion Time Multiplier", Float) = 1
 
     }
 
@@ -31,6 +32,7 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
                 float2 _Flip;
                 float _Cutoff;
                 float _Distortion;
+                float _DistortionTimeMultiplier;
             CBUFFER_END
             #include "Noise/SimplexNoise3D.hlsl"
         ENDHLSL
@@ -94,13 +96,13 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
                 Varyings o = (Varyings)0;
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+                
                 float4 objectspace = TransformObjectToHClip(v.positionOS);
                 #ifdef USE_VERTEXNOISE
-                float4 noise = SimplexNoiseGrad((v.positionOS + (_Time.x * 0.002)).xyz);
+                float noise = SimplexNoise(objectspace.xyz + (_Time.x * _DistortionTimeMultiplier));
                 noise -= 0.8;
                 noise *= 0.02;
-                noise *= v.uv.y;
-                objectspace = float4(objectspace.x + noise.w, objectspace.y, objectspace.z, objectspace.w);
+                objectspace = float4(objectspace.x + noise, objectspace.y, objectspace.z, objectspace.w);
                 #endif
                 o.positionCS = objectspace;
                 //o.positionCS = TransformObjectToHClip(v.positionOS);
@@ -170,14 +172,13 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
                 Varyings o = (Varyings)0;
                 UNITY_SETUP_INSTANCE_ID(attributes);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-
+                
                 float4 objectspace = TransformObjectToHClip(attributes.positionOS);
                 #ifdef USE_VERTEXNOISE
-                float4 noise = SimplexNoiseGrad((attributes.positionOS + (_Time.x * 0.02)).xyz);
+                float noise = SimplexNoise(objectspace.xyz + (_Time.x * _DistortionTimeMultiplier));
                 noise -= 0.8;
                 noise *= 0.02;
-                noise *= attributes.uv.y;
-                objectspace = float4(objectspace.x + noise.w, objectspace.y + noise.y, objectspace.z, objectspace.w);
+                objectspace = float4(objectspace.x + noise, objectspace.y, objectspace.z, objectspace.w);
                 #endif
                 o.positionCS = objectspace;
 
@@ -238,11 +239,10 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
 
                 float4 objectspace = TransformObjectToHClip(attributes.positionOS);
                 #ifdef USE_VERTEXNOISE
-                float4 noise = SimplexNoiseGrad((attributes.positionOS + (_Time.x * 0.002)).xyz);
+                float noise = SimplexNoise(objectspace.xyz + (_Time.x * _DistortionTimeMultiplier));
                 noise -= 0.8;
                 noise *= 0.02;
-                noise *= attributes.uv.y;
-                objectspace = float4(objectspace.x + noise.w, objectspace.y, objectspace.z, objectspace.w);
+                objectspace = float4(objectspace.x + noise, objectspace.y, objectspace.z, objectspace.w);
                 #endif
                 o.positionCS = objectspace;
                 

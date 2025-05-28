@@ -224,5 +224,53 @@ public static class Tween
         public static float EaseInCubic(float p) => p * p * p;
         public static float EaseOutCubic(float p) => (--p) * p * p + 1;
         public static float EaseInOutCubic(float p) => p < 0.5f ? 4 * p * p * p : (p - 1) * (2 * p - 2) * (2 * p - 2) + 1;
+
+
+        //Untested
+        public static float EaseInSine(float t) => 1 - (float)Math.Cos(t * Math.PI / 2);
+		public static float EaseOutSine(float t) => (float)Math.Sin(t * Math.PI / 2);
+		public static float EaseInOutSine(float t) => (float)(Math.Cos(t * Math.PI) - 1) / -2;
+        public static float EaseInQuint(float t) => t * t * t * t * t;
+		public static float EaseOutQuint(float t) => 1 - EaseInQuint(1 - t);
+		public static float EaseInOutQuint(float t)
+		{
+			if (t < 0.5) return EaseInQuint(t * 2) / 2;
+			return 1 - EaseInQuint((1 - t) * 2) / 2;
+		}
+        public static float EaseInQuart(float t) => t * t * t * t;
+		public static float EaseOutQuart(float t) => 1 - EaseInQuart(1 - t);
+		public static float EaseInOutQuart(float t)
+		{
+			if (t < 0.5) return EaseInQuart(t * 2) / 2;
+			return 1 - EaseInQuart((1 - t) * 2) / 2;
+		}
+
+        public static float EaseInExpo(float t) => (float)Math.Pow(2, 10 * (t - 1));
+		public static float EaseOutExpo(float t) => 1 - EaseInExpo(1 - t);
+		public static float InOutExpo(float t)
+		{
+			if (t < 0.5) return EaseInExpo(t * 2) / 2;
+			return 1 - EaseInExpo((1 - t) * 2) / 2;
+		}
+
+		public static float EaseInCirc(float t) => -((float)Math.Sqrt(1 - t * t) - 1);
+		public static float EaseOutCirc(float t) => 1 - EaseInCirc(1 - t);
+		public static float EaseInOutCirc(float t)
+		{
+			if (t < 0.5) return EaseInCirc(t * 2) / 2;
+			return 1 - EaseInCirc((1 - t) * 2) / 2;
+		}
+
+		public static float EaseInElastic(float t) => 1 - EaseOutElastic(1 - t);
+		public static float EaseOutElastic(float t)
+		{
+			float p = 0.3f;
+			return (float)Math.Pow(2, -10 * t) * (float)Math.Sin((t - p / 4) * (2 * Math.PI) / p) + 1;
+		}
+		public static float EaseInOutElastic(float t)
+		{
+			if (t < 0.5) return EaseInElastic(t * 2) / 2;
+			return 1 - EaseInElastic((1 - t) * 2) / 2;
+		}
     }
 }

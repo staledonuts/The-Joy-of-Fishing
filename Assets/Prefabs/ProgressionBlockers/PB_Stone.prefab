@@ -664,7 +664,7 @@ ParticleSystem:
   ShapeModule:
     serializedVersion: 6
     enabled: 1
-    type: 4
+    type: 10
     angle: 25
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
@@ -751,7 +751,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 1
+      value: 1.45
       mode: 0
       spread: 0
       speed:
@@ -5055,8 +5055,8 @@ MonoBehaviour:
   spriteRenderer: {fileID: 1850287924085740820}
   destructionParticles: {fileID: 2657648669314076292}
   destructionSound:
-    ID: 0
-    _sourceAsset: {fileID: 0}
+    ID: 805306369
+    _sourceAsset: {fileID: 11400000, guid: 5a7213c6d14a39d8e8d26238653b996b, type: 2}
     <DebugObject>k__BackingField: {fileID: 8446854031011628500}
   mainCollider: {fileID: 5506143432936988698}
   triggerCollider: {fileID: -6329726854551115319}
