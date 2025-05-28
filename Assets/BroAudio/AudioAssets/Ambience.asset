@@ -86,7 +86,7 @@ MonoBehaviour:
     <Loop>k__BackingField: 0
     <SeamlessLoop>k__BackingField: 0
     <TransitionTime>k__BackingField: 0
-    <SpatialSetting>k__BackingField: {fileID: 0}
+    <SpatialSetting>k__BackingField: {fileID: 11400000, guid: bffc3e08ece0cc94195d76ea1f7c810c, type: 2}
     <Priority>k__BackingField: 128
     <Pitch>k__BackingField: 1
     <PitchRandomRange>k__BackingField: 0
@@ -114,7 +114,7 @@ MonoBehaviour:
     <Loop>k__BackingField: 1
     <SeamlessLoop>k__BackingField: 0
     <TransitionTime>k__BackingField: -1
-    <SpatialSetting>k__BackingField: {fileID: 0}
+    <SpatialSetting>k__BackingField: {fileID: 11400000, guid: bffc3e08ece0cc94195d76ea1f7c810c, type: 2}
     <Priority>k__BackingField: 128
     <Pitch>k__BackingField: 1
     <PitchRandomRange>k__BackingField: 0
@@ -214,7 +214,167 @@ MonoBehaviour:
     <Loop>k__BackingField: 0
     <SeamlessLoop>k__BackingField: 0
     <TransitionTime>k__BackingField: -1
-    <SpatialSetting>k__BackingField: {fileID: 0}
+    <SpatialSetting>k__BackingField: {fileID: 11400000, guid: bffc3e08ece0cc94195d76ea1f7c810c, type: 2}
+    <Priority>k__BackingField: 128
+    <Pitch>k__BackingField: 1
+    <PitchRandomRange>k__BackingField: 0
+    <VolumeRandomRange>k__BackingField: 0
+    <RandomFlags>k__BackingField: 0
+    SeamlessTransitionType: 0
+    TransitionTempo:
+      BPM: 0
+      Beats: 0
+    SnapToFullVolume: 0
+  - <Name>k__BackingField: BirdSounds
+    <ID>k__BackingField: 805306372
+    MulticlipsPlayMode: 3
+    _group: {fileID: 0}
+    Clips:
+    - AudioClip: {fileID: 8300000, guid: e2f6d25b71e453c50b491361b3c71f96, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 43a3b77ba3f98c147a312cbd0ccb0393, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 84b84f753cff0c25795805991ccfa352, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 5ed9766dd0e5c03868f0d6e9e34334c6, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 6e40126891edc37678ef9d196cace44e, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: d94e6ca6ac33b8beab1ccf5b9f536772, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 68fd9ca7676ae68c0995acb9d6e658d0, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 4b5b48934e9f46481a23fad4f7bcf7b6, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 1bafa4775668244d6bc9c40e3379df57, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: f4472455c21a3f5988038d11fc975088, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: c8483aec5b6a156c7809fd612d857b5b, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: c0d22e76b4b4dcc2dbfbe76c86e1009c, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 900ccffbea35d29f1a89d9ac40c27a30, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    - AudioClip: {fileID: 8300000, guid: 1f8520a5c30c129c9a7195fea01c4a5d, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    <MasterVolume>k__BackingField: 1
+    <Loop>k__BackingField: 0
+    <SeamlessLoop>k__BackingField: 0
+    <TransitionTime>k__BackingField: -1
+    <SpatialSetting>k__BackingField: {fileID: 11400000, guid: bffc3e08ece0cc94195d76ea1f7c810c, type: 2}
+    <Priority>k__BackingField: 128
+    <Pitch>k__BackingField: 1
+    <PitchRandomRange>k__BackingField: 0
+    <VolumeRandomRange>k__BackingField: 0
+    <RandomFlags>k__BackingField: 0
+    SeamlessTransitionType: 0
+    TransitionTempo:
+      BPM: 0
+      Beats: 0
+    SnapToFullVolume: 1
+  - <Name>k__BackingField: LakeLoop
+    <ID>k__BackingField: 805306373
+    MulticlipsPlayMode: 0
+    _group: {fileID: 0}
+    Clips:
+    - AudioClip: {fileID: 8300000, guid: 1669be8f13b356f9c88eced1019d6c59, type: 3}
+      Volume: 0.65
+      Delay: 0
+      StartPosition: 0
+      EndPosition: 0
+      FadeIn: 0
+      FadeOut: 0
+      Weight: 0
+    <MasterVolume>k__BackingField: 1
+    <Loop>k__BackingField: 1
+    <SeamlessLoop>k__BackingField: 0
+    <TransitionTime>k__BackingField: -1
+    <SpatialSetting>k__BackingField: {fileID: 11400000, guid: bffc3e08ece0cc94195d76ea1f7c810c, type: 2}
     <Priority>k__BackingField: 128
     <Pitch>k__BackingField: 1
     <PitchRandomRange>k__BackingField: 0

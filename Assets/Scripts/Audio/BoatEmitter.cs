@@ -9,7 +9,6 @@ public class BoatEmitter : MonoBehaviour
     private SoundID inst;
 
     private SoundID instUnderwater;
-    //
 
     private IAudioPlayer player;
 
