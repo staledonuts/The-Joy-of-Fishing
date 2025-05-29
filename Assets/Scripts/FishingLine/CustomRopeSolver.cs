@@ -54,6 +54,8 @@ public sealed class CustomRopeSolver : MonoBehaviour
 
     private List<RopeNode> nodes = new List<RopeNode>();
     private Transform hook; 
+
+    private LureType _lure;
     private Rigidbody2D hookRb; 
     
     private float worldGravity = -9.81f; 
@@ -140,6 +142,7 @@ public sealed class CustomRopeSolver : MonoBehaviour
 
 
         GameObject hookObj = Instantiate(hookPrefab, hookVisualPosition, Quaternion.identity, transform);
+        _lure = hookObj.GetComponent<LureType>();
         hookRb = hookObj.GetComponent<Rigidbody2D>();
         if (hookRb == null)
         {
@@ -507,20 +510,14 @@ public sealed class CustomRopeSolver : MonoBehaviour
 
     public Transform GetHook() => hook;
 
+    public LureType GetLure() => _lure;
+
     
     public void TryCatchFish()
     {
-        if(hook.childCount > 0)
+        if(_lure.GetCurrentCatch() != null)
         {
-            try
-            {
-                FishStats fish = GetComponentInChildren<FishStats>();
-                Inventory.Instance.AddCaughtFish(fish);
-            }
-            catch
-            {
-                Debug.Log("tried to catch a fish but failed.");
-            }
+            Inventory.Instance.AddCaughtFish(_lure.GetCurrentCatch());
         }
     }
 

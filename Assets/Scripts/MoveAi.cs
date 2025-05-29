@@ -13,9 +13,8 @@ public class MoveAi : FishStats
 {
     private Seeker _agent;
     private AIPath _path;
-    private Transform _player;
+    private Transform _lure => CustomRopeSolver.Instance.GetLure().transform;
     private float _dist = 0f;
-    private bool _canFish = false;
 
 
     private Vector3 _wander = Vector3.zero;
@@ -35,33 +34,11 @@ public class MoveAi : FishStats
     private void OnEnable()
     {
         Wander();
-        BaitScript.BaitIsOut += delegate (bool theBait)
-        {
-            _player = FindAnyObjectByType<BaitScript>().transform;
-
-            _canFish = theBait;
-        };
-    }
-    private void OnDisable()
-    {
-        BaitScript.BaitIsOut -= delegate (bool theBait)
-        {
-            _player = FindAnyObjectByType<BaitScript>().transform;
-
-            _canFish = theBait;
-        };
     }
 
     private void LateUpdate()
     {
-        if (_canFish)
-        {
-            HookOut();
-        }
-        else
-        {
-            HookIn();
-        }
+        HookOut();
     }
 
     //Method that gets a random position in the world and sets the destination
@@ -104,7 +81,7 @@ public class MoveAi : FishStats
 
     private void HookOut()
     {
-        _dist = Vector3.Distance(this.transform.position, _player.position);
+        _dist = Vector3.Distance(this.transform.position, _lure.position);
         if (_dist > BaitAttractionRadius)
         {
             if (_path.reachedEndOfPath)
@@ -115,13 +92,13 @@ public class MoveAi : FishStats
         if (_dist < BaitAttractionRadius)
         {
             _path.canMove = true;
-            if (BaitScript.BaitLevel() == BaitLevel)
+            if (CustomRopeSolver.Instance.GetLure().CurretLureID == LureAttractionType)
             {
-               _agent.StartPath(this.transform.position, _player.position);
+               _agent.StartPath(this.transform.position, _lure.position);
             }
             else
             {
-                Flee(_player.position);
+                Flee(_lure.position);
             }
         }
 

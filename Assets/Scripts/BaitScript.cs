@@ -5,7 +5,7 @@ using UnityEngine;
 /*
  * This script is for when you have caught a fish.
  * It makes the fish a child of the transform the script is on.
- */
+ 
 
 [RequireComponent(typeof(Collider2D))]
 public class BaitScript : MonoBehaviour
@@ -131,4 +131,4 @@ public class BaitScript : MonoBehaviour
     {
         fishHookedInstance.Play(transform);
     }
-}
+}*/

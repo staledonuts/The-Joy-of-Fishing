@@ -4,13 +4,18 @@ using UnityEngine;
 public class Lure
 {
     [Tooltip("Unique string identifier for this lure, e.g., 'BasicLure', 'ShinySpinner'. This will be hashed.")]
-    public string lureID; // This is the string ID that will be hashed.
-    public string lureName;
-    public string description;
-    public uint cost; 
+    [SerializeField] private string _lureID; // This is the string ID that will be hashed.
+    [SerializeField] private string _lureName;
+    [SerializeField] private string _description;
+    [SerializeField] private uint _cost;
 
     private uint _hashedID = 0;
     private bool _isHashedIDCalculated = false;
+
+    public string LureID => _lureID;
+    public string LureName => _lureName;
+    public string Description => _description;
+    public uint Cost => _cost;
 
     /// <summary>
     /// Gets the FNV1a hashed ID of the lureID string. Calculated on first access.
@@ -21,14 +26,14 @@ public class Lure
         {
             if (!_isHashedIDCalculated)
             {
-                if (string.IsNullOrEmpty(lureID))
+                if (string.IsNullOrEmpty(_lureID))
                 {
-                    Debug.LogError($"Lure '{lureName}' has an empty or null lureID. Cannot generate HashedID.");
+                    Debug.LogError($"Lure '{_lureName}' has an empty or null lureID. Cannot generate HashedID.");
                     _hashedID = 0; // Or some other default error value
                 }
                 else
                 {
-                    _hashedID = FNV1aHash.Calculate(lureID);
+                    _hashedID = FNV1aHash.Calculate(_lureID);
                 }
                 _isHashedIDCalculated = true;
             }
@@ -38,10 +43,10 @@ public class Lure
 
     public Lure(string id, string name, string desc, uint itemCost)
     {
-        lureID = id; // Set the string ID
-        lureName = name;
-        description = desc;
-        cost = itemCost;
+        _lureID = id; // Set the string ID
+        _lureName = name;
+        _description = desc;
+        _cost = itemCost;
         // HashedID will be calculated on first access
     }
 

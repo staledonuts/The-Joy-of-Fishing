@@ -186,20 +186,20 @@ public sealed class Inventory : MonoBehaviour
         
         uint hashedLureID = lureToBuy.HashedID;
         if (hashedLureID == 0) {
-             Debug.LogError($"Lure '{lureToBuy.lureName}' has an invalid HashedID (0). Cannot buy.");
+             Debug.LogError($"Lure '{lureToBuy.LureName}' has an invalid HashedID (0). Cannot buy.");
              return false;
         }
 
         if (IsLureOwned(hashedLureID))
         {
-            Debug.Log($"Already own lure: {lureToBuy.lureName} (ID: {hashedLureID})");
+            Debug.Log($"Already own lure: {lureToBuy.LureName} (ID: {hashedLureID})");
             return false;
         }
 
-        if (SpendMoney(lureToBuy.cost))
+        if (SpendMoney(lureToBuy.Cost))
         {
             playerData.OwnedLureIDs.Add(hashedLureID);
-            Debug.Log($"Bought lure: {lureToBuy.lureName} (Hashed ID: {hashedLureID})");
+            Debug.Log($"Bought lure: {lureToBuy.LureName} (Hashed ID: {hashedLureID})");
             OnEquipmentChanged?.Invoke(); 
             OnInventoryChanged?.Invoke();
             SaveData();
@@ -211,7 +211,7 @@ public sealed class Inventory : MonoBehaviour
     // Overload to buy by string ID (which then gets hashed)
     public bool BuyLureByStringID(string stringLureID)
     {
-        Lure lureToBuy = allAvailableLures.Find(l => l.lureID == stringLureID);
+        Lure lureToBuy = allAvailableLures.Find(l => l.LureID == stringLureID);
         if (lureToBuy == null)
         {
             Debug.LogError($"Lure with string ID '{stringLureID}' not found in allAvailableLures.");
@@ -242,7 +242,7 @@ public sealed class Inventory : MonoBehaviour
         
         playerData.EquippedLureID = hashedLureID;
         Lure equippedLure = GetLureByHashedID(hashedLureID);
-        Debug.Log($"Equipped lure: {equippedLure?.lureName} (HashedID: {hashedLureID})");
+        Debug.Log($"Equipped lure: {equippedLure?.LureName} (HashedID: {hashedLureID})");
         OnEquipmentChanged?.Invoke();
         OnInventoryChanged?.Invoke();
         SaveData();
@@ -252,7 +252,7 @@ public sealed class Inventory : MonoBehaviour
     // Overload to equip by string ID
     public bool EquipLureByStringID(string stringLureID)
     {
-        Lure lureToEquip = allAvailableLures.Find(l => l.lureID == stringLureID);
+        Lure lureToEquip = allAvailableLures.Find(l => l.LureID == stringLureID);
         if (lureToEquip == null)
         {
             Debug.LogError($"Lure with string ID '{stringLureID}' not found for equipping.");
