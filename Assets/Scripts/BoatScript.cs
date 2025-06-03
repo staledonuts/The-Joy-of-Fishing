@@ -54,16 +54,7 @@ public class BoatScript : MonoBehaviour
     {
         if (context.performed)
         {
-            if(UIManager.Instance.OnShopSwitch())
-            {
-                SoundManager.Instance.TransitionToShopMusic(true);
-                GameManager.Instance.CameraSwitcher(CameraModes.Shop);
-            }
-            else
-            {
-                SoundManager.Instance.TransitionToShopMusic(false);
-                GameManager.Instance.CameraSwitcher(CameraModes.Hook);
-            }
+            UIManager.Instance.CallShop();
         }
     }
 

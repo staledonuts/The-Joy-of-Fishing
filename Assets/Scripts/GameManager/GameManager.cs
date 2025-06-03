@@ -33,11 +33,8 @@ public sealed class GameManager : MonoBehaviour
     [Header("UI Control Center")]
     [SerializeField] private GameObject pauseCanvas;
     [SerializeField] private GameObject callShopCanvas;
-    [SerializeField] private GameObject goFishCanvas;
     [HideInInspector] public Transform ShoppeBoat, Player, Hook;
     [HideInInspector] public float CMcamOrthoSize;
-    public int currentLineLevel = 0, currentBait = 0, cashAmount = 0;
-    public float currentTime = 0f;
 
     private void Awake()
     {
@@ -105,26 +102,24 @@ public sealed class GameManager : MonoBehaviour
         switch (cameraMode)
         {
             case CameraModes.Player:
+            {
                 if (vcamPlayer != null) vcamPlayer.Priority = ACTIVE_VCAM_PRIORITY;
                 else Debug.LogError("vcamPlayer not assigned!");
-
-                if(callShopCanvas != null) callShopCanvas.SetActive(true);
-                if(goFishCanvas != null) goFishCanvas.SetActive(true);
-                Debug.Log("Switched to Player Camera");
                 break;
+            }
             
             case CameraModes.Hook:
+            {
                 if (vcamHook != null)
                 {
-                    if (Hook == null) // Try to find hook if not assigned yet
+                    if (Hook == null)
                     {
                         GameObject hookObj = CustomRopeSolver.Instance.GetHook().gameObject;
                         if (hookObj != null) Hook = hookObj.transform;
                     }
 
-                    if (Hook != null) // Ensure Hook transform is available for VCam
+                    if (Hook != null)
                     {
-                        // If VCam_Hook's Follow/LookAt target is dynamic, ensure it's set
                         vcamHook.Follow = Hook; 
                         vcamHook.LookAt = Hook;
                         vcamHook.Priority = ACTIVE_VCAM_PRIORITY;
@@ -132,28 +127,22 @@ public sealed class GameManager : MonoBehaviour
                     else Debug.LogError("Hook Transform not found or assigned for vcamHook!");
                 }
                 else Debug.LogError("vcamHook not assigned!");
-
-                if(callShopCanvas != null) callShopCanvas.SetActive(true);
-                if(goFishCanvas != null) goFishCanvas.SetActive(false);
-                Debug.Log("Switched to Hook Camera");
                 break;
-            
+            }
+
             case CameraModes.Shop:
+            {
                 if (vcamShop != null) vcamShop.Priority = ACTIVE_VCAM_PRIORITY;
                 else Debug.LogError("vcamShop not assigned!");
-
-                if(callShopCanvas != null) callShopCanvas.SetActive(false);
-                if(goFishCanvas != null) goFishCanvas.SetActive(false);
-                Debug.Log("Switched to Shop Camera");
                 break;
+            }
             
             default:
+            {
                 Debug.LogWarning("Unknown CameraMode specified: " + cameraMode);
-                // Optionally default to player camera
                 if (vcamPlayer != null) vcamPlayer.Priority = ACTIVE_VCAM_PRIORITY;
-                if(callShopCanvas != null) callShopCanvas.SetActive(true);
-                if(goFishCanvas != null) goFishCanvas.SetActive(true);
                 break;
+            }
         }
     }        
     

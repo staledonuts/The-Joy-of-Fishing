@@ -1824,6 +1824,10 @@ PrefabInstance:
       propertyPath: insertCamera
       value: 
       objectReference: {fileID: 1485656630}
+    - target: {fileID: 2008221581, guid: 02cb2269b9bbb0143a103223f5ecb521, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1419649679062394681, guid: 02cb2269b9bbb0143a103223f5ecb521, type: 3}
       propertyPath: insertCamera
       value: 
@@ -1848,6 +1852,14 @@ PrefabInstance:
       propertyPath: insertCamera
       value: 
       objectReference: {fileID: 4962793760973506360}
+    - target: {fileID: 1419649680013765739, guid: 02cb2269b9bbb0143a103223f5ecb521, type: 3}
+      propertyPath: m_FlipX
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1419649680013765739, guid: 02cb2269b9bbb0143a103223f5ecb521, type: 3}
+      propertyPath: m_FlipY
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1419649680477501102, guid: 02cb2269b9bbb0143a103223f5ecb521, type: 3}
       propertyPath: insertCamera
       value: 
@@ -1900,6 +1912,10 @@ PrefabInstance:
       propertyPath: insertCamera
       value: 
       objectReference: {fileID: 4962793760973506360}
+    - target: {fileID: 6291092254886922814, guid: 02cb2269b9bbb0143a103223f5ecb521, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6626244373023877688, guid: 02cb2269b9bbb0143a103223f5ecb521, type: 3}
       propertyPath: insertCamera
       value: 
@@ -2379,7 +2395,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1262891170331517910, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00091552734
+      value: -0.00030517578
       objectReference: {fileID: 0}
     - target: {fileID: 3498249390951015349, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2437,6 +2453,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4962793762173381915, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+      propertyPath: orthographic size
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 5582745425297336145, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
       propertyPath: m_Value
       value: 1
@@ -2485,6 +2505,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2018631589}
+    - target: {fileID: 7219006627942776651, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7923029355948529481, guid: f22d4fc75ffe8f24a84d3afa9ea67006, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0

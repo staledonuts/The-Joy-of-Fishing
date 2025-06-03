@@ -29,6 +29,8 @@ public sealed class UIManager : MonoBehaviour
     }
     private readonly Vector2 SHOPPANELOFFPOS = new Vector2(-1000f, 0f);
     private readonly Vector2 SHOPPANELONPOS = new Vector2(-0f, 0f);
+    private readonly Color FADEOUTCOLOR = new(0,0,0,1);
+    private readonly Color FADEINCOLOR = new(0,0,0,0);
     private const float UITWEENSPEED = 0.8f;
     [SerializeField] private GameObject _pauseCanvas;
     [SerializeField] private GameObject _callShopCanvas;
@@ -131,33 +133,45 @@ public sealed class UIManager : MonoBehaviour
             {
                 _GameStartLogo.material = Instantiate(_GameStartLogo.material);
             }
-            _GameStartLogo.material.TweenMaterialFloat("_Dissolve", 0f, 2f, () => {
-                _GameStartLogo.gameObject.SetActive(false);
-            }, Tween.Easing.EaseInOutQuad);
+            _GameStartLogo.material.TweenMaterialFloat("_Dissolve", 0f, 2f, () => { _fadeCanvas.SetActive(false); }, Tween.Easing.EaseInOutQuad);
         }
     }
-    private bool shopbool = false;
-    public bool OnShopSwitch()
+    private bool _shopbool = false;
+    private bool OnShopSwitch()
     {
-        if (!shopbool)
+        if (!_shopbool)
         {
-            shopbool = true;
+            _shopbool = true;
             _shopPanel.TweenAnchoredPosition(SHOPPANELONPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutCirc);
             SoundManager.Instance.TransitionToShopMusic(true);
         }
         else
         {
-            shopbool = false;
+            _shopbool = false;
             _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutCirc);
             SoundManager.Instance.TransitionToShopMusic(false);
         }
-        return shopbool;
+        return _shopbool;
+    }
+
+    public void CallShop()
+    {            
+        if(OnShopSwitch())
+        {
+
+            SoundManager.Instance.TransitionToShopMusic(true);
+            GameManager.Instance.CameraSwitcher(CameraModes.Shop);
+        }
+        else
+        {
+            SoundManager.Instance.TransitionToShopMusic(false);
+            GameManager.Instance.CameraSwitcher(CameraModes.Hook);
+        }
     }
 
     [SerializeField] private Image _fadeimage;
     [SerializeField] private GameObject _fadeCanvas;
-    private readonly Color FADEOUTCOLOR = new(0,0,0,1);
-    private readonly Color FADEINCOLOR = new(0,0,0,0);
+    
 
     public void UIScreenfadeout() 
     {
@@ -174,6 +188,6 @@ public sealed class UIManager : MonoBehaviour
 
     public void StartGameFadeIN()
     {
-        _fadeimage.TweenImageColor(FADEINCOLOR, 1.2f, () => { _fadeCanvas.SetActive(false); TweenLogo(); }, Tween.Easing.EaseInQuad);
+        _fadeimage.TweenImageColor(FADEINCOLOR, 1.2f, () =>  TweenLogo() , Tween.Easing.EaseInQuad);
     }
 }

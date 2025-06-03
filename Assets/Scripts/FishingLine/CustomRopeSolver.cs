@@ -298,9 +298,8 @@ public sealed class CustomRopeSolver : MonoBehaviour
 
     private void SolveConstraints()
     {
-        if (nodes.Count == 0) return; // Should not happen if Start initializes nodes[0]
+        if (nodes.Count == 0) return;
 
-        // Rod tip node (node 0) always follows the rodTip transform directly (physics position)
         RopeNode rootNode = nodes[0];
         rootNode.position = rodTip.position;
         rootNode.prevPosition = rodTip.position; 
@@ -309,7 +308,6 @@ public sealed class CustomRopeSolver : MonoBehaviour
 
         for (int iter = 0; iter < 15; iter++) 
         {
-            // Constraint solving starts from the segment between nodes[0] and nodes[1]
             for (int i = 0; i < nodes.Count - 1; i++) 
             {
                 RopeNode nodeA = nodes[i];
@@ -326,11 +324,9 @@ public sealed class CustomRopeSolver : MonoBehaviour
                      error = (currentDistance - segmentLength) / (segmentLength + 0.0001f); 
                 }
 
-                Vector2 correction = delta * 0.5f * error; 
+                Vector2 correction = delta * 0.5f * error;
 
-                // Apply settle speed factor to the first segment (between rodTip and first free node)
-                // if the effect is active and it's trying to expand.
-                if (i == 0 && reelSettleSpeedEffectTimer > 0 && nodes.Count > 1) // nodes.Count > 1 ensures nodeB (nodes[1]) exists
+                if (i == 0 && reelSettleSpeedEffectTimer > 0 && nodes.Count > 1)
                 {
                     if (currentDistance < segmentLength) 
                     {
@@ -338,15 +334,12 @@ public sealed class CustomRopeSolver : MonoBehaviour
                     }
                 }
 
-                // nodeA is nodes[0] (rodTip), its position is fixed and should not be moved by constraints from below.
-                // So, only nodeB (which is nodes[i+1]) gets the full correction in the opposite direction.
-                // If i > 0, then nodeA is a free node and moves.
                 if (i != 0) 
                 {
                     nodeA.position += correction;
                     nodes[i] = nodeA;
                 }
-                nodeB.position -= correction; // nodeB always moves
+                nodeB.position -= correction;
                 nodes[i + 1] = nodeB;
             }
         }

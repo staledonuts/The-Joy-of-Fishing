@@ -16,7 +16,7 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
     {
         Tags {"Queue"="Geometry" "RenderType"="Opaque" "RenderPipeline" = "UniversalPipeline" "CanUseSpriteAtlas"="True" }
 
-        Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
+        Blend Off
         Cull Off
         ZWrite Off
 
@@ -100,7 +100,7 @@ Shader "JoyofFishing/Sprite-Lit-Masked"
                 float4 objectspace = TransformObjectToHClip(v.positionOS);
                 #ifdef USE_VERTEXNOISE
                 float noise = SimplexNoise(objectspace.xyz + (_Time.x * _DistortionTimeMultiplier));
-                //noise -= 0.8;
+                noise -= 0.8;
                 noise *= 0.02;
                 noise *= v.uv.y;
                 objectspace = float4(objectspace.x + noise, objectspace.y, objectspace.z, objectspace.w);
