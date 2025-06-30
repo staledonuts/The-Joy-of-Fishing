@@ -674,7 +674,6 @@ GameObject:
   - component: {fileID: 6041324265593011362}
   - component: {fileID: 7814803752114734574}
   - component: {fileID: 3702878219176956517}
-  - component: {fileID: 4173030885101621883}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -973,63 +972,6 @@ MonoBehaviour:
   maxSettleSpeedFactor: 1.5
   settleSpeedEffectDuration: 0.4
   visualInterpolationSpeed: 15
---- !u!114 &4173030885101621883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7824927940298590366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9687dbf2186e8f799ce6282883582a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerData:
-    money: 50
-    caughtFishes: []
-    currentMaxLineLength: 100
-    equippedLureID: BasicLureID
-    ownedLureIDs:
-    - BasicLureID
-  allAvailableLures: []
-  fishRanking:
-  - FishGetAudio:
-      ID: 1073741824
-      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7824927940298590366}
-    CoinGetAudio:
-      ID: 1073741828
-      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7824927940298590366}
-    CoinParticle: {fileID: 2261238947880879149}
-  - FishGetAudio:
-      ID: 1073741824
-      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
-      <DebugObject>k__BackingField: {fileID: 0}
-    CoinGetAudio:
-      ID: 1073741828
-      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
-      <DebugObject>k__BackingField: {fileID: 0}
-    CoinParticle: {fileID: 490540109590172885}
-  - FishGetAudio:
-      ID: 1073741826
-      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7824927940298590366}
-    CoinGetAudio:
-      ID: 1073741827
-      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7824927940298590366}
-    CoinParticle: {fileID: 2880228523093164176}
-  - FishGetAudio:
-      ID: 1073741825
-      _sourceAsset: {fileID: 11400000, guid: 8128e32f652a522d6b347b35fbf5fbeb, type: 2}
-      <DebugObject>k__BackingField: {fileID: 7824927940298590366}
-    CoinGetAudio:
-      ID: 1073741827
-      _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
-      <DebugObject>k__BackingField: {fileID: 0}
-    CoinParticle: {fileID: 1723046611083399176}
 --- !u!1001 &577352465420165216
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1131,11 +1073,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8b104f7da25932a84989b8fbfe350517, type: 3}
---- !u!198 &2880228523093164176 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 3457510618611458288, guid: 8b104f7da25932a84989b8fbfe350517, type: 3}
-  m_PrefabInstance: {fileID: 577352465420165216}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2880228523093164179 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3457510618611458291, guid: 8b104f7da25932a84989b8fbfe350517, type: 3}
@@ -1251,11 +1188,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4740158098452584111, guid: d967f5ed95a494a85b838466d89d5498, type: 3}
   m_PrefabInstance: {fileID: 5118010076677866107}
   m_PrefabAsset: {fileID: 0}
---- !u!198 &490540109590172885 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 4740158098452584110, guid: d967f5ed95a494a85b838466d89d5498, type: 3}
-  m_PrefabInstance: {fileID: 5118010076677866107}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6273058592716730285
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1349,11 +1281,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a908b3b76c4ff488d97fa35fd4f832da, type: 3}
---- !u!198 &1723046611083399176 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 4676737860773527461, guid: a908b3b76c4ff488d97fa35fd4f832da, type: 3}
-  m_PrefabInstance: {fileID: 6273058592716730285}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1723046611083399183 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4676737860773527458, guid: a908b3b76c4ff488d97fa35fd4f832da, type: 3}
@@ -1452,11 +1379,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e504f2428de8fb87a61f4bb0cdf1246, type: 3}
---- !u!198 &2261238947880879149 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 9220535096760509242, guid: 5e504f2428de8fb87a61f4bb0cdf1246, type: 3}
-  m_PrefabInstance: {fileID: 6959296205270116119}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2261238947880879150 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9220535096760509241, guid: 5e504f2428de8fb87a61f4bb0cdf1246, type: 3}

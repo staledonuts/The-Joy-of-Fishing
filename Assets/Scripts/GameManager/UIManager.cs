@@ -1,10 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Ami.BroAudio;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[System.Serializable]
+public class LineUpgradeTier
+{
+    public string Description;
+    public uint NewLength;
+    public uint Cost;
+    public Sprite TierImage;
+}
 public sealed class UIManager : MonoBehaviour
 {
     private static UIManager instance = null;
@@ -32,24 +42,29 @@ public sealed class UIManager : MonoBehaviour
     private readonly Color FADEOUTCOLOR = new(0,0,0,1);
     private readonly Color FADEINCOLOR = new(0,0,0,0);
     private const float UITWEENSPEED = 0.8f;
+    private LineUpgradeTier _nextAvailableTier;
+    private bool _shopbool = false;
+    
+    [Header("Upgrade Line Button")]
+    [SerializeField] private Button _upgradeLineButton;
+    [SerializeField] private TextMeshProUGUI _upgradeButtonText;
+    [SerializeField] private List<LineUpgradeTier> _lineUpgradeTiers = new List<LineUpgradeTier>();
+    [SerializeField] private Image _upgradeButtonImage; 
+    
+    [Header("Max Level State")]
+    [SerializeField] private Sprite _maxLevelImage;
+
+    [Header("Shop Settings")]
+    [SerializeField] private RectTransform _shopPanel;
+    [SerializeField] private GameObject _lureShopItemPrefab;
+    [SerializeField] private Transform _lureShopContainer;
+    
+    [Header("Other UI")]
     [SerializeField] private GameObject _pauseCanvas;
     [SerializeField] private GameObject _callShopCanvas;
-    [SerializeField] private RectTransform _shopPanel;
     [SerializeField] private GameObject _goFishCanvas;
-
     [SerializeField] private SoundID _buySfx;
     [SerializeField] private Image _GameStartLogo;
-    [SerializeField] private Button _mindcontrol; 
-    [SerializeField] private Button _lvl1Line; 
-    [SerializeField] private Button _lvl2Line; 
-    [SerializeField] private Button _lvl3Line;
-    [SerializeField] private uint _mindControlCost; 
-    [SerializeField] private uint _lvl1Cost; 
-    [SerializeField] private uint _lvl2Cost; 
-    [SerializeField] private uint _lvl3Cost;
-    [SerializeField] private uint _lvl1Length; 
-    [SerializeField] private uint _lvl2Length;
-    [SerializeField] private uint _lvl3Lenght;
 
     private void Awake()
     {   
@@ -72,56 +87,89 @@ public sealed class UIManager : MonoBehaviour
         _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, 0.2f, () => { Debug.Log("Panel move complete!"); }, BTween.Ease.OutQuad);
     }
 
-    public void BuyMindControlLure()
+     private void OnEnable()
     {
-        if (Inventory.Instance.SpendMoney(_mindControlCost))
-        {
-            _buySfx.Play();
-            _mindcontrol.interactable = false;
-            Inventory.Instance.playerData.RadioControlLure = true;
-        }
-        else
-        {
-            Debug.Log("not enough money!");
-        }
+        // Subscribe to events to keep the button state accurate
+        Inventory.OnMoneyChanged += UpdateUpgradeButtonUI;
+        Inventory.OnEquipmentChanged += UpdateUpgradeButtonUI;
     }
 
-    public void BuyLineLVL1()
+    private void OnDisable()
     {
-        if (Inventory.Instance.UpgradeLineLength(_lvl1Length, _lvl1Cost))
-        {
-            _buySfx.Play();
-            _lvl1Line.interactable = false;
-        }
-        else
-        {
-            Debug.Log("not enough money!");
-        }
+        // Always unsubscribe
+        Inventory.OnMoneyChanged -= UpdateUpgradeButtonUI;
+        Inventory.OnEquipmentChanged -= UpdateUpgradeButtonUI;
     }
 
-    public void BuyLineLVL2()
+        /// <summary>
+    /// This single method is called when the new upgrade button is pressed.
+    /// </summary>
+    public async void OnUpgradeLineButtonPressed()
     {
-        if (Inventory.Instance.UpgradeLineLength(_lvl2Length, _lvl2Cost))
+        if (_nextAvailableTier == null)
+        {
+            Debug.Log("Already at max level.");
+            return;
+        }
+
+        // Disable button to prevent double-clicks during the transaction
+        _upgradeLineButton.interactable = false;
+
+        bool success = await Inventory.Instance.UpgradeLineLength(_nextAvailableTier.NewLength, _nextAvailableTier.Cost);
+
+        if (success)
         {
             _buySfx.Play();
-            _lvl2Line.interactable = false;
+            Debug.Log($"Successfully upgraded line to {_nextAvailableTier.NewLength}m!");
         }
-        else
-        {
-            Debug.Log("not enough money!");
-        }
+        
+        // The UI will automatically update via the OnEquipmentChanged event,
+        // which re-enables the button if another tier is available and affordable.
     }
 
-    public void BuyLineLVL3()
+    /// <summary>
+    /// Updates the upgrade button's text and interactable state based on player progress.
+    /// </summary>
+    /// <summary>
+    /// Updates the upgrade button's text, image, and interactable state.
+    /// </summary>
+    private void UpdateUpgradeButtonUI()
     {
-        if (Inventory.Instance.UpgradeLineLength(_lvl3Lenght, _lvl3Cost))
+        uint currentLength = Inventory.Instance.CurrentMaxLineLength;
+        _nextAvailableTier = _lineUpgradeTiers.FirstOrDefault(tier => tier.NewLength > currentLength);
+
+        if (_nextAvailableTier != null)
         {
-            _buySfx.Play();
-            _lvl3Line.interactable = false;
+            // A next tier is available
+            _upgradeButtonText.text = $"{_nextAvailableTier.Description}\nCost: {_nextAvailableTier.Cost}g";
+            _upgradeLineButton.interactable = Inventory.Instance.Money >= _nextAvailableTier.Cost;
+            
+            // Set the image for the current tier
+            if (_upgradeButtonImage != null && _nextAvailableTier.TierImage != null)
+            {
+                _upgradeButtonImage.sprite = _nextAvailableTier.TierImage;
+                _upgradeButtonImage.enabled = true;
+            }
         }
         else
         {
-            Debug.Log("not enough money!");
+            // Player is at the max level
+            _upgradeButtonText.text = "Max Level";
+            _upgradeLineButton.interactable = false;
+
+            // Set the max level image, or disable the image if none is provided
+            if (_upgradeButtonImage != null)
+            {
+                if (_maxLevelImage != null)
+                {
+                    _upgradeButtonImage.sprite = _maxLevelImage;
+                    _upgradeButtonImage.enabled = true;
+                }
+                else
+                {
+                    _upgradeButtonImage.enabled = false;
+                }
+            }
         }
     }
 
@@ -136,19 +184,48 @@ public sealed class UIManager : MonoBehaviour
             _GameStartLogo.material.TweenMaterialFloat("_Dissolve", 0f, 2f, () => { _fadeCanvas.SetActive(false); }, BTween.Ease.InOutQuad);
         }
     }
-    private bool _shopbool = false;
+
+    /// <summary>
+    /// Fills the lure shop with items based on the Inventory's available lures.
+    /// </summary>
+    public void PopulateLureShop()
+    {
+        // 1. Clear any old items from the list
+        foreach (Transform child in _lureShopContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // 2. Get all lures defined in the Inventory
+        List<Lure> allLures = Inventory.Instance.allAvailableLures;
+
+        // 3. Create a UI element for each lure
+        foreach (Lure lure in allLures)
+        {
+            GameObject itemGO = Instantiate(_lureShopItemPrefab, _lureShopContainer);
+            LureShopItemUI itemUI = itemGO.GetComponent<LureShopItemUI>();
+            if (itemUI != null)
+            {
+                itemUI.Setup(lure);
+            }
+        }
+    }
+
     private bool OnShopSwitch()
     {
         if (!_shopbool)
         {
             _shopbool = true;
-            _shopPanel.TweenAnchoredPosition(SHOPPANELONPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, BTween.Ease.OutCirc);
+            _shopPanel.TweenAnchoredPosition(SHOPPANELONPOS, UITWEENSPEED, null, BTween.Ease.OutCirc);
             SoundManager.Instance.TransitionToShopMusic(true);
+            
+            // Populate the shop when it opens
+            PopulateLureShop();
         }
         else
         {
             _shopbool = false;
-            _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, BTween.Ease.OutCirc);
+            _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, UITWEENSPEED, null, BTween.Ease.OutCirc);
             SoundManager.Instance.TransitionToShopMusic(false);
         }
         return _shopbool;

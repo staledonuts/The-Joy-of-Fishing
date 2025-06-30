@@ -102,7 +102,6 @@ public class ProgressionBlocker : MonoBehaviour
             if (!Inventory.Instance.playerData.DestroyedBlockerIDs.Contains(HashedID))
             {
                 Inventory.Instance.playerData.DestroyedBlockerIDs.Add(HashedID);
-                Inventory.Instance.SaveData(); 
             }
         }
     }
