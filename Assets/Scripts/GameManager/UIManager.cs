@@ -69,7 +69,7 @@ public sealed class UIManager : MonoBehaviour
     void Start()
     {
         StartGameFadeIN();
-        _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, 0.2f, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutQuad);
+        _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, 0.2f, () => { Debug.Log("Panel move complete!"); }, BTween.Ease.OutQuad);
     }
 
     public void BuyMindControlLure()
@@ -133,7 +133,7 @@ public sealed class UIManager : MonoBehaviour
             {
                 _GameStartLogo.material = Instantiate(_GameStartLogo.material);
             }
-            _GameStartLogo.material.TweenMaterialFloat("_Dissolve", 0f, 2f, () => { _fadeCanvas.SetActive(false); }, Tween.Easing.EaseInOutQuad);
+            _GameStartLogo.material.TweenMaterialFloat("_Dissolve", 0f, 2f, () => { _fadeCanvas.SetActive(false); }, BTween.Ease.InOutQuad);
         }
     }
     private bool _shopbool = false;
@@ -142,13 +142,13 @@ public sealed class UIManager : MonoBehaviour
         if (!_shopbool)
         {
             _shopbool = true;
-            _shopPanel.TweenAnchoredPosition(SHOPPANELONPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutCirc);
+            _shopPanel.TweenAnchoredPosition(SHOPPANELONPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, BTween.Ease.OutCirc);
             SoundManager.Instance.TransitionToShopMusic(true);
         }
         else
         {
             _shopbool = false;
-            _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, Tween.Easing.EaseOutCirc);
+            _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, UITWEENSPEED, () => { Debug.Log("Panel move complete!"); }, BTween.Ease.OutCirc);
             SoundManager.Instance.TransitionToShopMusic(false);
         }
         return _shopbool;
@@ -179,15 +179,15 @@ public sealed class UIManager : MonoBehaviour
         {
             _fadeCanvas.SetActive(true);
         }
-        _fadeimage.TweenImageColor(FADEOUTCOLOR, UITWEENSPEED, null, Tween.Easing.EaseInOutQuad);
+        _fadeimage.TweenImageColor(FADEOUTCOLOR, UITWEENSPEED, null, BTween.Ease.InOutQuad);
     }
     public void UIScreenfadein() 
     {
-        _fadeimage.TweenImageColor(FADEINCOLOR, UITWEENSPEED, () => _fadeCanvas.SetActive(false), Tween.Easing.EaseInQuad);
+        _fadeimage.TweenImageColor(FADEINCOLOR, UITWEENSPEED, () => _fadeCanvas.SetActive(false), BTween.Ease.InQuad);
     }
 
     public void StartGameFadeIN()
     {
-        _fadeimage.TweenImageColor(FADEINCOLOR, 1.2f, () =>  TweenLogo() , Tween.Easing.EaseInQuad);
+        _fadeimage.TweenImageColor(FADEINCOLOR, 1.2f, () =>  TweenLogo() , BTween.Ease.InQuad);
     }
 }

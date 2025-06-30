@@ -59,13 +59,13 @@ public class SoundManager : MonoBehaviour
     {
         if(shopActive)
         {
-            _shopRadioAmbience.TweenVolume(1f, 2f, null, Tween.Easing.EaseInQuad);
-            _musicPlayer.TweenVolume(0f, 2f, null, Tween.Easing.EaseOutQuad);
+            _shopRadioAmbience.TweenVolume(1f, 2f, null, BTween.Ease.InQuad);
+            _musicPlayer.TweenVolume(0f, 2f, null, BTween.Ease.OutQuad);
         }
         else
         {
-            _musicPlayer.TweenVolume(1f, 2f, null, Tween.Easing.EaseInQuad);
-            _shopRadioAmbience.TweenVolume(0f, 2f, null, Tween.Easing.EaseOutQuad);
+            _musicPlayer.TweenVolume(1f, 2f, null, BTween.Ease.InQuad);
+            _shopRadioAmbience.TweenVolume(0f, 2f, null, BTween.Ease.OutQuad);
         }
     }
 
