@@ -1,7 +1,8 @@
 using UnityEngine;
 using System;
 using System.IO;
-using Cysharp.Threading.Tasks; // Import UniTask
+using Cysharp.Threading.Tasks;
+using System.Threading; // Import UniTask
 
 public sealed class SaveLoadManager : MonoBehaviour
 {
@@ -25,21 +26,20 @@ public sealed class SaveLoadManager : MonoBehaviour
     }
 
     public static event Func<UniTask> OnSaveStarted;
-
     private string _savePath;
+    private static readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1, 1);
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-            _savePath = Path.Combine(Application.persistentDataPath, "playerData.json");
-        }
-        else if (instance != this)
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+        _savePath = Path.Combine(Application.persistentDataPath, "playerData.json");
     }
 
     /// <summary>
@@ -83,11 +83,14 @@ public sealed class SaveLoadManager : MonoBehaviour
             return;
         }
 
-        // Invoke the event for any listeners and let it run independently.
-        OnSaveStarted?.Invoke().Forget();
+        // Wait until the "lock" is free. This will pause any other save
+        // requests until the current one is done.
+        await _saveLock.WaitAsync();
 
         try
         {
+            OnSaveStarted?.Invoke().Forget();
+
             string json = JsonUtility.ToJson(playerData, true);
             await File.WriteAllTextAsync(_savePath, json);
             Debug.Log($"Player data saved to {_savePath}");
@@ -95,6 +98,12 @@ public sealed class SaveLoadManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"Failed to save player data: {e.Message}");
+        }
+        finally
+        {
+            // IMPORTANT: Release the lock so the next save operation can proceed.
+            // The 'finally' block ensures this happens even if an error occurs.
+            _saveLock.Release();
         }
     }
 }

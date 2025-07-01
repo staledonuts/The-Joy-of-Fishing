@@ -15,6 +15,8 @@ public class LineUpgradeTier
     public uint Cost;
     public Sprite TierImage;
 }
+
+public enum InventoryMode { Gear, Fish }
 public sealed class UIManager : MonoBehaviour
 {
     private static UIManager instance = null;
@@ -42,22 +44,27 @@ public sealed class UIManager : MonoBehaviour
     private readonly Color FADEOUTCOLOR = new(0,0,0,1);
     private readonly Color FADEINCOLOR = new(0,0,0,0);
     private const float UITWEENSPEED = 0.8f;
-    private LineUpgradeTier _nextAvailableTier;
     private bool _shopbool = false;
-    
-    [Header("Upgrade Line Button")]
-    [SerializeField] private Button _upgradeLineButton;
-    [SerializeField] private TextMeshProUGUI _upgradeButtonText;
+    private InventoryMode _currentInventoryMode = InventoryMode.Gear;
+
+    [Header("Shop Panel")]
+    [SerializeField] private RectTransform _shopPanel;
+    [SerializeField] private GameObject _shopItemPrefab; // The new universal prefab
+    [SerializeField] private Transform _shopContainer;
+
+    [Header("Inventory & Fish Bag Panel")]
+    [SerializeField] private RectTransform _inventoryPanel;
+    [SerializeField] private Transform _inventoryContainer;
+    [SerializeField] private GameObject _inventoryItemPrefab;
+    [SerializeField] private GameObject _fishBagItemPrefab;
+    [SerializeField] private Button _gearTabButton;
+    [SerializeField] private Button _fishTabButton;
+
+    [Header("Upgrade Tiers")]
     [SerializeField] private List<LineUpgradeTier> _lineUpgradeTiers = new List<LineUpgradeTier>();
-    [SerializeField] private Image _upgradeButtonImage; 
     
     [Header("Max Level State")]
     [SerializeField] private Sprite _maxLevelImage;
-
-    [Header("Shop Settings")]
-    [SerializeField] private RectTransform _shopPanel;
-    [SerializeField] private GameObject _lureShopItemPrefab;
-    [SerializeField] private Transform _lureShopContainer;
     
     [Header("Other UI")]
     [SerializeField] private GameObject _pauseCanvas;
@@ -65,6 +72,9 @@ public sealed class UIManager : MonoBehaviour
     [SerializeField] private GameObject _goFishCanvas;
     [SerializeField] private SoundID _buySfx;
     [SerializeField] private Image _GameStartLogo;
+    
+    [Header("Asset Databases")]
+    [SerializeField] private FishDatabase _fishDatabase;
 
     private void Awake()
     {   
@@ -83,94 +93,142 @@ public sealed class UIManager : MonoBehaviour
 
     void Start()
     {
+        _gearTabButton.onClick.AddListener(() => SwitchInventoryTab(InventoryMode.Gear));
+        _fishTabButton.onClick.AddListener(() => SwitchInventoryTab(InventoryMode.Fish));
+
+        // Set the initial state
+        SwitchInventoryTab(InventoryMode.Gear);
+        PopulateShopPanel();
+        PopulateInventoryPanel();
         StartGameFadeIN();
         _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, 0.2f, () => { Debug.Log("Panel move complete!"); }, BTween.Ease.OutQuad);
     }
 
-     private void OnEnable()
+private void OnEnable()
     {
-        // Subscribe to events to keep the button state accurate
-        Inventory.OnMoneyChanged += UpdateUpgradeButtonUI;
-        Inventory.OnEquipmentChanged += UpdateUpgradeButtonUI;
+        // Subscribe to events to keep UI up-to-date
+        Inventory.OnMoneyChanged += PopulateShopPanel;
+        Inventory.OnEquipmentChanged += PopulateShopPanel;
+        Inventory.OnEquipmentChanged += PopulateInventoryPanel;
     }
 
     private void OnDisable()
     {
         // Always unsubscribe
-        Inventory.OnMoneyChanged -= UpdateUpgradeButtonUI;
-        Inventory.OnEquipmentChanged -= UpdateUpgradeButtonUI;
-    }
-
-        /// <summary>
-    /// This single method is called when the new upgrade button is pressed.
-    /// </summary>
-    public async void OnUpgradeLineButtonPressed()
-    {
-        if (_nextAvailableTier == null)
-        {
-            Debug.Log("Already at max level.");
-            return;
-        }
-
-        // Disable button to prevent double-clicks during the transaction
-        _upgradeLineButton.interactable = false;
-
-        bool success = await Inventory.Instance.UpgradeLineLength(_nextAvailableTier.NewLength, _nextAvailableTier.Cost);
-
-        if (success)
-        {
-            _buySfx.Play();
-            Debug.Log($"Successfully upgraded line to {_nextAvailableTier.NewLength}m!");
-        }
-        
-        // The UI will automatically update via the OnEquipmentChanged event,
-        // which re-enables the button if another tier is available and affordable.
+        Inventory.OnMoneyChanged -= PopulateShopPanel;
+        Inventory.OnEquipmentChanged -= PopulateShopPanel;
+        Inventory.OnEquipmentChanged -= PopulateInventoryPanel;
     }
 
     /// <summary>
-    /// Updates the upgrade button's text and interactable state based on player progress.
+    /// Switches the view of the right-side panel between Gear and Fish.
     /// </summary>
-    /// <summary>
-    /// Updates the upgrade button's text, image, and interactable state.
-    /// </summary>
-    private void UpdateUpgradeButtonUI()
+    public void SwitchInventoryTab(InventoryMode mode)
     {
+        _currentInventoryMode = mode;
+        if (mode == InventoryMode.Gear)
+        {
+            PopulateGearPanel();
+            // Optional: Visually change tab colors to show active state
+            _gearTabButton.interactable = false;
+            _fishTabButton.interactable = true;
+        }
+        else // mode == InventoryMode.Fish
+        {
+            PopulateFishBagPanel();
+            _gearTabButton.interactable = true;
+            _fishTabButton.interactable = false;
+        }
+    }
+
+    public void PopulateShopPanel()
+    {
+        foreach (Transform child in _shopContainer) Destroy(child.gameObject);
+
+        // 1. Add the next available line upgrade
         uint currentLength = Inventory.Instance.CurrentMaxLineLength;
-        _nextAvailableTier = _lineUpgradeTiers.FirstOrDefault(tier => tier.NewLength > currentLength);
-
-        if (_nextAvailableTier != null)
+        LineUpgradeTier nextTier = _lineUpgradeTiers.FirstOrDefault(tier => tier.NewLength > currentLength);
+        if (nextTier != null)
         {
-            // A next tier is available
-            _upgradeButtonText.text = $"{_nextAvailableTier.Description}\nCost: {_nextAvailableTier.Cost}g";
-            _upgradeLineButton.interactable = Inventory.Instance.Money >= _nextAvailableTier.Cost;
-            
-            // Set the image for the current tier
-            if (_upgradeButtonImage != null && _nextAvailableTier.TierImage != null)
+            GameObject tierGO = Instantiate(_shopItemPrefab, _shopContainer);
+            tierGO.GetComponent<ShopItemUI>().SetupAsLineUpgrade(nextTier);
+        }
+
+        // 2. Add all unowned lures
+        List<Lure> allLures = Inventory.Instance.allAvailableLures;
+        foreach (Lure lure in allLures)
+        {
+            if (!Inventory.Instance.IsLureOwned(lure.HashedID))
             {
-                _upgradeButtonImage.sprite = _nextAvailableTier.TierImage;
-                _upgradeButtonImage.enabled = true;
+                GameObject lureGO = Instantiate(_shopItemPrefab, _shopContainer);
+                lureGO.GetComponent<ShopItemUI>().SetupAsLure(lure);
             }
         }
-        else
-        {
-            // Player is at the max level
-            _upgradeButtonText.text = "Max Level";
-            _upgradeLineButton.interactable = false;
+    }
 
-            // Set the max level image, or disable the image if none is provided
-            if (_upgradeButtonImage != null)
+    private void PopulateGearPanel()
+    {
+        // Only run if this tab is active
+        if (_currentInventoryMode != InventoryMode.Gear) return;
+
+        foreach (Transform child in _inventoryContainer) Destroy(child.gameObject);
+
+        var ownedLureIDs = Inventory.Instance.playerData.OwnedLureIDs;
+        foreach (uint lureID in ownedLureIDs)
+        {
+            Lure lureData = Inventory.Instance.GetLureByHashedID(lureID);
+            if (lureData != null)
             {
-                if (_maxLevelImage != null)
-                {
-                    _upgradeButtonImage.sprite = _maxLevelImage;
-                    _upgradeButtonImage.enabled = true;
-                }
-                else
-                {
-                    _upgradeButtonImage.enabled = false;
-                }
+                GameObject itemGO = Instantiate(_inventoryItemPrefab, _inventoryContainer);
+                itemGO.GetComponent<InventoryItemUI>().Setup(lureData);
             }
         }
+    }
+
+    // This is the new method for the inventory panel on the right
+    public void PopulateInventoryPanel()
+    {
+        foreach (Transform child in _inventoryContainer) Destroy(child.gameObject);
+
+        List<uint> ownedLureIDs = Inventory.Instance.playerData.OwnedLureIDs;
+        foreach (uint lureID in ownedLureIDs)
+        {
+            Lure lureData = Inventory.Instance.GetLureByHashedID(lureID);
+            if (lureData != null)
+            {
+                GameObject itemGO = Instantiate(_inventoryItemPrefab, _inventoryContainer);
+                itemGO.GetComponent<InventoryItemUI>().Setup(lureData);
+            }
+        }
+    }
+
+    private void PopulateFishBagPanel()
+    {
+        // Only run if this tab is active
+        if (_currentInventoryMode != InventoryMode.Fish) return;
+
+        foreach (Transform child in _inventoryContainer) Destroy(child.gameObject);
+
+        var caughtFishes = Inventory.Instance.playerData.CaughtFishes;
+        foreach (CaughtFishData fishData in caughtFishes)
+        {
+            GameObject itemGO = Instantiate(_fishBagItemPrefab, _inventoryContainer);
+            itemGO.GetComponent<FishBagItemUI>().Setup(fishData);
+        }
+    }
+
+    /// <summary>
+    /// Gets a fish sprite from the database by its name.
+    /// This method now passes the request to the FishDatabase asset.
+    /// </summary>
+    public Sprite GetFishSprite(string fishName)
+    {
+        if (_fishDatabase == null)
+        {
+            Debug.LogError("FishDatabase has not been assigned in the UIManager inspector!");
+            return null;
+        }
+        return _fishDatabase.GetSprite(fishName);
     }
 
     public void TweenLogo()
@@ -185,42 +243,13 @@ public sealed class UIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Fills the lure shop with items based on the Inventory's available lures.
-    /// </summary>
-    public void PopulateLureShop()
-    {
-        // 1. Clear any old items from the list
-        foreach (Transform child in _lureShopContainer)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // 2. Get all lures defined in the Inventory
-        List<Lure> allLures = Inventory.Instance.allAvailableLures;
-
-        // 3. Create a UI element for each lure
-        foreach (Lure lure in allLures)
-        {
-            GameObject itemGO = Instantiate(_lureShopItemPrefab, _lureShopContainer);
-            LureShopItemUI itemUI = itemGO.GetComponent<LureShopItemUI>();
-            if (itemUI != null)
-            {
-                itemUI.Setup(lure);
-            }
-        }
-    }
-
     private bool OnShopSwitch()
     {
         if (!_shopbool)
         {
             _shopbool = true;
             _shopPanel.TweenAnchoredPosition(SHOPPANELONPOS, UITWEENSPEED, null, BTween.Ease.OutCirc);
-            SoundManager.Instance.TransitionToShopMusic(true);
-            
-            // Populate the shop when it opens
-            PopulateLureShop();
+            SoundManager.Instance.TransitionToShopMusic(true);    
         }
         else
         {

@@ -211,8 +211,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b16fb1e43a7d3b158adfe1ce62875ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _upgradeLineButton: {fileID: 4814166236539441017}
-  _upgradeButtonText: {fileID: 4814166236789239903}
+  _shopPanel: {fileID: 4814166237412483993}
+  _shopItemPrefab: {fileID: 6524890074510786464, guid: 617dcf8c982c8003b92e764147fe6111, type: 3}
+  _shopContainer: {fileID: 4814166238537170659}
+  _inventoryPanel: {fileID: 7004141136621377878}
+  _inventoryItemPrefab: {fileID: 6524890074510786464, guid: 2038dce4cc733a93b9c29fc108980cd9, type: 3}
+  _inventoryContainer: {fileID: 5120442103424455592}
   _lineUpgradeTiers:
   - Description: Level 1
     NewLength: 100
@@ -226,11 +230,7 @@ MonoBehaviour:
     NewLength: 100
     Cost: 100
     TierImage: {fileID: 475629015, guid: 6933d6bad7fedf2279ab12c8239ca43f, type: 3}
-  _upgradeButtonImage: {fileID: 0}
   _maxLevelImage: {fileID: 1010505455, guid: 6933d6bad7fedf2279ab12c8239ca43f, type: 3}
-  _shopPanel: {fileID: 7211786687894706706}
-  _lureShopItemPrefab: {fileID: 6524890074510786464, guid: 617dcf8c982c8003b92e764147fe6111, type: 3}
-  _lureShopContainer: {fileID: 7211786687894706706}
   _pauseCanvas: {fileID: 1039891413}
   _callShopCanvas: {fileID: 2139381186}
   _goFishCanvas: {fileID: 0}
@@ -318,8 +318,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3109438545549627758}
+  m_Children: []
   m_Father: {fileID: 452882850}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &597308763
@@ -1401,7 +1400,7 @@ Transform:
   m_GameObject: {fileID: 1200073256}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 17.032501, y: 12.73, z: -100}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1643,10 +1642,12 @@ MonoBehaviour:
     _lureName: Basic Lure
     _description: 
     _cost: 10
+    _gameplayLureType: 0
   - _lureID: SpinnerLure
     _lureName: Spinner Lure
     _description: 
     _cost: 200
+    _gameplayLureType: 0
 --- !u!1001 &1431149529
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3792,11 +3793,43 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 521062971}
+    m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1574410858175361237, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
       propertyPath: m_Name
       value: SaveNotifier
+      objectReference: {fileID: 0}
+    - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3816,15 +3849,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3843,11 +3884,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
---- !u!4 &3109438545549627758 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6933906580593649119, guid: ec67a589b8ca9cb69a373ac8711023fd, type: 3}
-  m_PrefabInstance: {fileID: 3109438545549627757}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &3262557245597786400
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6839,6 +6875,7 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 3109438545549627757}
   - {fileID: 1296312661}
   - {fileID: 1431149529}
   - {fileID: 1987895001}

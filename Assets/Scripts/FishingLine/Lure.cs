@@ -8,6 +8,7 @@ public class Lure
     [SerializeField] private string _lureName;
     [SerializeField] private string _description;
     [SerializeField] private uint _cost;
+    [SerializeField] private LureID _gameplayLureType;
 
     private uint _hashedID = 0;
     private bool _isHashedIDCalculated = false;
@@ -16,6 +17,7 @@ public class Lure
     public string LureName => _lureName;
     public string Description => _description;
     public uint Cost => _cost;
+    public LureID GameplayLureType => _gameplayLureType;
 
     /// <summary>
     /// Gets the FNV1a hashed ID of the lureID string. Calculated on first access.

@@ -22,6 +22,7 @@ public class FishStats : MonoBehaviour
     public uint Value => _value;
     public LureID LureAttractionType => _lureAttractionType;
     public float BaitAttractionRadius => _baitAttractionRadius;
+    public Sprite FishSprite => _sprite;
     public string FishName => _fishName;
 
     private void Start()

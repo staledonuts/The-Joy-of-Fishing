@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Cysharp.Threading.Tasks; 
 public class BoatScript : MonoBehaviour
 {
     private float triggerValue;
@@ -93,11 +94,13 @@ public class BoatScript : MonoBehaviour
 
             if (rightTrigger > Mathf.Epsilon)
             {
-                CustomRopeSolver.Instance.ReelOut(rightTrigger);
+                // Add .Forget() to suppress the warning
+                CustomRopeSolver.Instance.ReelOut(rightTrigger).Forget();
             }
             else if (leftTrigger > Mathf.Epsilon)
             {
-                CustomRopeSolver.Instance.ReelIn(leftTrigger);
+                // Add .Forget() here as well
+                CustomRopeSolver.Instance.ReelIn(leftTrigger).Forget();
             }   
         }
     }

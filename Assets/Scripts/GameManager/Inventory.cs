@@ -126,7 +126,7 @@ public sealed class Inventory : MonoBehaviour
         return playerData.OwnedLureIDs.Contains(hashedLureID);
     }
 
-    public bool EquipLure(uint hashedLureID)
+    public async UniTask<bool> EquipLure(uint hashedLureID)
     {
         if (hashedLureID == 0) {
             Debug.LogWarning("Cannot equip lure with HashedID 0.");
@@ -147,9 +147,19 @@ public sealed class Inventory : MonoBehaviour
         
         playerData.EquippedLureID = hashedLureID;
         Lure equippedLure = GetLureByHashedID(hashedLureID);
-        Debug.Log($"Equipped lure: {equippedLure?.LureName} (HashedID: {hashedLureID})");
+        if (equippedLure != null && CustomRopeSolver.Instance != null)
+        {
+            CustomRopeSolver.Instance.GetLure()?.ChangeBait(equippedLure.GameplayLureType);
+            Debug.Log($"Equipped lure: {equippedLure.LureName} and changed gameplay bait to {equippedLure.GameplayLureType}");
+        }
+        
+        // Invoke events to notify UI
         OnEquipmentChanged?.Invoke();
         OnInventoryChanged?.Invoke();
+        
+        // Await the asynchronous save operation
+        await SaveAsync();
+        
         return true;
     }
 
@@ -166,7 +176,7 @@ public sealed class Inventory : MonoBehaviour
     }
     
     // Overload to equip by string ID
-    public bool EquipLureByStringID(string stringLureID)
+    public async UniTask<bool> EquipLureByStringID(string stringLureID)
     {
         Lure lureToEquip = allAvailableLures.Find(l => l.LureID == stringLureID);
         if (lureToEquip == null)
@@ -174,7 +184,8 @@ public sealed class Inventory : MonoBehaviour
             Debug.LogError($"Lure with string ID '{stringLureID}' not found for equipping.");
             return false;
         }
-        return EquipLure(lureToEquip.HashedID);
+        // Await the result of the async EquipLure method before returning it.
+        return await EquipLure(lureToEquip.HashedID);
     }
 
     // --- Private Helper Methods ---

@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Smoke
-  m_Shader: {fileID: 4800000, guid: 6789208902b276e34a544390c413982c, type: 3}
+  m_Shader: {fileID: 4800000, guid: 4e92efddcc9f94d4fbe453ca3d3e9122, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []

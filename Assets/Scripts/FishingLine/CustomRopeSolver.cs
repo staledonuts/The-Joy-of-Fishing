@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public sealed class CustomRopeSolver : MonoBehaviour
@@ -433,54 +434,49 @@ public sealed class CustomRopeSolver : MonoBehaviour
         ropeLine.SetPosition(nodes.Count, hookVisualPosition); 
     }
 
-    public void ReelIn(float inputAmount) 
+    public async UniTask ReelIn(float inputAmount) // Changed to async UniTask
     {
         float interval = Mathf.Lerp(maxReelInInterval, minReelInInterval, inputAmount);
         if (Time.time < lastInstanceTime + interval) return;
-        
-        // We need at least nodes[0] (rodTip) and nodes[1] (first segment) to remove nodes[1].
-        // So, nodes.Count must be greater than 1.
+
         if (nodes.Count > 1)
         {
             lastInstanceTime = Time.time;
-            RopeNode removedNode = nodes[1]; // Remove the node right after the rodTip anchor
-            if (removedNode.transform != null) 
+            RopeNode removedNode = nodes[1];
+            if (removedNode.transform != null)
             {
                 Destroy(removedNode.transform.gameObject);
             }
-            nodes.RemoveAt(1); // Remove at index 1
+            nodes.RemoveAt(1);
         }
         else
         {
-            TryCatchFish();
+            // Await the TryCatchFish method
+            await TryCatchFish();
         }
     }
 
-    public void ReelOut(float inputAmount) 
+    public async UniTask ReelOut(float inputAmount) // Changed to async UniTask
     {
-        // Check if we can add more nodes (maxNodes includes the anchor node at index 0)
         if (nodes.Count >= maxNodes) return;
 
         float interval = Mathf.Lerp(maxReelOutInterval, minReelOutInterval, inputAmount);
         if (Time.time < lastInstanceTime + interval) return;
         
-        // This should only be called if nodes[0] (rodTip anchor) exists.
-        // Start() ensures nodes.Count is at least 1.
         if (nodes.Count > 0 && nodes.Count < maxNodes) 
         {
+            // Yield to make the method truly async and prevent compiler warnings inside this method
+            await UniTask.Yield(); 
+            
             lastInstanceTime = Time.time;
             
-            RopeNode rodTipNode = nodes[0]; // The anchor point
-            
-            // New node's physics position starts at the rod tip
+            RopeNode rodTipNode = nodes[0];
             Vector2 initialNewNodePhysicsPos = rodTipNode.position; 
-            // New node's visual position also starts at the rod tip's visual position
             Vector2 initialVisualPos = rodTipNode.visualPosition; 
 
             GameObject nodeObj = null;
             if (nodePrefab != null)
             {
-                // Instantiate at the visual starting point
                 nodeObj = Instantiate(nodePrefab, initialVisualPos, Quaternion.identity, transform);
                 Rigidbody2D nodeRb = nodeObj.GetComponent<Rigidbody2D>();
                 if (nodeRb != null) nodeRb.bodyType = RigidbodyType2D.Kinematic;
@@ -489,12 +485,12 @@ public sealed class CustomRopeSolver : MonoBehaviour
             RopeNode newNode = new RopeNode
             {
                 position = initialNewNodePhysicsPos, 
-                prevPosition = initialNewNodePhysicsPos, // Start with zero velocity relative to spawn
+                prevPosition = initialNewNodePhysicsPos,
                 transform = nodeObj?.transform,
                 visualPosition = initialVisualPos 
             };
 
-            nodes.Insert(1, newNode); // Insert the new node at index 1 (after rodTip anchor)
+            nodes.Insert(1, newNode);
 
             currentReelOutSettleSpeedFactor = Mathf.Lerp(minSettleSpeedFactor, maxSettleSpeedFactor, inputAmount);
             reelSettleSpeedEffectTimer = settleSpeedEffectDuration;
@@ -506,11 +502,15 @@ public sealed class CustomRopeSolver : MonoBehaviour
     public LureType GetLure() => _lure;
 
     
-    public void TryCatchFish()
+    public async UniTask TryCatchFish() // Changed to async UniTask
     {
-        if(_lure.GetCurrentCatch() != null)
+        FishStats caughtFish = _lure.GetCurrentCatch();
+        if (caughtFish != null)
         {
-            Inventory.Instance.AddCaughtFish(_lure.GetCurrentCatch());
+            // Now we properly await the async operation
+            await Inventory.Instance.AddCaughtFish(caughtFish);
+            
+            _lure.DestroyCatch();
         }
     }
 

@@ -63,6 +63,8 @@ public class LureType : MonoBehaviour
 
     private void AddFishToHook(FishStats fish)
     {
+        _hookedFish = fish;
+
         fish.GetComponent<Collider2D>().enabled = false;
         fish.GetComponent<MoveAi>().enabled = false;
         fish.GetComponent<Pathfinding.AIPath>().enabled = false;
@@ -83,10 +85,12 @@ public class LureType : MonoBehaviour
     {
         if(_hookedFish != null)
         {
-            Destroy(_hookedFish);
+            // Add .gameObject to destroy the entire fish object
+            Destroy(_hookedFish.gameObject);
             _hookedFish = null;
         }
     }
+    
     public void ChangeBait(LureID lureID)
     {
         _currentLure = _lureDict.GetValueOrDefault(lureID);

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Use TextMeshPro for better text rendering
+using TMPro;
+using Cysharp.Threading.Tasks;
 
 public class LureShopItemUI : MonoBehaviour
 {
@@ -9,14 +10,11 @@ public class LureShopItemUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _costText;
     [SerializeField] private Button _buyButton;
     [SerializeField] private Button _equipButton;
-    [SerializeField] private GameObject _ownedIndicator; // An icon or text saying "Owned"
-    [SerializeField] private GameObject _equippedIndicator; // An icon or text showing this is equipped
+    [SerializeField] private GameObject _ownedIndicator;
+    [SerializeField] private GameObject _equippedIndicator;
 
     private Lure _lure;
 
-    /// <summary>
-    /// Configures the UI element with the data from a Lure object.
-    /// </summary>
     public void Setup(Lure lureData)
     {
         _lure = lureData;
@@ -31,17 +29,16 @@ public class LureShopItemUI : MonoBehaviour
         UpdateStatus();
     }
 
-    /// <summary>
-    /// Updates the visibility of buttons and indicators based on player's inventory.
-    /// </summary>
     public void UpdateStatus()
     {
         bool isOwned = Inventory.Instance.IsLureOwned(_lure.HashedID);
         bool isEquipped = Inventory.Instance.playerData.EquippedLureID == _lure.HashedID;
 
-        _ownedIndicator.SetActive(isOwned);
         _buyButton.gameObject.SetActive(!isOwned);
+        _costText.gameObject.SetActive(!isOwned);
+        
         _equipButton.gameObject.SetActive(isOwned);
+        _ownedIndicator.SetActive(isOwned);
 
         _equippedIndicator.SetActive(isEquipped);
         _equipButton.interactable = !isEquipped;
@@ -49,28 +46,31 @@ public class LureShopItemUI : MonoBehaviour
 
     private async void OnBuyButtonPressed()
     {
-        _buyButton.interactable = false; // Prevent double-clicks
+        _buyButton.interactable = false;
         bool success = await Inventory.Instance.BuyLure(_lure);
         if (success)
         {
-            // Successfully bought, refresh the entire shop UI
-            UIManager.Instance.PopulateLureShop();
+            // FIX: The method was renamed to PopulateShopPanel in UIManager.
+            // We also need to refresh the inventory panel.
+            UIManager.Instance.PopulateShopPanel();
+            UIManager.Instance.PopulateInventoryPanel();
         }
         else
         {
-            Debug.Log("Could not buy lure. Not enough money?");
             _buyButton.interactable = true; // Re-enable if purchase failed
         }
     }
 
     private async void OnEquipButtonPressed()
     {
-        // EquipLure now returns a UniTask<bool>
-        bool success = Inventory.Instance.EquipLure(_lure.HashedID);
+        // FIX: The 'await' keyword was missing here. Adding it fixes
+        // the CS0029 and CS1998 errors.
+        bool success = await Inventory.Instance.EquipLure(_lure.HashedID);
         if (success)
         {
-            // Refresh the entire shop UI to show the new "Equipped" status
-            UIManager.Instance.PopulateLureShop();
+            // FIX: We also call the correct method here.
+            // We only need to refresh the inventory when equipping.
+            UIManager.Instance.PopulateInventoryPanel();
         }
     }
 }
