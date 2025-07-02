@@ -59,8 +59,9 @@ public sealed class CustomRopeSolver : MonoBehaviour
     private LureType _lure;
     private Rigidbody2D hookRb; 
     
-    private float worldGravity = -9.81f; 
+    private float _worldGravity = -9.81f; 
 
+    private bool _isBusy = false;
     private float maxReelOutInterval = 0.4f, minReelOutInterval = 0.05f;
     private float maxReelInInterval = 0.4f, minReelInInterval = 0.10f;
     private float lastInstanceTime = 0;
@@ -257,7 +258,7 @@ public sealed class CustomRopeSolver : MonoBehaviour
             Vector2 currentPositionForCast = n.position; 
             n.prevPosition = currentPositionForCast;     
 
-            Vector2 tentativePosition = currentPositionForCast + velocity + (Vector2.up * worldGravity * gravityScale * dt * dt);
+            Vector2 tentativePosition = currentPositionForCast + velocity + (Vector2.up * _worldGravity * gravityScale * dt * dt);
             
             Vector2 movementVector = tentativePosition - currentPositionForCast;
             float movementDistance = movementVector.magnitude;
@@ -434,30 +435,43 @@ public sealed class CustomRopeSolver : MonoBehaviour
         ropeLine.SetPosition(nodes.Count, hookVisualPosition); 
     }
 
-    public async UniTask ReelIn(float inputAmount) // Changed to async UniTask
+    public async UniTask ReelIn(float inputAmount)
     {
+        // Don't start a new ReelIn if a reel action is already in progress
+        if (_isBusy) return;
+
         float interval = Mathf.Lerp(maxReelInInterval, minReelInInterval, inputAmount);
         if (Time.time < lastInstanceTime + interval) return;
 
-        if (nodes.Count > 1)
+        _isBusy = true; // Set the lock
+        try
         {
-            lastInstanceTime = Time.time;
-            RopeNode removedNode = nodes[1];
-            if (removedNode.transform != null)
+            if (nodes.Count > 1)
             {
-                Destroy(removedNode.transform.gameObject);
+                lastInstanceTime = Time.time;
+                RopeNode removedNode = nodes[1];
+                if (removedNode.transform != null)
+                {
+                    Destroy(removedNode.transform.gameObject);
+                }
+                nodes.RemoveAt(1);
             }
-            nodes.RemoveAt(1);
+            else
+            {
+                await TryCatchFish();
+            }
         }
-        else
+        finally
         {
-            // Await the TryCatchFish method
-            await TryCatchFish();
+            _isBusy = false; // Always release the lock
         }
     }
 
-    public async UniTask ReelOut(float inputAmount) // Changed to async UniTask
+    public async UniTask ReelOut(float inputAmount)
     {
+        // Don't start a new ReelOut if a reel action is already in progress
+        if (_isBusy) return;
+        
         if (nodes.Count >= maxNodes) return;
 
         float interval = Mathf.Lerp(maxReelOutInterval, minReelOutInterval, inputAmount);
@@ -465,35 +479,44 @@ public sealed class CustomRopeSolver : MonoBehaviour
         
         if (nodes.Count > 0 && nodes.Count < maxNodes) 
         {
-            // Yield to make the method truly async and prevent compiler warnings inside this method
-            await UniTask.Yield(); 
-            
-            lastInstanceTime = Time.time;
-            
-            RopeNode rodTipNode = nodes[0];
-            Vector2 initialNewNodePhysicsPos = rodTipNode.position; 
-            Vector2 initialVisualPos = rodTipNode.visualPosition; 
-
-            GameObject nodeObj = null;
-            if (nodePrefab != null)
+            _isBusy = true; // Set the lock
+            try
             {
-                nodeObj = Instantiate(nodePrefab, initialVisualPos, Quaternion.identity, transform);
-                Rigidbody2D nodeRb = nodeObj.GetComponent<Rigidbody2D>();
-                if (nodeRb != null) nodeRb.bodyType = RigidbodyType2D.Kinematic;
+                // This logic is now inside the try block
+                lastInstanceTime = Time.time;
+                await UniTask.Yield(); // Yield before continuing
+                
+                // ... The entire logic for creating and inserting a new node remains the same ...
+                // (RopeNode rodTipNode = nodes[0]; ... etc)
+                RopeNode rodTipNode = nodes[0];
+                Vector2 initialNewNodePhysicsPos = rodTipNode.position; 
+                Vector2 initialVisualPos = rodTipNode.visualPosition; 
+
+                GameObject nodeObj = null;
+                if (nodePrefab != null)
+                {
+                    nodeObj = Instantiate(nodePrefab, initialVisualPos, Quaternion.identity, transform);
+                    Rigidbody2D nodeRb = nodeObj.GetComponent<Rigidbody2D>();
+                    if (nodeRb != null) nodeRb.bodyType = RigidbodyType2D.Kinematic;
+                }
+
+                RopeNode newNode = new RopeNode
+                {
+                    position = initialNewNodePhysicsPos, 
+                    prevPosition = initialNewNodePhysicsPos,
+                    transform = nodeObj?.transform,
+                    visualPosition = initialVisualPos 
+                };
+
+                nodes.Insert(1, newNode);
+
+                currentReelOutSettleSpeedFactor = Mathf.Lerp(minSettleSpeedFactor, maxSettleSpeedFactor, inputAmount);
+                reelSettleSpeedEffectTimer = settleSpeedEffectDuration;
             }
-
-            RopeNode newNode = new RopeNode
+            finally
             {
-                position = initialNewNodePhysicsPos, 
-                prevPosition = initialNewNodePhysicsPos,
-                transform = nodeObj?.transform,
-                visualPosition = initialVisualPos 
-            };
-
-            nodes.Insert(1, newNode);
-
-            currentReelOutSettleSpeedFactor = Mathf.Lerp(minSettleSpeedFactor, maxSettleSpeedFactor, inputAmount);
-            reelSettleSpeedEffectTimer = settleSpeedEffectDuration;
+                _isBusy = false; // Always release the lock
+            }
         }
     }
 

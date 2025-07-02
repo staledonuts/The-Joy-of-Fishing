@@ -215,8 +215,11 @@ MonoBehaviour:
   _shopItemPrefab: {fileID: 6524890074510786464, guid: 617dcf8c982c8003b92e764147fe6111, type: 3}
   _shopContainer: {fileID: 4814166238537170659}
   _inventoryPanel: {fileID: 7004141136621377878}
-  _inventoryItemPrefab: {fileID: 6524890074510786464, guid: 2038dce4cc733a93b9c29fc108980cd9, type: 3}
   _inventoryContainer: {fileID: 5120442103424455592}
+  _inventoryItemPrefab: {fileID: 6524890074510786464, guid: 2038dce4cc733a93b9c29fc108980cd9, type: 3}
+  _fishBagItemPrefab: {fileID: 619092751}
+  _gearTabButton: {fileID: 1823241398}
+  _fishTabButton: {fileID: 320758272}
   _lineUpgradeTiers:
   - Description: Level 1
     NewLength: 100
@@ -239,8 +242,20 @@ MonoBehaviour:
     _sourceAsset: {fileID: 11400000, guid: 7045a98b90998175cb89c634678db2ae, type: 2}
     <DebugObject>k__BackingField: {fileID: 155264705}
   _GameStartLogo: {fileID: 8274773435323112179}
+  _fishDatabase: {fileID: 0}
   _fadeimage: {fileID: 4027800787695343827}
   _fadeCanvas: {fileID: 1455472810}
+--- !u!114 &320758272 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3836749991450154834, guid: bfea0ddd656a2704abe0d417dbde0471, type: 3}
+  m_PrefabInstance: {fileID: 1137403537}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &452882849
 GameObject:
   m_ObjectHideFlags: 0
@@ -354,6 +369,11 @@ Transform:
   - {fileID: 19419056}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &619092751 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2697470972405550060, guid: e7f30196d57cc9448b09aabc4d49ec43, type: 3}
+  m_PrefabInstance: {fileID: 886366897}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &683481876
 GameObject:
   m_ObjectHideFlags: 0
@@ -2159,6 +2179,17 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1823241398 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6882297311231084489, guid: 617dcf8c982c8003b92e764147fe6111, type: 3}
+  m_PrefabInstance: {fileID: 7814394120846967439}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1987895001
 PrefabInstance:
   m_ObjectHideFlags: 0
