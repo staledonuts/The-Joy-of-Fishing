@@ -79,30 +79,22 @@ public class BoatScript : MonoBehaviour
     {
         if(Inventory.Instance.playerData.RadioControlLure)
         {
-            CustomRopeSolver.Instance.ApplyMovementToHook(hookInput * forcetoAdd * Time.deltaTime);
+            EventBus.Publish(new MoveHookEvent { MoveInput = hookInput * forcetoAdd * Time.deltaTime });
         }
     }
     public void ReelRope()
     {
-        if (!CustomRopeSolver.Instance) 
-        {  
-            return;   
-        }
-        else
-        {
-            float rightTrigger = Mathf.Clamp(triggerValue, 0, 1);
-            float leftTrigger = Mathf.Abs(Mathf.Clamp(triggerValue, -1, 0));
+        float rightTrigger = Mathf.Clamp(triggerValue, 0, 1);
+        float leftTrigger = Mathf.Abs(Mathf.Clamp(triggerValue, -1, 0));
 
-            if (rightTrigger > Mathf.Epsilon)
-            {
-                // Add .Forget() to suppress the warning
-                CustomRopeSolver.Instance.ReelOut(rightTrigger).Forget();
-            }
-            else if (leftTrigger > Mathf.Epsilon)
-            {
-                CustomRopeSolver.Instance.ReelIn(leftTrigger);
-            }   
+        if (rightTrigger > Mathf.Epsilon)
+        {
+            EventBus.Publish(new ReelOutEvent { InputValue = rightTrigger });
         }
+        else if (leftTrigger > Mathf.Epsilon)
+        {
+            EventBus.Publish(new ReelInEvent { InputValue = leftTrigger });
+        }   
     }
 
     public void OnCastOut()

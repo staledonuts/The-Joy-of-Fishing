@@ -62,6 +62,20 @@ public sealed class CustomRopeSolver : MonoBehaviour
     private float reelSettleSpeedEffectTimer = 0f;
     private Vector2 _hookExternalForce;
 
+    private void OnEnable()
+    {
+        EventBus.Subscribe<ReelInEvent>(HandleReelIn);
+        EventBus.Subscribe<ReelOutEvent>(HandleReelOut);
+        EventBus.Subscribe<MoveHookEvent>(HandleMoveHook);
+    }
+
+    private void OnDisable()
+    {
+        EventBus.Unsubscribe<ReelInEvent>(HandleReelIn);
+        EventBus.Unsubscribe<ReelOutEvent>(HandleReelOut);
+        EventBus.Unsubscribe<MoveHookEvent>(HandleMoveHook);
+    }
+
     private void Awake()
     {
         if (instance == null)
@@ -278,8 +292,6 @@ public sealed class CustomRopeSolver : MonoBehaviour
         }
     }
 
-
-
     private void CorrectCollisionsAfterConstraints()
     {
         for (int i = 1; i < ropeState.nodes.Count; i++) 
@@ -349,11 +361,11 @@ public sealed class CustomRopeSolver : MonoBehaviour
         ropeLine.SetPosition(ropeState.nodes.Count, ropeState.hookVisualPosition); 
     }
 
-    public void ReelIn(float inputAmount)
+    private void HandleReelIn(ReelInEvent e)
     {
         if (_isBusy) return;
 
-        float interval = Mathf.Lerp(maxReelInInterval, minReelInInterval, inputAmount);
+        float interval = Mathf.Lerp(maxReelInInterval, minReelInInterval, e.InputValue);
         if (Time.time < lastInstanceTime + interval) return;
 
         _isBusy = true;
@@ -380,7 +392,12 @@ public sealed class CustomRopeSolver : MonoBehaviour
         }
     }
 
-    public async UniTask ReelOut(float inputAmount)
+    private void HandleReelOut(ReelOutEvent e)
+    {
+        ReelOutInternal(e.InputValue).Forget();
+    }
+
+    private async UniTask ReelOutInternal(float inputAmount)
     {
         if (_isBusy) return;
         
@@ -429,6 +446,11 @@ public sealed class CustomRopeSolver : MonoBehaviour
         }
     }
 
+    private void HandleMoveHook(MoveHookEvent e)
+    {
+        _hookExternalForce += e.MoveInput;
+    }
+
     public Transform GetHook() => hook;
 
     public LureType GetLure() => _lure;
@@ -442,10 +464,5 @@ public sealed class CustomRopeSolver : MonoBehaviour
             
             _lure.DestroyCatch();
         }
-    }
-
-    public void ApplyMovementToHook(Vector2 displacementThisFrame)
-    {
-        _hookExternalForce += displacementThisFrame;
     }
 }

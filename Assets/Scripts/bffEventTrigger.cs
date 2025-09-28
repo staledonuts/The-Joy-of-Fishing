@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Ami.BroAudio;
+using DonutPackage.EventBus;
 using UnityEngine;
 
 public class bffEventTrigger : MonoBehaviour
@@ -28,6 +29,6 @@ public class bffEventTrigger : MonoBehaviour
 
     public void endgame()
     {
-        UIManager.Instance.UIScreenfadeout();
+        EventBus.Publish(new FadeOutScreenEvent());
     }
 }

@@ -113,6 +113,7 @@ private void OnEnable()
         EventBus.Subscribe<InventoryChangedEvent>(HandleInventoryChanged);
         EventBus.Subscribe<PauseStateChangedEvent>(HandlePauseState);
         EventBus.Subscribe<ToggleShopEvent>(HandleToggleShop);
+        EventBus.Subscribe<FadeOutScreenEvent>(HandleFadeOutScreen);
     }
 
     private void OnDisable()
@@ -123,6 +124,12 @@ private void OnEnable()
         EventBus.Unsubscribe<InventoryChangedEvent>(HandleInventoryChanged);
         EventBus.Unsubscribe<PauseStateChangedEvent>(HandlePauseState);
         EventBus.Unsubscribe<ToggleShopEvent>(HandleToggleShop);
+        EventBus.Unsubscribe<FadeOutScreenEvent>(HandleFadeOutScreen);
+    }
+
+    private void HandleFadeOutScreen(FadeOutScreenEvent e)
+    {
+        UIScreenfadeout();
     }
 
     private void HandleMoneyChanged(MoneyChangedEvent e)
