@@ -1,5 +1,5 @@
-
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public sealed class CatchPoint : MonoBehaviour
 {

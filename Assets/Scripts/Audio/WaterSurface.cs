@@ -7,8 +7,6 @@ using UnityEngine;
 
 public class WaterSurface : MonoBehaviour
 {
-    [SerializeField] private bool hookSubmerged = false; //Hook is under the watersurface
-
     private SoundID splashEvent;
     private BoatEmitter boatEmitter;
 
@@ -25,7 +23,7 @@ public class WaterSurface : MonoBehaviour
 
     private void Update()
     {
-        /*if (hookSubmerged)
+        /*if (some_condition)
         {
             lakeAmbienceEvent.("music_duck", 1);
             boatEmitter.UnderWater();
@@ -43,7 +41,6 @@ public class WaterSurface : MonoBehaviour
         {
             if (other.transform.position.y > gameObject.transform.position.y)
             {
-                hookSubmerged = true;
                 if(audioPlayer == null)
                 {
                     audioPlayer = splashEvent.Play(other.transform);
@@ -55,7 +52,7 @@ public class WaterSurface : MonoBehaviour
             }
             else if (other.transform.position.y < gameObject.transform.position.y)
             {
-                hookSubmerged = false;
+                // The hook is now above the water surface.
             }
         }
     }

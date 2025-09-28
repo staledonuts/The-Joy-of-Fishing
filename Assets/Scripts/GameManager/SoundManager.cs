@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using Ami.BroAudio;
+using DonutPackage.BTween;
+using DonutPackage.EventBus;
 using UnityEngine;
 
 
@@ -38,21 +40,44 @@ public class SoundManager : MonoBehaviour
 
     [SerializeField] private SoundID _musicTracks;
     [SerializeField] private SoundID _radioTrack;
-    private IAudioPlayer _musicPlayer;
+    [Tooltip("The transform where the shop radio sound should emanate from.")]
+    [SerializeField] private Transform _shopRadioSource;
 
+    private IMusicPlayer _musicPlayer;
     private IAudioPlayer _shopRadioAmbience;
+
+    private void OnEnable()
+    {
+        EventBus.Subscribe<ShopStateChangedEvent>(HandleShopStateChanged);
+    }
+
+    private void OnDisable()
+    {
+        EventBus.Unsubscribe<ShopStateChangedEvent>(HandleShopStateChanged);
+    }
 
     private void Start()
     {
-        _musicPlayer = (IAudioPlayer)_musicTracks.Play().AsBGM();
-        GameObject shoppeBoatObj = GameObject.Find("ShoppeBoat");
-        _shopRadioAmbience = _radioTrack.Play(shoppeBoatObj.transform);
-        _shopRadioAmbience.SetVolume(0);
+        _musicPlayer = _musicTracks.Play().AsBGM();
+        if (_shopRadioSource != null)
+        {
+            _shopRadioAmbience = _radioTrack.Play(_shopRadioSource);
+            _shopRadioAmbience.SetVolume(0);
+        }
+        else
+        {
+            Debug.LogError("Shop Radio Source Transform is not assigned in the SoundManager inspector!", this);
+        }
+    }
+
+    private void HandleShopStateChanged(ShopStateChangedEvent e)
+    {
+        TransitionToShopMusic(e.IsShopOpen);
     }
 
     public void NextMusicTrack()
     {
-        _musicPlayer = (IAudioPlayer)_musicTracks.Play().AsBGM();
+        _musicPlayer = _musicTracks.Play().AsBGM();
     }
 
     public void TransitionToShopMusic(bool shopActive)
@@ -60,11 +85,11 @@ public class SoundManager : MonoBehaviour
         if(shopActive)
         {
             _shopRadioAmbience.TweenVolume(1f, 2f, null, BTween.Ease.InQuad);
-            _musicPlayer.TweenVolume(0f, 2f, null, BTween.Ease.OutQuad);
+            (_musicPlayer as IAudioPlayer).TweenVolume(0f, 2f, null, BTween.Ease.OutQuad);
         }
         else
         {
-            _musicPlayer.TweenVolume(1f, 2f, null, BTween.Ease.InQuad);
+            (_musicPlayer as IAudioPlayer).TweenVolume(1f, 2f, null, BTween.Ease.InQuad);
             _shopRadioAmbience.TweenVolume(0f, 2f, null, BTween.Ease.OutQuad);
         }
     }
@@ -77,11 +102,6 @@ public class SoundManager : MonoBehaviour
         BroAudio.SetVolume(BroAudioType.Music, musicVolume);
         BroAudio.SetVolume(BroAudioType.SFX, sfxVolume);
         BroAudio.SetVolume(BroAudioType.Ambience, ambienceVolume);
-    }
-
-    // Update is called once per frame
-    private void Update()
-    {    
     }
 
     public void MasterVolumeLevel(float newMasterVolume)

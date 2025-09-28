@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Ami.BroAudio;
+using DonutPackage.BTween;
+using DonutPackage.EventBus;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -99,7 +101,6 @@ public sealed class UIManager : MonoBehaviour
         // Set the initial state
         SwitchInventoryTab(InventoryMode.Gear);
         PopulateShopPanel();
-        PopulateInventoryPanel();
         StartGameFadeIN();
         _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, 0.2f, () => { Debug.Log("Panel move complete!"); }, BTween.Ease.OutQuad);
     }
@@ -107,17 +108,54 @@ public sealed class UIManager : MonoBehaviour
 private void OnEnable()
     {
         // Subscribe to events to keep UI up-to-date
-        Inventory.OnMoneyChanged += PopulateShopPanel;
-        Inventory.OnEquipmentChanged += PopulateShopPanel;
-        Inventory.OnEquipmentChanged += PopulateInventoryPanel;
+        EventBus.Subscribe<MoneyChangedEvent>(HandleMoneyChanged);
+        EventBus.Subscribe<EquipmentChangedEvent>(HandleEquipmentChanged);
+        EventBus.Subscribe<InventoryChangedEvent>(HandleInventoryChanged);
+        EventBus.Subscribe<PauseStateChangedEvent>(HandlePauseState);
+        EventBus.Subscribe<ToggleShopEvent>(HandleToggleShop);
     }
 
     private void OnDisable()
     {
         // Always unsubscribe
-        Inventory.OnMoneyChanged -= PopulateShopPanel;
-        Inventory.OnEquipmentChanged -= PopulateShopPanel;
-        Inventory.OnEquipmentChanged -= PopulateInventoryPanel;
+        EventBus.Unsubscribe<MoneyChangedEvent>(HandleMoneyChanged);
+        EventBus.Unsubscribe<EquipmentChangedEvent>(HandleEquipmentChanged);
+        EventBus.Unsubscribe<InventoryChangedEvent>(HandleInventoryChanged);
+        EventBus.Unsubscribe<PauseStateChangedEvent>(HandlePauseState);
+        EventBus.Unsubscribe<ToggleShopEvent>(HandleToggleShop);
+    }
+
+    private void HandleMoneyChanged(MoneyChangedEvent e)
+    {
+        PopulateShopPanel();
+    }
+
+    private void HandleInventoryChanged(InventoryChangedEvent e)
+    {
+        if (_currentInventoryMode == InventoryMode.Fish)
+        {
+            PopulateFishBagPanel();
+        }
+        else
+        {
+            UpdateGearPanel();
+        }
+    }
+
+    private void HandleEquipmentChanged(EquipmentChangedEvent e)
+    {
+        PopulateShopPanel();
+        UpdateGearPanel();
+    }
+
+    private void HandlePauseState(PauseStateChangedEvent e)
+    {
+        if (_pauseCanvas != null) _pauseCanvas.SetActive(e.IsPaused);
+    }
+
+    private void HandleToggleShop(ToggleShopEvent e)
+    {
+        ToggleShop();
     }
 
     /// <summary>
@@ -128,7 +166,7 @@ private void OnEnable()
         _currentInventoryMode = mode;
         if (mode == InventoryMode.Gear)
         {
-            PopulateGearPanel();
+            UpdateGearPanel();
             // Optional: Visually change tab colors to show active state
             _gearTabButton.interactable = false;
             _fishTabButton.interactable = true;
@@ -166,31 +204,18 @@ private void OnEnable()
         }
     }
 
-    private void PopulateGearPanel()
+    /// <summary>
+    /// Populates the inventory panel with the player's owned gear (lures).
+    /// This is now the single method responsible for this panel.
+    /// </summary>
+    private void UpdateGearPanel()
     {
         // Only run if this tab is active
         if (_currentInventoryMode != InventoryMode.Gear) return;
 
         foreach (Transform child in _inventoryContainer) Destroy(child.gameObject);
 
-        var ownedLureIDs = Inventory.Instance.playerData.OwnedLureIDs;
-        foreach (uint lureID in ownedLureIDs)
-        {
-            Lure lureData = Inventory.Instance.GetLureByHashedID(lureID);
-            if (lureData != null)
-            {
-                GameObject itemGO = Instantiate(_inventoryItemPrefab, _inventoryContainer);
-                itemGO.GetComponent<InventoryItemUI>().Setup(lureData);
-            }
-        }
-    }
-
-    // This is the new method for the inventory panel on the right
-    public void PopulateInventoryPanel()
-    {
-        foreach (Transform child in _inventoryContainer) Destroy(child.gameObject);
-
-        List<uint> ownedLureIDs = Inventory.Instance.playerData.OwnedLureIDs;
+        List<uint> ownedLureIDs = new List<uint>(Inventory.Instance.playerData.OwnedLureIDs);
         foreach (uint lureID in ownedLureIDs)
         {
             Lure lureData = Inventory.Instance.GetLureByHashedID(lureID);
@@ -243,36 +268,22 @@ private void OnEnable()
         }
     }
 
-    private bool OnShopSwitch()
+    /// <summary>
+    /// Toggles the shop panel's visibility and associated game state.
+    /// </summary>
+    public void ToggleShop()
     {
-        if (!_shopbool)
+        _shopbool = !_shopbool;
+
+        if (_shopbool)
         {
-            _shopbool = true;
             _shopPanel.TweenAnchoredPosition(SHOPPANELONPOS, UITWEENSPEED, null, BTween.Ease.OutCirc);
-            SoundManager.Instance.TransitionToShopMusic(true);    
         }
         else
         {
-            _shopbool = false;
             _shopPanel.TweenAnchoredPosition(SHOPPANELOFFPOS, UITWEENSPEED, null, BTween.Ease.OutCirc);
-            SoundManager.Instance.TransitionToShopMusic(false);
         }
-        return _shopbool;
-    }
-
-    public void CallShop()
-    {            
-        if(OnShopSwitch())
-        {
-
-            SoundManager.Instance.TransitionToShopMusic(true);
-            GameManager.Instance.CameraSwitcher(CameraModes.Shop);
-        }
-        else
-        {
-            SoundManager.Instance.TransitionToShopMusic(false);
-            GameManager.Instance.CameraSwitcher(CameraModes.Hook);
-        }
+        EventBus.Publish(new ShopStateChangedEvent { IsShopOpen = _shopbool });
     }
 
     [SerializeField] private Image _fadeimage;

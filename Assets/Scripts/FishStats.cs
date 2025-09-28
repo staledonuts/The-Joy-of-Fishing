@@ -19,6 +19,8 @@ public class FishStats : MonoBehaviour
     [SerializeField] private int _excitementLevel;
     [SerializeField] private int _baitLevel;
     [SerializeField] private LureID _lureAttractionType;
+    public float Weight => _weight;
+    public float Length => _length;
     public uint Value => _value;
     public LureID LureAttractionType => _lureAttractionType;
     public float BaitAttractionRadius => _baitAttractionRadius;

@@ -1,0 +1,19 @@
+{
+    "name": "DonutPackage.Generator.Editor",
+    "rootNamespace": "DonutPackage.Generator.Editor",
+    "references": [
+        "DonutPackage.Utils",
+        "DonutPackage.Generator"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

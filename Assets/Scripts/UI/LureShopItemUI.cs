@@ -50,11 +50,8 @@ public class LureShopItemUI : MonoBehaviour
         bool success = await Inventory.Instance.BuyLure(_lure);
         if (success)
         {
-            // FIX: The method was renamed to PopulateShopPanel in UIManager.
-            // We also need to refresh the inventory panel.
-            UIManager.Instance.PopulateShopPanel();
-            UIManager.Instance.PopulateInventoryPanel();
-        }
+            // The UI will be updated automatically via events from the Inventory.
+        } 
         else
         {
             _buyButton.interactable = true; // Re-enable if purchase failed
@@ -68,9 +65,7 @@ public class LureShopItemUI : MonoBehaviour
         bool success = await Inventory.Instance.EquipLure(_lure.HashedID);
         if (success)
         {
-            // FIX: We also call the correct method here.
-            // We only need to refresh the inventory when equipping.
-            UIManager.Instance.PopulateInventoryPanel();
+            // The UI will be updated automatically via events from the Inventory.
         }
     }
 }

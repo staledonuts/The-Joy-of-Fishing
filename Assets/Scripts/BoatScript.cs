@@ -1,4 +1,5 @@
 using System;
+using DonutPackage.EventBus;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks; 
@@ -55,7 +56,7 @@ public class BoatScript : MonoBehaviour
     {
         if (context.performed)
         {
-            UIManager.Instance.CallShop();
+            EventBus.Publish(new ToggleShopEvent());
         }
     }
 
@@ -70,7 +71,7 @@ public class BoatScript : MonoBehaviour
     {
         if(context.performed)
         {
-            GameManager.Instance.Pause();
+            EventBus.Publish(new PauseGameEvent());
         }
     }
 
@@ -78,7 +79,7 @@ public class BoatScript : MonoBehaviour
     {
         if(Inventory.Instance.playerData.RadioControlLure)
         {
-            CustomRopeSolver.Instance.ApplyMovementToLastNode(hookInput * forcetoAdd * Time.deltaTime);
+            CustomRopeSolver.Instance.ApplyMovementToHook(hookInput * forcetoAdd * Time.deltaTime);
         }
     }
     public void ReelRope()
@@ -99,15 +100,14 @@ public class BoatScript : MonoBehaviour
             }
             else if (leftTrigger > Mathf.Epsilon)
             {
-                // Add .Forget() here as well
-                CustomRopeSolver.Instance.ReelIn(leftTrigger).Forget();
+                CustomRopeSolver.Instance.ReelIn(leftTrigger);
             }   
         }
     }
 
     public void OnCastOut()
     {
-        GameManager.Instance.Hook = CustomRopeSolver.Instance.GetHook();
+        GameManager.Instance.HookTransform = CustomRopeSolver.Instance.GetHook();
         GameManager.Instance.CameraSwitcher(CameraModes.Hook);
     }
 }

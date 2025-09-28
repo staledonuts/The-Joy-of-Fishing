@@ -1,3 +1,4 @@
+using DonutPackage.EventBus;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -56,8 +57,7 @@ public sealed class CustomRopeSolver : MonoBehaviour
     private List<RopeNode> nodes = new List<RopeNode>();
     private Transform hook; 
 
-    private LureType _lure;
-    private Rigidbody2D hookRb; 
+    private LureType _lure; 
     
     private float _worldGravity = -9.81f; 
 
@@ -72,6 +72,8 @@ public sealed class CustomRopeSolver : MonoBehaviour
     // For hook interpolation
     private Vector2 hookPhysicsTargetPosition;
     private Vector2 hookVisualPosition;
+    private Vector2 prevHookPhysicsTargetPosition;
+    private Vector2 _hookExternalForce;
     private Quaternion hookVisualRotation;
 
 
@@ -140,18 +142,12 @@ public sealed class CustomRopeSolver : MonoBehaviour
 
 
         hookPhysicsTargetPosition = nodes.Count > 0 ? nodes[nodes.Count - 1].position + Vector2.down * segmentLength : startPos + Vector2.down * segmentLength;
+        prevHookPhysicsTargetPosition = hookPhysicsTargetPosition;
         hookVisualPosition = hookPhysicsTargetPosition;
 
 
         GameObject hookObj = Instantiate(hookPrefab, hookVisualPosition, Quaternion.identity, transform);
         _lure = hookObj.GetComponent<LureType>();
-        hookRb = hookObj.GetComponent<Rigidbody2D>();
-        if (hookRb == null)
-        {
-            Debug.LogError("Hook prefab must have a Rigidbody2D component!", hookObj);
-            hookRb = hookObj.AddComponent<Rigidbody2D>(); 
-        }
-        hookRb.bodyType = RigidbodyType2D.Kinematic; 
         hook = hookObj.transform;
         hookVisualRotation = hook.rotation; 
     }
@@ -173,13 +169,28 @@ public sealed class CustomRopeSolver : MonoBehaviour
         }
 
         Simulate(Time.fixedDeltaTime);
+        SimulateHook(Time.fixedDeltaTime);
         SolveConstraints();
-        CorrectCollisionsAfterConstraints(); 
-        
-        UpdateHookPhysicsTargetPosition();
+        CorrectCollisionsAfterConstraints();
     }
 
-    void Update() 
+    private void SimulateHook(float dt)
+    {
+        if (hook == null) return;
+
+        // Verlet Integration for the hook
+        Vector2 velocity = hookPhysicsTargetPosition - prevHookPhysicsTargetPosition;
+        prevHookPhysicsTargetPosition = hookPhysicsTargetPosition;
+
+        // Apply gravity and external forces from user input
+        Vector2 acceleration = (Vector2.up * _worldGravity * gravityScale) + _hookExternalForce;
+        hookPhysicsTargetPosition += velocity + acceleration * (dt * dt);
+
+        // Reset external force after applying it for this frame
+        _hookExternalForce = Vector2.zero;
+    }
+    
+    private void Update() 
     {
         if (rodTip == null || hook == null) return;
         if (nodes.Count == 0) return;
@@ -344,6 +355,29 @@ public sealed class CustomRopeSolver : MonoBehaviour
                 nodeB.position -= correction;
                 nodes[i + 1] = nodeB;
             }
+
+            // Last node to hook constraint
+            if (nodes.Count > 0)
+            {
+                RopeNode lastNode = nodes[nodes.Count - 1];
+                Vector2 delta = hookPhysicsTargetPosition - lastNode.position;
+                float currentDistance = delta.magnitude;
+                float error = 0f;
+
+                if (currentDistance > 0.0001f)
+                    error = (currentDistance - segmentLength) / currentDistance;
+                else
+                    error = (currentDistance - segmentLength) / (segmentLength + 0.0001f);
+
+                Vector2 correction = delta * 0.5f * error;
+
+                if (nodes.Count > 1) // Don't move the root node
+                {
+                    lastNode.position += correction;
+                    nodes[nodes.Count - 1] = lastNode;
+                }
+                hookPhysicsTargetPosition -= correction;
+            }
         }
     }
 
@@ -367,46 +401,34 @@ public sealed class CustomRopeSolver : MonoBehaviour
                         directionFromCollider = Vector2.up; 
                     }
                 }
-                n.position = closestPointOnCollider + directionFromCollider * (nodeRadius + 0.001f); 
+                Vector2 newPos = closestPointOnCollider + directionFromCollider * (nodeRadius + 0.001f);
+                Vector2 correction = newPos - n.position;
+                n.position += correction;
+                n.prevPosition += correction; // Fix jitter
                 nodes[i] = n; 
             }
         }
-    }
-    
-    private void UpdateHookPhysicsTargetPosition() 
-    {
-        if (nodes.Count > 0) // Check if there's at least the rodTip node
-        {
-            RopeNode lastPhysicsNode = nodes[nodes.Count - 1]; 
-            Vector2 directionFromPreviousPhysicsNode;
 
-            if (nodes.Count > 1) // If there's an actual segment before the last node
-            {
-                RopeNode secondLastPhysicsNode = nodes[nodes.Count - 2];
-                if (Vector2.SqrMagnitude(lastPhysicsNode.position - secondLastPhysicsNode.position) > 0.00001f)
-                {
-                    directionFromPreviousPhysicsNode = (lastPhysicsNode.position - secondLastPhysicsNode.position).normalized;
-                }
-                else 
-                {
-                    // Fallback: direction from rodTip to last node if secondLast and last are coincident
-                    directionFromPreviousPhysicsNode = (lastPhysicsNode.position - nodes[0].position).normalized; 
-                    if (directionFromPreviousPhysicsNode == Vector2.zero) 
-                    {
-                        directionFromPreviousPhysicsNode = Vector2.down; // Absolute fallback
-                    }
-                }
-            }
-            else // Only one node (nodes[0], the rodTip anchor), hook hangs directly below it
-            {
-                directionFromPreviousPhysicsNode = Vector2.down; 
-            }
-            
-            hookPhysicsTargetPosition = lastPhysicsNode.position + directionFromPreviousPhysicsNode * segmentLength;
-        }
-        else if (rodTip != null) // Should not be reached if Start() guarantees nodes[0]
+        // Correct hook collision
+        if (hook != null)
         {
-            hookPhysicsTargetPosition = rodTip.position;
+            Collider2D hit = Physics2D.OverlapCircle(hookPhysicsTargetPosition, nodeRadius, obstacleMask);
+            if (hit != null)
+            {
+                Vector2 closestPointOnCollider = hit.ClosestPoint(hookPhysicsTargetPosition);
+                Vector2 directionFromCollider = (hookPhysicsTargetPosition - closestPointOnCollider).normalized;
+                if (directionFromCollider.sqrMagnitude < 0.0001f)
+                {
+                    directionFromCollider = (hookPhysicsTargetPosition - (Vector2)hit.bounds.center).normalized;
+                    if (directionFromCollider.sqrMagnitude < 0.0001f)
+                        directionFromCollider = Vector2.up;
+                }
+                Vector2 newPos = closestPointOnCollider + directionFromCollider * (nodeRadius + 0.001f);
+                Vector2 correction = newPos - hookPhysicsTargetPosition;
+
+                hookPhysicsTargetPosition += correction;
+                prevHookPhysicsTargetPosition += correction; // Fix jitter
+            }
         }
     }
 
@@ -435,7 +457,7 @@ public sealed class CustomRopeSolver : MonoBehaviour
         ropeLine.SetPosition(nodes.Count, hookVisualPosition); 
     }
 
-    public async UniTask ReelIn(float inputAmount)
+    public void ReelIn(float inputAmount)
     {
         // Don't start a new ReelIn if a reel action is already in progress
         if (_isBusy) return;
@@ -458,7 +480,7 @@ public sealed class CustomRopeSolver : MonoBehaviour
             }
             else
             {
-                await TryCatchFish();
+                TryCatchFish();
             }
         }
         finally
@@ -525,28 +547,20 @@ public sealed class CustomRopeSolver : MonoBehaviour
     public LureType GetLure() => _lure;
 
     
-    public async UniTask TryCatchFish() // Changed to async UniTask
+    public void TryCatchFish()
     {
         FishStats caughtFish = _lure.GetCurrentCatch();
         if (caughtFish != null)
         {
-            // Now we properly await the async operation
-            await Inventory.Instance.AddCaughtFish(caughtFish);
+            EventBus.Publish(new FishCaughtEvent { Fish = caughtFish });
             
             _lure.DestroyCatch();
         }
     }
 
-
-
-    public void ApplyMovementToLastNode(Vector2 displacementThisFrame)
+    public void ApplyMovementToHook(Vector2 displacementThisFrame)
     {
-        if (nodes.Count > 0) // Check if there's at least the rodTip node
-        {
-            // Apply movement to the actual last node in the list
-            RopeNode lastNode = nodes[nodes.Count - 1];
-            lastNode.position += displacementThisFrame; 
-            nodes[nodes.Count - 1] = lastNode;
-        }
+        // Accumulate force to be applied in the next physics step
+        _hookExternalForce += displacementThisFrame;
     }
 }

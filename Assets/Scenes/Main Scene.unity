@@ -2190,6 +2190,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &1978756992 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6475346120064133853, guid: c6a4dcf01b485c945a3ab0ded4a2f019, type: 3}
+  m_PrefabInstance: {fileID: 1987895001}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1987895001
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5133,12 +5138,9 @@ MonoBehaviour:
   vcamPlayer: {fileID: 364856038686349179}
   vcamShop: {fileID: 702398552519205454}
   vcamHook: {fileID: 5451034409564594453}
-  pauseCanvas: {fileID: 1039891413}
-  callShopCanvas: {fileID: 1542002683}
-  ShoppeBoat: {fileID: 0}
-  Player: {fileID: 0}
-  Hook: {fileID: 0}
-  CMcamOrthoSize: 0
+  playerTransform: {fileID: 2018631586}
+  shoppeBoatTransform: {fileID: 1978756992}
+  m_HookTransform: {fileID: 0}
 --- !u!1 &4962793760742474808
 GameObject:
   m_ObjectHideFlags: 0
@@ -6024,6 +6026,7 @@ MonoBehaviour:
     ID: 805306370
     _sourceAsset: {fileID: 11400000, guid: 5a7213c6d14a39d8e8d26238653b996b, type: 2}
     <DebugObject>k__BackingField: {fileID: 145529384407560158}
+  _shopRadioSource: {fileID: 1978756992}
 --- !u!224 &7004141136621377878
 RectTransform:
   m_ObjectHideFlags: 0

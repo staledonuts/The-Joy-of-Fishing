@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Ami.BroAudio; 
+using DonutPackage.EventBus;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
@@ -29,33 +30,67 @@ public sealed class Inventory : MonoBehaviour
 
     [Header("Configuration")]
     public List<Lure> allAvailableLures = new List<Lure>();
-    //[SerializeField] private FishRanking[] fishRanking;
+    private readonly Dictionary<uint, Lure> _lureLookupByHashedID = new Dictionary<uint, Lure>();
+    private readonly Dictionary<string, Lure> _lureLookupByStringID = new Dictionary<string, Lure>();
 
-    public static event Action OnInventoryChanged;
-    public static event Action OnMoneyChanged;
-    public static event Action OnEquipmentChanged;
-
-    // `Awake` becomes `async void` to allow for awaiting the load operation.
-    // This is a primary entry point for async logic in Unity's lifecycle.
     private async void Awake()
     {
         if (instance == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // Populate the lookup dictionaries for fast access
+            foreach (var lure in allAvailableLures)
+            {
+                if (lure != null && !string.IsNullOrEmpty(lure.LureID))
+                {
+                    if(!_lureLookupByHashedID.ContainsKey(lure.HashedID)) _lureLookupByHashedID.Add(lure.HashedID, lure);
+                    if(!_lureLookupByStringID.ContainsKey(lure.LureID)) _lureLookupByStringID.Add(lure.LureID, lure);
+                }
+                else
+                {
+                    Debug.LogWarning($"A lure in 'allAvailableLures' is null or has an empty LureID.", this);
+                }
+            }
             
             // Await the asynchronous loading of data
             playerData = await SaveLoadManager.Instance.LoadDataAsync();
             
             // After data is loaded, notify all listeners to update UI etc.
-            OnMoneyChanged?.Invoke();
-            OnEquipmentChanged?.Invoke();
-            OnInventoryChanged?.Invoke();
+            EventBus.Publish(new MoneyChangedEvent());
+            EventBus.Publish(new EquipmentChangedEvent());
+            EventBus.Publish(new InventoryChangedEvent());
         }
         else if (instance != this)
         {
             Destroy(gameObject);
         }
+    }
+
+    private void OnEnable()
+    {
+        EventBus.Subscribe<FishCaughtEvent>(HandleFishCaught);
+    }
+
+    private void OnDisable()
+    {
+        EventBus.Unsubscribe<FishCaughtEvent>(HandleFishCaught);
+    }
+
+    private void HandleFishCaught(FishCaughtEvent e)
+    {
+        if (e.Fish == null) return;
+
+        // TODO: Add logic for fish size and weight randomization if needed
+        var fishData = new CaughtFishData(e.Fish.FishName, e.Fish.Length, e.Fish.Weight, e.Fish.Value);
+        playerData.CaughtFishes.Add(fishData);
+        
+        // Optionally, play feedback
+        PlayFishCatchFeedback(e.Fish.transform);
+
+        EventBus.Publish(new InventoryChangedEvent());
+        SaveAsync().Forget();
     }
     
     // --- Public Properties (unchanged) ---
@@ -65,18 +100,10 @@ public sealed class Inventory : MonoBehaviour
 
     // --- Data Modification Methods ---
 
-    public async UniTask AddCaughtFish(FishStats fishCaught)
-    {
-        // ... (logic for adding fish is the same)
-        
-        OnInventoryChanged?.Invoke();
-        await SaveAsync(); // Await the save operation
-    }
-
     public async UniTask AddMoney(uint amount)
     {
         playerData.Money += amount;
-        OnMoneyChanged?.Invoke();
+        EventBus.Publish(new MoneyChangedEvent());
         await SaveAsync();
     }
 
@@ -85,7 +112,7 @@ public sealed class Inventory : MonoBehaviour
         if (playerData.Money < amount) return false;
         
         playerData.Money -= amount;
-        OnMoneyChanged?.Invoke();
+        EventBus.Publish(new MoneyChangedEvent());
         await SaveAsync();
         return true;
     }
@@ -96,7 +123,7 @@ public sealed class Inventory : MonoBehaviour
         {
             // `AddMoney` is now async, so we await it.
             await AddMoney(fishToSell.value);
-            OnInventoryChanged?.Invoke();
+            EventBus.Publish(new InventoryChangedEvent());
         }
     }
 
@@ -106,7 +133,7 @@ public sealed class Inventory : MonoBehaviour
         if (!await SpendMoney(cost)) return false;
         
         playerData.CurrentMaxLineLength = newLength;
-        OnEquipmentChanged?.Invoke();
+        EventBus.Publish(new EquipmentChangedEvent());
         // `SpendMoney` already saves, so no need to save again here.
         return true;
     }
@@ -117,7 +144,7 @@ public sealed class Inventory : MonoBehaviour
         if (!await SpendMoney(lureToBuy.Cost)) return false;
 
         playerData.OwnedLureIDs.Add(lureToBuy.HashedID);
-        OnEquipmentChanged?.Invoke();
+        EventBus.Publish(new EquipmentChangedEvent());
         return true;
     }
 
@@ -154,8 +181,8 @@ public sealed class Inventory : MonoBehaviour
         }
         
         // Invoke events to notify UI
-        OnEquipmentChanged?.Invoke();
-        OnInventoryChanged?.Invoke();
+        EventBus.Publish(new EquipmentChangedEvent());
+        EventBus.Publish(new InventoryChangedEvent());
         
         // Await the asynchronous save operation
         await SaveAsync();
@@ -166,7 +193,8 @@ public sealed class Inventory : MonoBehaviour
     public Lure GetLureByHashedID(uint hashedLureID)
     {
         if (hashedLureID == 0) return null; // Assuming 0 is not a valid hashed ID
-        return allAvailableLures.Find(lure => lure.HashedID == hashedLureID);
+        _lureLookupByHashedID.TryGetValue(hashedLureID, out Lure lure);
+        return lure;
     }
     
     public Lure GetEquippedLure()
@@ -178,8 +206,7 @@ public sealed class Inventory : MonoBehaviour
     // Overload to equip by string ID
     public async UniTask<bool> EquipLureByStringID(string stringLureID)
     {
-        Lure lureToEquip = allAvailableLures.Find(l => l.LureID == stringLureID);
-        if (lureToEquip == null)
+        if (!_lureLookupByStringID.TryGetValue(stringLureID, out Lure lureToEquip))
         {
             Debug.LogError($"Lure with string ID '{stringLureID}' not found for equipping.");
             return false;

@@ -1,3 +1,4 @@
+using DonutPackage.EventBus;
 using UnityEngine;
 using Unity.Cinemachine;
 
@@ -27,14 +28,21 @@ public sealed class GameManager : MonoBehaviour
     [SerializeField] private CinemachineVirtualCameraBase vcamShop;
     [SerializeField] private CinemachineVirtualCameraBase vcamHook;
 
+    [Header("Camera Targets")]
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform shoppeBoatTransform;
+    [SerializeField] private Transform m_HookTransform;
+
     private const int ACTIVE_VCAM_PRIORITY = 10;
     private const int INACTIVE_VCAM_PRIORITY = 0;
     
-    [Header("UI Control Center")]
-    [SerializeField] private GameObject pauseCanvas;
-    [SerializeField] private GameObject callShopCanvas;
-    [HideInInspector] public Transform ShoppeBoat, Player, Hook;
-    [HideInInspector] public float CMcamOrthoSize;
+    private bool _isPaused = false;
+
+    public Transform HookTransform
+    {
+        get => m_HookTransform;
+        set => m_HookTransform = value;
+    }
 
     private void Awake()
     {
@@ -50,35 +58,48 @@ public sealed class GameManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        EventBus.Subscribe<PauseGameEvent>(HandlePauseGame);
+        EventBus.Subscribe<ShopStateChangedEvent>(HandleShopStateChanged);
+    }
+
+    private void OnDisable()
+    {
+        EventBus.Unsubscribe<PauseGameEvent>(HandlePauseGame);
+        EventBus.Unsubscribe<ShopStateChangedEvent>(HandleShopStateChanged);
+    }
+
+    private void HandleShopStateChanged(ShopStateChangedEvent e)
+    {
+        CameraSwitcher(e.IsShopOpen ? CameraModes.Shop : CameraModes.Hook);
+    }
+
     void Start()
     {
-        GameObject shoppeBoatObj = GameObject.Find("ShoppeBoat");
-        if (shoppeBoatObj != null) 
+        // Assign camera targets if they are set
+        if (shoppeBoatTransform != null && vcamShop != null) 
         {
-            ShoppeBoat = shoppeBoatObj.transform;
-            vcamShop.Follow = ShoppeBoat;
-            vcamShop.LookAt = ShoppeBoat;
+            vcamShop.Follow = shoppeBoatTransform;
+            vcamShop.LookAt = shoppeBoatTransform;
         }
-        else Debug.LogError("ShoppeBoat GameObject not found!");
+        else Debug.LogError("ShoppeBoat Transform or vcamShop is not assigned in GameManager!");
 
-        GameObject playerObj = GameObject.Find("Player");
-        if (playerObj != null) 
+        if (playerTransform != null && vcamPlayer != null) 
         {
-            Player = playerObj.transform;
-            vcamPlayer.Follow = Player;
-            vcamPlayer.LookAt = Player;
+            vcamPlayer.Follow = playerTransform;
+            vcamPlayer.LookAt = playerTransform;
         }
-        else Debug.LogError("Player GameObject not found!");
+        else Debug.LogError("Player Transform or vcamPlayer is not assigned in GameManager!");
         
-        GameObject hookObj = GameObject.Find("Hook");
-        if (hookObj != null) 
+        if (m_HookTransform != null && vcamHook != null) 
         {
-            Hook = hookObj.transform;
-            vcamHook.Follow = Hook;
-            vcamHook.LookAt = Hook;
+            vcamHook.Follow = m_HookTransform;
+            vcamHook.LookAt = m_HookTransform;
         }
+        // No error needed for hook, it might be assigned later. The CameraSwitcher handles this.
 
-        if (Player != null && vcamPlayer != null)
+        if (playerTransform != null && vcamPlayer != null)
         {
             CameraSwitcher(CameraModes.Player);
         }
@@ -87,8 +108,6 @@ public sealed class GameManager : MonoBehaviour
             Debug.LogError("Player Virtual Camera (vcamPlayer) is not assigned in GameManager!");
         }
     }
-
-    // Removed Update() as it was empty
 
     public void CameraSwitcher(CameraModes cameraMode)
     {
@@ -112,16 +131,16 @@ public sealed class GameManager : MonoBehaviour
             {
                 if (vcamHook != null)
                 {
-                    if (Hook == null)
+                    if (m_HookTransform == null)
                     {
                         GameObject hookObj = CustomRopeSolver.Instance.GetHook().gameObject;
-                        if (hookObj != null) Hook = hookObj.transform;
+                        if (hookObj != null) m_HookTransform = hookObj.transform;
                     }
 
-                    if (Hook != null)
+                    if (m_HookTransform != null)
                     {
-                        vcamHook.Follow = Hook; 
-                        vcamHook.LookAt = Hook;
+                        vcamHook.Follow = m_HookTransform; 
+                        vcamHook.LookAt = m_HookTransform;
                         vcamHook.Priority = ACTIVE_VCAM_PRIORITY;
                     }
                     else Debug.LogError("Hook Transform not found or assigned for vcamHook!");
@@ -146,24 +165,20 @@ public sealed class GameManager : MonoBehaviour
         }
     }        
     
+    private void HandlePauseGame(PauseGameEvent e)
+    {
+        Pause();
+    }
+    
     //============================ PauseScreen ============================
-    private bool _setPause;
     public void Pause()
     {
-        if (Time.timeScale == 1)
-        {
-            Time.timeScale = 0;
-            if(pauseCanvas != null) pauseCanvas.SetActive(true);
-            _setPause = true;
-        } 
-        else 
-        {
-            Time.timeScale = 1; 
-            if(pauseCanvas != null) pauseCanvas.SetActive(false);
-            _setPause = false; 
-        }
+        _isPaused = !_isPaused;
+        Time.timeScale = _isPaused ? 0f : 1f;
+        EventBus.Publish(new PauseStateChangedEvent { IsPaused = _isPaused });
     }
 }
+
 public enum CameraModes
 {
     Shop,
